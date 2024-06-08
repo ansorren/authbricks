@@ -1,6 +1,6 @@
-baseURL = 'https://authforge.id'
+baseURL = 'https://authbricks.com'
 languageCode = 'en-us'
-title = 'authforge.id'
+title = 'AuthBricks'
 
 # Code higlighting settings
 pygmentsCodefences            = true

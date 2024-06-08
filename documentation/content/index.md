@@ -1,10 +1,10 @@
 ---
 weight: 10
-title: "authforge"
+title: "AuthBricks"
 ---
 
 
-# authforge
+# AuthBricks
 
 Why this project?
 
