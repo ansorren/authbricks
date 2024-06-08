@@ -50,6 +50,7 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Install Node.js dependencies
         run: | 
+          cd documentation ; \
           [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
           sudo npm install -g postcss-cli
           sudo npm install -g npx --force
