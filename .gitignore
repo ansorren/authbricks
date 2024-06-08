@@ -1,0 +1,12 @@
+.DS_Store
+node_modules
+dist
+tmp
+
+# Hugo assets
+documentation/public/
+documentation/resources/_gen/
+
+hugo.exe
+hugo.linux
+hugo.darwin
