@@ -65,7 +65,6 @@ jobs:
           cd documentation ; \
           sudo hugo mod tidy ; \
           sudo hugo 
-            --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/" \
       - name: Upload artifact
