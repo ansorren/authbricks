@@ -52,9 +52,10 @@ jobs:
         run: | 
           cd documentation ; \
           [[ -f package-lock.json || -f npm-shrinkwrap.json ]] && npm ci || true
-          sudo npm install -g postcss-cli
-          sudo npm install -g npx --force
-          sudo npm install -g tailwindcss postcss autoprefixer
+          sudo npm install -D npx --force
+          sudo npm install -D autoprefixer
+          sudo npm install -D postcss
+          sudo npm install -D postcss-cli
       - name: Build with Hugo
         env:
           # For maximum backward compatibility with Hugo modules
