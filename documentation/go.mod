@@ -1,4 +1,4 @@
-module go.authbricks.com/documentation
+module go.authbricks.com/bricks/documentation
 
 go 1.21.0
 
