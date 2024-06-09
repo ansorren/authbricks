@@ -1,6 +1,6 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://authbricks.com/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'AuthBricks'
 
 [module]
   [[module.imports]]
