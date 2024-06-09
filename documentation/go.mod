@@ -1,4 +1,4 @@
-module github.com/ansorren/authbricks/documentation
+module go.authbricks.com/documentation
 
 go 1.21.0
 
