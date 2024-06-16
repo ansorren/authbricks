@@ -20,13 +20,12 @@ At the moment it implements the following RFCs (planning to get to full OIDC com
 
 
 
-# Get Started
+# Get Started 
 
 
 ## Postgres 
 
-The following example shows how to create a new Postgres database connection and start the API server.
-The server will then listen on port 8080. 
+Connect to a local postgres database, and start the API server on port 8080.
 
 ```go
 package main
@@ -58,7 +57,8 @@ func main() {
 
 
 ## MySQL
-The following example shows how to create a new MySQL database connection and start the API server.
+
+Connect to a local MySQL database, and start the API server on port 8080.
 
 ```go
 package main
@@ -86,7 +86,8 @@ func main() {
 ```
 
 ## SQLite
-The following example shows how to create a new SQLite database connection and start the API server.
+
+Connect to a SQLite database, and start the API server on port 8080.
 
 ```go
 package main 

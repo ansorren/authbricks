@@ -1,82 +1,67 @@
 ---
 weight: 11
-title: Kittens
+title: Services
 ---
 
-# Kittens
+# Define a new Service
 
-## Get All Kittens
+All the examples so far have simply started the API server on port 8080. The server does not actually have any endpoints yet. 
+In this section, we will define a new service. 
+
+In terms of OAuth / OIDC specifications, you can think of a `service` as your Authorization server.
+For example, if your business needs to authenticate both your customers and your employees, you could define 
+two different services called `customers` and `employees`
 
 ```go
-package main
+serviceConfig := service.Config{
+	Name: "customers",
+	Scopes: []string{"read", "write"}, 
+	GrantTypes: []string{"authorization_code"},
+	ResponseTypes: []string{"code"},
+}
 
-import "github.com/bep/kittn/auth"
 
-func main() {
-	api := auth.Authorize("meowmeowmeow")
-
-	_ = api.GetKittens()
+svc, err := db.CreateOrUpdateService(context.Background(), serviceConfig)
+if err != nil {
+    panic(err)
 }
 ```
 
-```ruby
-require 'kittn'
+# Define an Application
+Once you have defined a service, you can create a new application (also known as OAuth Client) for that service.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
+```go
+svc, err := db.GetService(context.Background(), "customers")
+if err != nil {
+    panic(err)
+}
+
+appConfig := application.Config{
+    Name: "myapp",
+    RedirectURIs: []string{"http://localhost:8080/callback"},
+    GrantTypes: []string{"authorization_code"},
+    ResponseTypes: []string{"code"},
+    Scopes: []string{"read", "write"},
+}
+
+app, err := svc.CreateOrUpdateApplication(context.Background(), appConfig)
+if err != nil {
+    panic(err)
+}
 ```
 
-```python
-import kittn
+# Credentials
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
+Once you have created an application, you can generate credentials for it.
+
+```go
+
+credentialsConfig := credentials.Config{
+    ClientID: "myapp",
+    ClientSecret: "mysecret",
+}
+creds, err := app.CreateCredentials(context.Background(), credentialsConfig)
+if err != nil {
+    panic(err)
+}
 ```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Optional | Description
---------- | ------- |----------| -----------
-include_cats | false | true     | If set to true, the result will also include cats.
-available | true | true     |  If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success" Remember — a happy kitten is an authenticated kitten! </aside>
