@@ -23,6 +23,6 @@ func (Credentials) Fields() []ent.Field {
 // Edges of the Credentials.
 func (Credentials) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("oauth_client", Application.Type).Ref("credentials").Unique(),
+		edge.From("application", Application.Type).Ref("credentials").Unique(),
 	}
 }

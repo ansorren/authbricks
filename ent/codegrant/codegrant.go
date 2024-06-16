@@ -16,17 +16,17 @@ const (
 	FieldScopes = "scopes"
 	// FieldCallbacks holds the string denoting the callbacks field in the database.
 	FieldCallbacks = "callbacks"
-	// EdgeClient holds the string denoting the client edge name in mutations.
-	EdgeClient = "client"
+	// EdgeApplication holds the string denoting the application edge name in mutations.
+	EdgeApplication = "application"
 	// Table holds the table name of the codegrant in the database.
 	Table = "code_grants"
-	// ClientTable is the table that holds the client relation/edge.
-	ClientTable = "code_grants"
-	// ClientInverseTable is the table name for the Application entity.
+	// ApplicationTable is the table that holds the application relation/edge.
+	ApplicationTable = "code_grants"
+	// ApplicationInverseTable is the table name for the Application entity.
 	// It exists in this package in order to avoid circular dependency with the "application" package.
-	ClientInverseTable = "applications"
-	// ClientColumn is the table column denoting the client relation/edge.
-	ClientColumn = "application_code_grants"
+	ApplicationInverseTable = "applications"
+	// ApplicationColumn is the table column denoting the application relation/edge.
+	ApplicationColumn = "application_code_grant"
 )
 
 // Columns holds all SQL columns for codegrant fields.
@@ -39,7 +39,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "code_grants"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"application_code_grants",
+	"application_code_grant",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -70,16 +70,16 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByClientField orders the results by client field.
-func ByClientField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByApplicationField orders the results by application field.
+func ByApplicationField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClientStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newApplicationStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newClientStep() *sqlgraph.Step {
+func newApplicationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClientInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, ClientTable, ClientColumn),
+		sqlgraph.To(ApplicationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, ApplicationTable, ApplicationColumn),
 	)
 }

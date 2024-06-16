@@ -32,10 +32,10 @@ type Application struct {
 
 // ApplicationEdges holds the relations/edges for other nodes in the graph.
 type ApplicationEdges struct {
-	// M2mGrants holds the value of the m2m_grants edge.
-	M2mGrants *M2MGrant `json:"m2m_grants,omitempty"`
-	// CodeGrants holds the value of the code_grants edge.
-	CodeGrants *CodeGrant `json:"code_grants,omitempty"`
+	// M2mGrant holds the value of the m2m_grant edge.
+	M2mGrant *M2MGrant `json:"m2m_grant,omitempty"`
+	// CodeGrant holds the value of the code_grant edge.
+	CodeGrant *CodeGrant `json:"code_grant,omitempty"`
 	// Credentials holds the value of the credentials edge.
 	Credentials []*Credentials `json:"credentials,omitempty"`
 	// Service holds the value of the service edge.
@@ -45,26 +45,26 @@ type ApplicationEdges struct {
 	loadedTypes [4]bool
 }
 
-// M2mGrantsOrErr returns the M2mGrants value or an error if the edge
+// M2mGrantOrErr returns the M2mGrant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ApplicationEdges) M2mGrantsOrErr() (*M2MGrant, error) {
-	if e.M2mGrants != nil {
-		return e.M2mGrants, nil
+func (e ApplicationEdges) M2mGrantOrErr() (*M2MGrant, error) {
+	if e.M2mGrant != nil {
+		return e.M2mGrant, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: m2mgrant.Label}
 	}
-	return nil, &NotLoadedError{edge: "m2m_grants"}
+	return nil, &NotLoadedError{edge: "m2m_grant"}
 }
 
-// CodeGrantsOrErr returns the CodeGrants value or an error if the edge
+// CodeGrantOrErr returns the CodeGrant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ApplicationEdges) CodeGrantsOrErr() (*CodeGrant, error) {
-	if e.CodeGrants != nil {
-		return e.CodeGrants, nil
+func (e ApplicationEdges) CodeGrantOrErr() (*CodeGrant, error) {
+	if e.CodeGrant != nil {
+		return e.CodeGrant, nil
 	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: codegrant.Label}
 	}
-	return nil, &NotLoadedError{edge: "code_grants"}
+	return nil, &NotLoadedError{edge: "code_grant"}
 }
 
 // CredentialsOrErr returns the Credentials value or an error if the edge
@@ -152,14 +152,14 @@ func (a *Application) Value(name string) (ent.Value, error) {
 	return a.selectValues.Get(name)
 }
 
-// QueryM2mGrants queries the "m2m_grants" edge of the Application entity.
-func (a *Application) QueryM2mGrants() *M2MGrantQuery {
-	return NewApplicationClient(a.config).QueryM2mGrants(a)
+// QueryM2mGrant queries the "m2m_grant" edge of the Application entity.
+func (a *Application) QueryM2mGrant() *M2MGrantQuery {
+	return NewApplicationClient(a.config).QueryM2mGrant(a)
 }
 
-// QueryCodeGrants queries the "code_grants" edge of the Application entity.
-func (a *Application) QueryCodeGrants() *CodeGrantQuery {
-	return NewApplicationClient(a.config).QueryCodeGrants(a)
+// QueryCodeGrant queries the "code_grant" edge of the Application entity.
+func (a *Application) QueryCodeGrant() *CodeGrantQuery {
+	return NewApplicationClient(a.config).QueryCodeGrant(a)
 }
 
 // QueryCredentials queries the "credentials" edge of the Application entity.

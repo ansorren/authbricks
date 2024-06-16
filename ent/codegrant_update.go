@@ -53,23 +53,23 @@ func (cgu *CodeGrantUpdate) AppendCallbacks(s []string) *CodeGrantUpdate {
 	return cgu
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (cgu *CodeGrantUpdate) SetClientID(id string) *CodeGrantUpdate {
-	cgu.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cgu *CodeGrantUpdate) SetApplicationID(id string) *CodeGrantUpdate {
+	cgu.mutation.SetApplicationID(id)
 	return cgu
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (cgu *CodeGrantUpdate) SetNillableClientID(id *string) *CodeGrantUpdate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cgu *CodeGrantUpdate) SetNillableApplicationID(id *string) *CodeGrantUpdate {
 	if id != nil {
-		cgu = cgu.SetClientID(*id)
+		cgu = cgu.SetApplicationID(*id)
 	}
 	return cgu
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (cgu *CodeGrantUpdate) SetClient(a *Application) *CodeGrantUpdate {
-	return cgu.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cgu *CodeGrantUpdate) SetApplication(a *Application) *CodeGrantUpdate {
+	return cgu.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -77,9 +77,9 @@ func (cgu *CodeGrantUpdate) Mutation() *CodeGrantMutation {
 	return cgu.mutation
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (cgu *CodeGrantUpdate) ClearClient() *CodeGrantUpdate {
-	cgu.mutation.ClearClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (cgu *CodeGrantUpdate) ClearApplication() *CodeGrantUpdate {
+	cgu.mutation.ClearApplication()
 	return cgu
 }
 
@@ -135,12 +135,12 @@ func (cgu *CodeGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, codegrant.FieldCallbacks, value)
 		})
 	}
-	if cgu.mutation.ClientCleared() {
+	if cgu.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   codegrant.ClientTable,
-			Columns: []string{codegrant.ClientColumn},
+			Table:   codegrant.ApplicationTable,
+			Columns: []string{codegrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -148,12 +148,12 @@ func (cgu *CodeGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cgu.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := cgu.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   codegrant.ClientTable,
-			Columns: []string{codegrant.ClientColumn},
+			Table:   codegrant.ApplicationTable,
+			Columns: []string{codegrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -208,23 +208,23 @@ func (cguo *CodeGrantUpdateOne) AppendCallbacks(s []string) *CodeGrantUpdateOne 
 	return cguo
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (cguo *CodeGrantUpdateOne) SetClientID(id string) *CodeGrantUpdateOne {
-	cguo.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cguo *CodeGrantUpdateOne) SetApplicationID(id string) *CodeGrantUpdateOne {
+	cguo.mutation.SetApplicationID(id)
 	return cguo
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (cguo *CodeGrantUpdateOne) SetNillableClientID(id *string) *CodeGrantUpdateOne {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cguo *CodeGrantUpdateOne) SetNillableApplicationID(id *string) *CodeGrantUpdateOne {
 	if id != nil {
-		cguo = cguo.SetClientID(*id)
+		cguo = cguo.SetApplicationID(*id)
 	}
 	return cguo
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (cguo *CodeGrantUpdateOne) SetClient(a *Application) *CodeGrantUpdateOne {
-	return cguo.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cguo *CodeGrantUpdateOne) SetApplication(a *Application) *CodeGrantUpdateOne {
+	return cguo.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -232,9 +232,9 @@ func (cguo *CodeGrantUpdateOne) Mutation() *CodeGrantMutation {
 	return cguo.mutation
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (cguo *CodeGrantUpdateOne) ClearClient() *CodeGrantUpdateOne {
-	cguo.mutation.ClearClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (cguo *CodeGrantUpdateOne) ClearApplication() *CodeGrantUpdateOne {
+	cguo.mutation.ClearApplication()
 	return cguo
 }
 
@@ -320,12 +320,12 @@ func (cguo *CodeGrantUpdateOne) sqlSave(ctx context.Context) (_node *CodeGrant, 
 			sqljson.Append(u, codegrant.FieldCallbacks, value)
 		})
 	}
-	if cguo.mutation.ClientCleared() {
+	if cguo.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   codegrant.ClientTable,
-			Columns: []string{codegrant.ClientColumn},
+			Table:   codegrant.ApplicationTable,
+			Columns: []string{codegrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -333,12 +333,12 @@ func (cguo *CodeGrantUpdateOne) sqlSave(ctx context.Context) (_node *CodeGrant, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cguo.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := cguo.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   codegrant.ClientTable,
-			Columns: []string{codegrant.ClientColumn},
+			Table:   codegrant.ApplicationTable,
+			Columns: []string{codegrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),

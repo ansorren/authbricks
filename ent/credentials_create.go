@@ -38,23 +38,23 @@ func (cc *CredentialsCreate) SetID(s string) *CredentialsCreate {
 	return cc
 }
 
-// SetOauthClientID sets the "oauth_client" edge to the Application entity by ID.
-func (cc *CredentialsCreate) SetOauthClientID(id string) *CredentialsCreate {
-	cc.mutation.SetOauthClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cc *CredentialsCreate) SetApplicationID(id string) *CredentialsCreate {
+	cc.mutation.SetApplicationID(id)
 	return cc
 }
 
-// SetNillableOauthClientID sets the "oauth_client" edge to the Application entity by ID if the given value is not nil.
-func (cc *CredentialsCreate) SetNillableOauthClientID(id *string) *CredentialsCreate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cc *CredentialsCreate) SetNillableApplicationID(id *string) *CredentialsCreate {
 	if id != nil {
-		cc = cc.SetOauthClientID(*id)
+		cc = cc.SetApplicationID(*id)
 	}
 	return cc
 }
 
-// SetOauthClient sets the "oauth_client" edge to the Application entity.
-func (cc *CredentialsCreate) SetOauthClient(a *Application) *CredentialsCreate {
-	return cc.SetOauthClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cc *CredentialsCreate) SetApplication(a *Application) *CredentialsCreate {
+	return cc.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CredentialsMutation object of the builder.
@@ -150,12 +150,12 @@ func (cc *CredentialsCreate) createSpec() (*Credentials, *sqlgraph.CreateSpec) {
 		_spec.SetField(credentials.FieldClientSecret, field.TypeString, value)
 		_node.ClientSecret = value
 	}
-	if nodes := cc.mutation.OauthClientIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   credentials.OauthClientTable,
-			Columns: []string{credentials.OauthClientColumn},
+			Table:   credentials.ApplicationTable,
+			Columns: []string{credentials.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),

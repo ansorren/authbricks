@@ -203,21 +203,21 @@ func ClientSecretContainsFold(v string) predicate.Credentials {
 	return predicate.Credentials(sql.FieldContainsFold(FieldClientSecret, v))
 }
 
-// HasOauthClient applies the HasEdge predicate on the "oauth_client" edge.
-func HasOauthClient() predicate.Credentials {
+// HasApplication applies the HasEdge predicate on the "application" edge.
+func HasApplication() predicate.Credentials {
 	return predicate.Credentials(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, OauthClientTable, OauthClientColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ApplicationTable, ApplicationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOauthClientWith applies the HasEdge predicate on the "oauth_client" edge with a given conditions (other predicates).
-func HasOauthClientWith(preds ...predicate.Application) predicate.Credentials {
+// HasApplicationWith applies the HasEdge predicate on the "application" edge with a given conditions (other predicates).
+func HasApplicationWith(preds ...predicate.Application) predicate.Credentials {
 	return predicate.Credentials(func(s *sql.Selector) {
-		step := newOauthClientStep()
+		step := newApplicationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

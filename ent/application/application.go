@@ -16,30 +16,30 @@ const (
 	FieldName = "name"
 	// FieldPublic holds the string denoting the public field in the database.
 	FieldPublic = "public"
-	// EdgeM2mGrants holds the string denoting the m2m_grants edge name in mutations.
-	EdgeM2mGrants = "m2m_grants"
-	// EdgeCodeGrants holds the string denoting the code_grants edge name in mutations.
-	EdgeCodeGrants = "code_grants"
+	// EdgeM2mGrant holds the string denoting the m2m_grant edge name in mutations.
+	EdgeM2mGrant = "m2m_grant"
+	// EdgeCodeGrant holds the string denoting the code_grant edge name in mutations.
+	EdgeCodeGrant = "code_grant"
 	// EdgeCredentials holds the string denoting the credentials edge name in mutations.
 	EdgeCredentials = "credentials"
 	// EdgeService holds the string denoting the service edge name in mutations.
 	EdgeService = "service"
 	// Table holds the table name of the application in the database.
 	Table = "applications"
-	// M2mGrantsTable is the table that holds the m2m_grants relation/edge.
-	M2mGrantsTable = "m2m_grants"
-	// M2mGrantsInverseTable is the table name for the M2MGrant entity.
+	// M2mGrantTable is the table that holds the m2m_grant relation/edge.
+	M2mGrantTable = "m2m_grants"
+	// M2mGrantInverseTable is the table name for the M2MGrant entity.
 	// It exists in this package in order to avoid circular dependency with the "m2mgrant" package.
-	M2mGrantsInverseTable = "m2m_grants"
-	// M2mGrantsColumn is the table column denoting the m2m_grants relation/edge.
-	M2mGrantsColumn = "application_m2m_grants"
-	// CodeGrantsTable is the table that holds the code_grants relation/edge.
-	CodeGrantsTable = "code_grants"
-	// CodeGrantsInverseTable is the table name for the CodeGrant entity.
+	M2mGrantInverseTable = "m2m_grants"
+	// M2mGrantColumn is the table column denoting the m2m_grant relation/edge.
+	M2mGrantColumn = "application_m2m_grant"
+	// CodeGrantTable is the table that holds the code_grant relation/edge.
+	CodeGrantTable = "code_grants"
+	// CodeGrantInverseTable is the table name for the CodeGrant entity.
 	// It exists in this package in order to avoid circular dependency with the "codegrant" package.
-	CodeGrantsInverseTable = "code_grants"
-	// CodeGrantsColumn is the table column denoting the code_grants relation/edge.
-	CodeGrantsColumn = "application_code_grants"
+	CodeGrantInverseTable = "code_grants"
+	// CodeGrantColumn is the table column denoting the code_grant relation/edge.
+	CodeGrantColumn = "application_code_grant"
 	// CredentialsTable is the table that holds the credentials relation/edge.
 	CredentialsTable = "credentials"
 	// CredentialsInverseTable is the table name for the Credentials entity.
@@ -111,17 +111,17 @@ func ByPublic(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPublic, opts...).ToFunc()
 }
 
-// ByM2mGrantsField orders the results by m2m_grants field.
-func ByM2mGrantsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByM2mGrantField orders the results by m2m_grant field.
+func ByM2mGrantField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newM2mGrantsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newM2mGrantStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByCodeGrantsField orders the results by code_grants field.
-func ByCodeGrantsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByCodeGrantField orders the results by code_grant field.
+func ByCodeGrantField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCodeGrantsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newCodeGrantStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -145,18 +145,18 @@ func ByServiceField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newServiceStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newM2mGrantsStep() *sqlgraph.Step {
+func newM2mGrantStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(M2mGrantsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantsTable, M2mGrantsColumn),
+		sqlgraph.To(M2mGrantInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantTable, M2mGrantColumn),
 	)
 }
-func newCodeGrantsStep() *sqlgraph.Step {
+func newCodeGrantStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CodeGrantsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantsTable, CodeGrantsColumn),
+		sqlgraph.To(CodeGrantInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantTable, CodeGrantColumn),
 	)
 }
 func newCredentialsStep() *sqlgraph.Step {

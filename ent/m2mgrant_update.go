@@ -41,23 +41,23 @@ func (mgu *M2MGrantUpdate) AppendScopes(s []string) *M2MGrantUpdate {
 	return mgu
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (mgu *M2MGrantUpdate) SetClientID(id string) *M2MGrantUpdate {
-	mgu.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (mgu *M2MGrantUpdate) SetApplicationID(id string) *M2MGrantUpdate {
+	mgu.mutation.SetApplicationID(id)
 	return mgu
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (mgu *M2MGrantUpdate) SetNillableClientID(id *string) *M2MGrantUpdate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (mgu *M2MGrantUpdate) SetNillableApplicationID(id *string) *M2MGrantUpdate {
 	if id != nil {
-		mgu = mgu.SetClientID(*id)
+		mgu = mgu.SetApplicationID(*id)
 	}
 	return mgu
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (mgu *M2MGrantUpdate) SetClient(a *Application) *M2MGrantUpdate {
-	return mgu.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (mgu *M2MGrantUpdate) SetApplication(a *Application) *M2MGrantUpdate {
+	return mgu.SetApplicationID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -65,9 +65,9 @@ func (mgu *M2MGrantUpdate) Mutation() *M2MGrantMutation {
 	return mgu.mutation
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (mgu *M2MGrantUpdate) ClearClient() *M2MGrantUpdate {
-	mgu.mutation.ClearClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (mgu *M2MGrantUpdate) ClearApplication() *M2MGrantUpdate {
+	mgu.mutation.ClearApplication()
 	return mgu
 }
 
@@ -115,12 +115,12 @@ func (mgu *M2MGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, m2mgrant.FieldScopes, value)
 		})
 	}
-	if mgu.mutation.ClientCleared() {
+	if mgu.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   m2mgrant.ClientTable,
-			Columns: []string{m2mgrant.ClientColumn},
+			Table:   m2mgrant.ApplicationTable,
+			Columns: []string{m2mgrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -128,12 +128,12 @@ func (mgu *M2MGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mgu.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := mgu.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   m2mgrant.ClientTable,
-			Columns: []string{m2mgrant.ClientColumn},
+			Table:   m2mgrant.ApplicationTable,
+			Columns: []string{m2mgrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -176,23 +176,23 @@ func (mguo *M2MGrantUpdateOne) AppendScopes(s []string) *M2MGrantUpdateOne {
 	return mguo
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (mguo *M2MGrantUpdateOne) SetClientID(id string) *M2MGrantUpdateOne {
-	mguo.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (mguo *M2MGrantUpdateOne) SetApplicationID(id string) *M2MGrantUpdateOne {
+	mguo.mutation.SetApplicationID(id)
 	return mguo
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (mguo *M2MGrantUpdateOne) SetNillableClientID(id *string) *M2MGrantUpdateOne {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (mguo *M2MGrantUpdateOne) SetNillableApplicationID(id *string) *M2MGrantUpdateOne {
 	if id != nil {
-		mguo = mguo.SetClientID(*id)
+		mguo = mguo.SetApplicationID(*id)
 	}
 	return mguo
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (mguo *M2MGrantUpdateOne) SetClient(a *Application) *M2MGrantUpdateOne {
-	return mguo.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (mguo *M2MGrantUpdateOne) SetApplication(a *Application) *M2MGrantUpdateOne {
+	return mguo.SetApplicationID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -200,9 +200,9 @@ func (mguo *M2MGrantUpdateOne) Mutation() *M2MGrantMutation {
 	return mguo.mutation
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (mguo *M2MGrantUpdateOne) ClearClient() *M2MGrantUpdateOne {
-	mguo.mutation.ClearClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (mguo *M2MGrantUpdateOne) ClearApplication() *M2MGrantUpdateOne {
+	mguo.mutation.ClearApplication()
 	return mguo
 }
 
@@ -280,12 +280,12 @@ func (mguo *M2MGrantUpdateOne) sqlSave(ctx context.Context) (_node *M2MGrant, er
 			sqljson.Append(u, m2mgrant.FieldScopes, value)
 		})
 	}
-	if mguo.mutation.ClientCleared() {
+	if mguo.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   m2mgrant.ClientTable,
-			Columns: []string{m2mgrant.ClientColumn},
+			Table:   m2mgrant.ApplicationTable,
+			Columns: []string{m2mgrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -293,12 +293,12 @@ func (mguo *M2MGrantUpdateOne) sqlSave(ctx context.Context) (_node *M2MGrant, er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mguo.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := mguo.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   m2mgrant.ClientTable,
-			Columns: []string{m2mgrant.ClientColumn},
+			Table:   m2mgrant.ApplicationTable,
+			Columns: []string{m2mgrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),

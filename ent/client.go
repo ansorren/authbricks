@@ -437,15 +437,15 @@ func (c *ApplicationClient) GetX(ctx context.Context, id string) *Application {
 	return obj
 }
 
-// QueryM2mGrants queries the m2m_grants edge of a Application.
-func (c *ApplicationClient) QueryM2mGrants(a *Application) *M2MGrantQuery {
+// QueryM2mGrant queries the m2m_grant edge of a Application.
+func (c *ApplicationClient) QueryM2mGrant(a *Application) *M2MGrantQuery {
 	query := (&M2MGrantClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(application.Table, application.FieldID, id),
 			sqlgraph.To(m2mgrant.Table, m2mgrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.M2mGrantsTable, application.M2mGrantsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, application.M2mGrantTable, application.M2mGrantColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -453,15 +453,15 @@ func (c *ApplicationClient) QueryM2mGrants(a *Application) *M2MGrantQuery {
 	return query
 }
 
-// QueryCodeGrants queries the code_grants edge of a Application.
-func (c *ApplicationClient) QueryCodeGrants(a *Application) *CodeGrantQuery {
+// QueryCodeGrant queries the code_grant edge of a Application.
+func (c *ApplicationClient) QueryCodeGrant(a *Application) *CodeGrantQuery {
 	query := (&CodeGrantClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(application.Table, application.FieldID, id),
 			sqlgraph.To(codegrant.Table, codegrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.CodeGrantsTable, application.CodeGrantsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, application.CodeGrantTable, application.CodeGrantColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -916,15 +916,15 @@ func (c *CodeGrantClient) GetX(ctx context.Context, id string) *CodeGrant {
 	return obj
 }
 
-// QueryClient queries the client edge of a CodeGrant.
-func (c *CodeGrantClient) QueryClient(cg *CodeGrant) *ApplicationQuery {
+// QueryApplication queries the application edge of a CodeGrant.
+func (c *CodeGrantClient) QueryApplication(cg *CodeGrant) *ApplicationQuery {
 	query := (&ApplicationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cg.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codegrant.Table, codegrant.FieldID, id),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ClientTable, codegrant.ClientColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ApplicationTable, codegrant.ApplicationColumn),
 		)
 		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
 		return fromV, nil
@@ -1198,15 +1198,15 @@ func (c *CredentialsClient) GetX(ctx context.Context, id string) *Credentials {
 	return obj
 }
 
-// QueryOauthClient queries the oauth_client edge of a Credentials.
-func (c *CredentialsClient) QueryOauthClient(cr *Credentials) *ApplicationQuery {
+// QueryApplication queries the application edge of a Credentials.
+func (c *CredentialsClient) QueryApplication(cr *Credentials) *ApplicationQuery {
 	query := (&ApplicationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := cr.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(credentials.Table, credentials.FieldID, id),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, credentials.OauthClientTable, credentials.OauthClientColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, credentials.ApplicationTable, credentials.ApplicationColumn),
 		)
 		fromV = sqlgraph.Neighbors(cr.driver.Dialect(), step)
 		return fromV, nil
@@ -1512,15 +1512,15 @@ func (c *M2MGrantClient) GetX(ctx context.Context, id string) *M2MGrant {
 	return obj
 }
 
-// QueryClient queries the client edge of a M2MGrant.
-func (c *M2MGrantClient) QueryClient(mg *M2MGrant) *ApplicationQuery {
+// QueryApplication queries the application edge of a M2MGrant.
+func (c *M2MGrantClient) QueryApplication(mg *M2MGrant) *ApplicationQuery {
 	query := (&ApplicationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := mg.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(m2mgrant.Table, m2mgrant.FieldID, id),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ClientTable, m2mgrant.ClientColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ApplicationTable, m2mgrant.ApplicationColumn),
 		)
 		fromV = sqlgraph.Neighbors(mg.driver.Dialect(), step)
 		return fromV, nil

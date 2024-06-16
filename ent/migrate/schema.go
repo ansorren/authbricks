@@ -84,7 +84,7 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "scopes", Type: field.TypeJSON},
 		{Name: "callbacks", Type: field.TypeJSON},
-		{Name: "application_code_grants", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "application_code_grant", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// CodeGrantsTable holds the schema information for the "code_grants" table.
 	CodeGrantsTable = &schema.Table{
@@ -93,7 +93,7 @@ var (
 		PrimaryKey: []*schema.Column{CodeGrantsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "code_grants_applications_code_grants",
+				Symbol:     "code_grants_applications_code_grant",
 				Columns:    []*schema.Column{CodeGrantsColumns[3]},
 				RefColumns: []*schema.Column{ApplicationsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -156,7 +156,7 @@ var (
 	M2mGrantsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "scopes", Type: field.TypeJSON},
-		{Name: "application_m2m_grants", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "application_m2m_grant", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// M2mGrantsTable holds the schema information for the "m2m_grants" table.
 	M2mGrantsTable = &schema.Table{
@@ -165,7 +165,7 @@ var (
 		PrimaryKey: []*schema.Column{M2mGrantsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "m2m_grants_applications_m2m_grants",
+				Symbol:     "m2m_grants_applications_m2m_grant",
 				Columns:    []*schema.Column{M2mGrantsColumns[2]},
 				RefColumns: []*schema.Column{ApplicationsColumns[0]},
 				OnDelete:   schema.SetNull,

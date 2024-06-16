@@ -32,23 +32,23 @@ func (mgc *M2MGrantCreate) SetID(s string) *M2MGrantCreate {
 	return mgc
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (mgc *M2MGrantCreate) SetClientID(id string) *M2MGrantCreate {
-	mgc.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (mgc *M2MGrantCreate) SetApplicationID(id string) *M2MGrantCreate {
+	mgc.mutation.SetApplicationID(id)
 	return mgc
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (mgc *M2MGrantCreate) SetNillableClientID(id *string) *M2MGrantCreate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (mgc *M2MGrantCreate) SetNillableApplicationID(id *string) *M2MGrantCreate {
 	if id != nil {
-		mgc = mgc.SetClientID(*id)
+		mgc = mgc.SetApplicationID(*id)
 	}
 	return mgc
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (mgc *M2MGrantCreate) SetClient(a *Application) *M2MGrantCreate {
-	return mgc.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (mgc *M2MGrantCreate) SetApplication(a *Application) *M2MGrantCreate {
+	return mgc.SetApplicationID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -132,12 +132,12 @@ func (mgc *M2MGrantCreate) createSpec() (*M2MGrant, *sqlgraph.CreateSpec) {
 		_spec.SetField(m2mgrant.FieldScopes, field.TypeJSON, value)
 		_node.Scopes = value
 	}
-	if nodes := mgc.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := mgc.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   m2mgrant.ClientTable,
-			Columns: []string{m2mgrant.ClientColumn},
+			Table:   m2mgrant.ApplicationTable,
+			Columns: []string{m2mgrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -146,7 +146,7 @@ func (mgc *M2MGrantCreate) createSpec() (*M2MGrant, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.application_m2m_grants = &nodes[0]
+		_node.application_m2m_grant = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

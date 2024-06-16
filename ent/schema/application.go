@@ -23,8 +23,8 @@ func (Application) Fields() []ent.Field {
 // Edges of the Application.
 func (Application) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("m2m_grants", M2MGrant.Type).Unique(),
-		edge.To("code_grants", CodeGrant.Type).Unique(),
+		edge.To("m2m_grant", M2MGrant.Type).Unique(),
+		edge.To("code_grant", CodeGrant.Type).Unique(),
 		edge.To("credentials", Credentials.Type),
 		edge.From("service", Service.Type).Ref("applications").Unique(),
 	}

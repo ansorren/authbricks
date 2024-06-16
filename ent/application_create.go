@@ -49,42 +49,42 @@ func (ac *ApplicationCreate) SetID(s string) *ApplicationCreate {
 	return ac
 }
 
-// SetM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID.
-func (ac *ApplicationCreate) SetM2mGrantsID(id string) *ApplicationCreate {
-	ac.mutation.SetM2mGrantsID(id)
+// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
+func (ac *ApplicationCreate) SetM2mGrantID(id string) *ApplicationCreate {
+	ac.mutation.SetM2mGrantID(id)
 	return ac
 }
 
-// SetNillableM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableM2mGrantsID(id *string) *ApplicationCreate {
+// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
+func (ac *ApplicationCreate) SetNillableM2mGrantID(id *string) *ApplicationCreate {
 	if id != nil {
-		ac = ac.SetM2mGrantsID(*id)
+		ac = ac.SetM2mGrantID(*id)
 	}
 	return ac
 }
 
-// SetM2mGrants sets the "m2m_grants" edge to the M2MGrant entity.
-func (ac *ApplicationCreate) SetM2mGrants(m *M2MGrant) *ApplicationCreate {
-	return ac.SetM2mGrantsID(m.ID)
+// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
+func (ac *ApplicationCreate) SetM2mGrant(m *M2MGrant) *ApplicationCreate {
+	return ac.SetM2mGrantID(m.ID)
 }
 
-// SetCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID.
-func (ac *ApplicationCreate) SetCodeGrantsID(id string) *ApplicationCreate {
-	ac.mutation.SetCodeGrantsID(id)
+// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
+func (ac *ApplicationCreate) SetCodeGrantID(id string) *ApplicationCreate {
+	ac.mutation.SetCodeGrantID(id)
 	return ac
 }
 
-// SetNillableCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableCodeGrantsID(id *string) *ApplicationCreate {
+// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
+func (ac *ApplicationCreate) SetNillableCodeGrantID(id *string) *ApplicationCreate {
 	if id != nil {
-		ac = ac.SetCodeGrantsID(*id)
+		ac = ac.SetCodeGrantID(*id)
 	}
 	return ac
 }
 
-// SetCodeGrants sets the "code_grants" edge to the CodeGrant entity.
-func (ac *ApplicationCreate) SetCodeGrants(c *CodeGrant) *ApplicationCreate {
-	return ac.SetCodeGrantsID(c.ID)
+// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
+func (ac *ApplicationCreate) SetCodeGrant(c *CodeGrant) *ApplicationCreate {
+	return ac.SetCodeGrantID(c.ID)
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -223,12 +223,12 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
 		_node.Public = &value
 	}
-	if nodes := ac.mutation.M2mGrantsIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.M2mGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.M2mGrantsTable,
-			Columns: []string{application.M2mGrantsColumn},
+			Table:   application.M2mGrantTable,
+			Columns: []string{application.M2mGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
@@ -239,12 +239,12 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.CodeGrantsIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.CodeGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.CodeGrantsTable,
-			Columns: []string{application.CodeGrantsColumn},
+			Table:   application.CodeGrantTable,
+			Columns: []string{application.CodeGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),

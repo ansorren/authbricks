@@ -18,12 +18,12 @@ import (
 // M2MGrantQuery is the builder for querying M2MGrant entities.
 type M2MGrantQuery struct {
 	config
-	ctx        *QueryContext
-	order      []m2mgrant.OrderOption
-	inters     []Interceptor
-	predicates []predicate.M2MGrant
-	withClient *ApplicationQuery
-	withFKs    bool
+	ctx             *QueryContext
+	order           []m2mgrant.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.M2MGrant
+	withApplication *ApplicationQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +60,8 @@ func (mgq *M2MGrantQuery) Order(o ...m2mgrant.OrderOption) *M2MGrantQuery {
 	return mgq
 }
 
-// QueryClient chains the current query on the "client" edge.
-func (mgq *M2MGrantQuery) QueryClient() *ApplicationQuery {
+// QueryApplication chains the current query on the "application" edge.
+func (mgq *M2MGrantQuery) QueryApplication() *ApplicationQuery {
 	query := (&ApplicationClient{config: mgq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mgq.prepareQuery(ctx); err != nil {
@@ -74,7 +74,7 @@ func (mgq *M2MGrantQuery) QueryClient() *ApplicationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(m2mgrant.Table, m2mgrant.FieldID, selector),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ClientTable, m2mgrant.ClientColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ApplicationTable, m2mgrant.ApplicationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mgq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,26 +269,26 @@ func (mgq *M2MGrantQuery) Clone() *M2MGrantQuery {
 		return nil
 	}
 	return &M2MGrantQuery{
-		config:     mgq.config,
-		ctx:        mgq.ctx.Clone(),
-		order:      append([]m2mgrant.OrderOption{}, mgq.order...),
-		inters:     append([]Interceptor{}, mgq.inters...),
-		predicates: append([]predicate.M2MGrant{}, mgq.predicates...),
-		withClient: mgq.withClient.Clone(),
+		config:          mgq.config,
+		ctx:             mgq.ctx.Clone(),
+		order:           append([]m2mgrant.OrderOption{}, mgq.order...),
+		inters:          append([]Interceptor{}, mgq.inters...),
+		predicates:      append([]predicate.M2MGrant{}, mgq.predicates...),
+		withApplication: mgq.withApplication.Clone(),
 		// clone intermediate query.
 		sql:  mgq.sql.Clone(),
 		path: mgq.path,
 	}
 }
 
-// WithClient tells the query-builder to eager-load the nodes that are connected to
-// the "client" edge. The optional arguments are used to configure the query builder of the edge.
-func (mgq *M2MGrantQuery) WithClient(opts ...func(*ApplicationQuery)) *M2MGrantQuery {
+// WithApplication tells the query-builder to eager-load the nodes that are connected to
+// the "application" edge. The optional arguments are used to configure the query builder of the edge.
+func (mgq *M2MGrantQuery) WithApplication(opts ...func(*ApplicationQuery)) *M2MGrantQuery {
 	query := (&ApplicationClient{config: mgq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mgq.withClient = query
+	mgq.withApplication = query
 	return mgq
 }
 
@@ -372,10 +372,10 @@ func (mgq *M2MGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*M2
 		withFKs     = mgq.withFKs
 		_spec       = mgq.querySpec()
 		loadedTypes = [1]bool{
-			mgq.withClient != nil,
+			mgq.withApplication != nil,
 		}
 	)
-	if mgq.withClient != nil {
+	if mgq.withApplication != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -399,23 +399,23 @@ func (mgq *M2MGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*M2
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mgq.withClient; query != nil {
-		if err := mgq.loadClient(ctx, query, nodes, nil,
-			func(n *M2MGrant, e *Application) { n.Edges.Client = e }); err != nil {
+	if query := mgq.withApplication; query != nil {
+		if err := mgq.loadApplication(ctx, query, nodes, nil,
+			func(n *M2MGrant, e *Application) { n.Edges.Application = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *ApplicationQuery, nodes []*M2MGrant, init func(*M2MGrant), assign func(*M2MGrant, *Application)) error {
+func (mgq *M2MGrantQuery) loadApplication(ctx context.Context, query *ApplicationQuery, nodes []*M2MGrant, init func(*M2MGrant), assign func(*M2MGrant, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*M2MGrant)
 	for i := range nodes {
-		if nodes[i].application_m2m_grants == nil {
+		if nodes[i].application_m2m_grant == nil {
 			continue
 		}
-		fk := *nodes[i].application_m2m_grants
+		fk := *nodes[i].application_m2m_grant
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -432,7 +432,7 @@ func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *ApplicationQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "application_m2m_grants" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "application_m2m_grant" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -63,21 +63,21 @@ func IDContainsFold(id string) predicate.M2MGrant {
 	return predicate.M2MGrant(sql.FieldContainsFold(FieldID, id))
 }
 
-// HasClient applies the HasEdge predicate on the "client" edge.
-func HasClient() predicate.M2MGrant {
+// HasApplication applies the HasEdge predicate on the "application" edge.
+func HasApplication() predicate.M2MGrant {
 	return predicate.M2MGrant(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, ClientTable, ClientColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, ApplicationTable, ApplicationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClientWith applies the HasEdge predicate on the "client" edge with a given conditions (other predicates).
-func HasClientWith(preds ...predicate.Application) predicate.M2MGrant {
+// HasApplicationWith applies the HasEdge predicate on the "application" edge with a given conditions (other predicates).
+func HasApplicationWith(preds ...predicate.Application) predicate.M2MGrant {
 	return predicate.M2MGrant(func(s *sql.Selector) {
-		step := newClientStep()
+		step := newApplicationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

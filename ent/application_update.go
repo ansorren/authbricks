@@ -59,42 +59,42 @@ func (au *ApplicationUpdate) SetNillablePublic(b *bool) *ApplicationUpdate {
 	return au
 }
 
-// SetM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID.
-func (au *ApplicationUpdate) SetM2mGrantsID(id string) *ApplicationUpdate {
-	au.mutation.SetM2mGrantsID(id)
+// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
+func (au *ApplicationUpdate) SetM2mGrantID(id string) *ApplicationUpdate {
+	au.mutation.SetM2mGrantID(id)
 	return au
 }
 
-// SetNillableM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID if the given value is not nil.
-func (au *ApplicationUpdate) SetNillableM2mGrantsID(id *string) *ApplicationUpdate {
+// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableM2mGrantID(id *string) *ApplicationUpdate {
 	if id != nil {
-		au = au.SetM2mGrantsID(*id)
+		au = au.SetM2mGrantID(*id)
 	}
 	return au
 }
 
-// SetM2mGrants sets the "m2m_grants" edge to the M2MGrant entity.
-func (au *ApplicationUpdate) SetM2mGrants(m *M2MGrant) *ApplicationUpdate {
-	return au.SetM2mGrantsID(m.ID)
+// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
+func (au *ApplicationUpdate) SetM2mGrant(m *M2MGrant) *ApplicationUpdate {
+	return au.SetM2mGrantID(m.ID)
 }
 
-// SetCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID.
-func (au *ApplicationUpdate) SetCodeGrantsID(id string) *ApplicationUpdate {
-	au.mutation.SetCodeGrantsID(id)
+// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
+func (au *ApplicationUpdate) SetCodeGrantID(id string) *ApplicationUpdate {
+	au.mutation.SetCodeGrantID(id)
 	return au
 }
 
-// SetNillableCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID if the given value is not nil.
-func (au *ApplicationUpdate) SetNillableCodeGrantsID(id *string) *ApplicationUpdate {
+// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableCodeGrantID(id *string) *ApplicationUpdate {
 	if id != nil {
-		au = au.SetCodeGrantsID(*id)
+		au = au.SetCodeGrantID(*id)
 	}
 	return au
 }
 
-// SetCodeGrants sets the "code_grants" edge to the CodeGrant entity.
-func (au *ApplicationUpdate) SetCodeGrants(c *CodeGrant) *ApplicationUpdate {
-	return au.SetCodeGrantsID(c.ID)
+// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
+func (au *ApplicationUpdate) SetCodeGrant(c *CodeGrant) *ApplicationUpdate {
+	return au.SetCodeGrantID(c.ID)
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -136,15 +136,15 @@ func (au *ApplicationUpdate) Mutation() *ApplicationMutation {
 	return au.mutation
 }
 
-// ClearM2mGrants clears the "m2m_grants" edge to the M2MGrant entity.
-func (au *ApplicationUpdate) ClearM2mGrants() *ApplicationUpdate {
-	au.mutation.ClearM2mGrants()
+// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
+func (au *ApplicationUpdate) ClearM2mGrant() *ApplicationUpdate {
+	au.mutation.ClearM2mGrant()
 	return au
 }
 
-// ClearCodeGrants clears the "code_grants" edge to the CodeGrant entity.
-func (au *ApplicationUpdate) ClearCodeGrants() *ApplicationUpdate {
-	au.mutation.ClearCodeGrants()
+// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
+func (au *ApplicationUpdate) ClearCodeGrant() *ApplicationUpdate {
+	au.mutation.ClearCodeGrant()
 	return au
 }
 
@@ -230,12 +230,12 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Public(); ok {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
 	}
-	if au.mutation.M2mGrantsCleared() {
+	if au.mutation.M2mGrantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.M2mGrantsTable,
-			Columns: []string{application.M2mGrantsColumn},
+			Table:   application.M2mGrantTable,
+			Columns: []string{application.M2mGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
@@ -243,12 +243,12 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.M2mGrantsIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.M2mGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.M2mGrantsTable,
-			Columns: []string{application.M2mGrantsColumn},
+			Table:   application.M2mGrantTable,
+			Columns: []string{application.M2mGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
@@ -259,12 +259,12 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.CodeGrantsCleared() {
+	if au.mutation.CodeGrantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.CodeGrantsTable,
-			Columns: []string{application.CodeGrantsColumn},
+			Table:   application.CodeGrantTable,
+			Columns: []string{application.CodeGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
@@ -272,12 +272,12 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.CodeGrantsIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.CodeGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.CodeGrantsTable,
-			Columns: []string{application.CodeGrantsColumn},
+			Table:   application.CodeGrantTable,
+			Columns: []string{application.CodeGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
@@ -410,42 +410,42 @@ func (auo *ApplicationUpdateOne) SetNillablePublic(b *bool) *ApplicationUpdateOn
 	return auo
 }
 
-// SetM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID.
-func (auo *ApplicationUpdateOne) SetM2mGrantsID(id string) *ApplicationUpdateOne {
-	auo.mutation.SetM2mGrantsID(id)
+// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
+func (auo *ApplicationUpdateOne) SetM2mGrantID(id string) *ApplicationUpdateOne {
+	auo.mutation.SetM2mGrantID(id)
 	return auo
 }
 
-// SetNillableM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by ID if the given value is not nil.
-func (auo *ApplicationUpdateOne) SetNillableM2mGrantsID(id *string) *ApplicationUpdateOne {
+// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableM2mGrantID(id *string) *ApplicationUpdateOne {
 	if id != nil {
-		auo = auo.SetM2mGrantsID(*id)
+		auo = auo.SetM2mGrantID(*id)
 	}
 	return auo
 }
 
-// SetM2mGrants sets the "m2m_grants" edge to the M2MGrant entity.
-func (auo *ApplicationUpdateOne) SetM2mGrants(m *M2MGrant) *ApplicationUpdateOne {
-	return auo.SetM2mGrantsID(m.ID)
+// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
+func (auo *ApplicationUpdateOne) SetM2mGrant(m *M2MGrant) *ApplicationUpdateOne {
+	return auo.SetM2mGrantID(m.ID)
 }
 
-// SetCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID.
-func (auo *ApplicationUpdateOne) SetCodeGrantsID(id string) *ApplicationUpdateOne {
-	auo.mutation.SetCodeGrantsID(id)
+// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
+func (auo *ApplicationUpdateOne) SetCodeGrantID(id string) *ApplicationUpdateOne {
+	auo.mutation.SetCodeGrantID(id)
 	return auo
 }
 
-// SetNillableCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by ID if the given value is not nil.
-func (auo *ApplicationUpdateOne) SetNillableCodeGrantsID(id *string) *ApplicationUpdateOne {
+// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableCodeGrantID(id *string) *ApplicationUpdateOne {
 	if id != nil {
-		auo = auo.SetCodeGrantsID(*id)
+		auo = auo.SetCodeGrantID(*id)
 	}
 	return auo
 }
 
-// SetCodeGrants sets the "code_grants" edge to the CodeGrant entity.
-func (auo *ApplicationUpdateOne) SetCodeGrants(c *CodeGrant) *ApplicationUpdateOne {
-	return auo.SetCodeGrantsID(c.ID)
+// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
+func (auo *ApplicationUpdateOne) SetCodeGrant(c *CodeGrant) *ApplicationUpdateOne {
+	return auo.SetCodeGrantID(c.ID)
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -487,15 +487,15 @@ func (auo *ApplicationUpdateOne) Mutation() *ApplicationMutation {
 	return auo.mutation
 }
 
-// ClearM2mGrants clears the "m2m_grants" edge to the M2MGrant entity.
-func (auo *ApplicationUpdateOne) ClearM2mGrants() *ApplicationUpdateOne {
-	auo.mutation.ClearM2mGrants()
+// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
+func (auo *ApplicationUpdateOne) ClearM2mGrant() *ApplicationUpdateOne {
+	auo.mutation.ClearM2mGrant()
 	return auo
 }
 
-// ClearCodeGrants clears the "code_grants" edge to the CodeGrant entity.
-func (auo *ApplicationUpdateOne) ClearCodeGrants() *ApplicationUpdateOne {
-	auo.mutation.ClearCodeGrants()
+// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
+func (auo *ApplicationUpdateOne) ClearCodeGrant() *ApplicationUpdateOne {
+	auo.mutation.ClearCodeGrant()
 	return auo
 }
 
@@ -611,12 +611,12 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 	if value, ok := auo.mutation.Public(); ok {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
 	}
-	if auo.mutation.M2mGrantsCleared() {
+	if auo.mutation.M2mGrantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.M2mGrantsTable,
-			Columns: []string{application.M2mGrantsColumn},
+			Table:   application.M2mGrantTable,
+			Columns: []string{application.M2mGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
@@ -624,12 +624,12 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.M2mGrantsIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.M2mGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.M2mGrantsTable,
-			Columns: []string{application.M2mGrantsColumn},
+			Table:   application.M2mGrantTable,
+			Columns: []string{application.M2mGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
@@ -640,12 +640,12 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.CodeGrantsCleared() {
+	if auo.mutation.CodeGrantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.CodeGrantsTable,
-			Columns: []string{application.CodeGrantsColumn},
+			Table:   application.CodeGrantTable,
+			Columns: []string{application.CodeGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
@@ -653,12 +653,12 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.CodeGrantsIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.CodeGrantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   application.CodeGrantsTable,
-			Columns: []string{application.CodeGrantsColumn},
+			Table:   application.CodeGrantTable,
+			Columns: []string{application.CodeGrantColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),

@@ -16,17 +16,17 @@ const (
 	FieldClientID = "client_id"
 	// FieldClientSecret holds the string denoting the client_secret field in the database.
 	FieldClientSecret = "client_secret"
-	// EdgeOauthClient holds the string denoting the oauth_client edge name in mutations.
-	EdgeOauthClient = "oauth_client"
+	// EdgeApplication holds the string denoting the application edge name in mutations.
+	EdgeApplication = "application"
 	// Table holds the table name of the credentials in the database.
 	Table = "credentials"
-	// OauthClientTable is the table that holds the oauth_client relation/edge.
-	OauthClientTable = "credentials"
-	// OauthClientInverseTable is the table name for the Application entity.
+	// ApplicationTable is the table that holds the application relation/edge.
+	ApplicationTable = "credentials"
+	// ApplicationInverseTable is the table name for the Application entity.
 	// It exists in this package in order to avoid circular dependency with the "application" package.
-	OauthClientInverseTable = "applications"
-	// OauthClientColumn is the table column denoting the oauth_client relation/edge.
-	OauthClientColumn = "application_credentials"
+	ApplicationInverseTable = "applications"
+	// ApplicationColumn is the table column denoting the application relation/edge.
+	ApplicationColumn = "application_credentials"
 )
 
 // Columns holds all SQL columns for credentials fields.
@@ -82,16 +82,16 @@ func ByClientSecret(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldClientSecret, opts...).ToFunc()
 }
 
-// ByOauthClientField orders the results by oauth_client field.
-func ByOauthClientField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByApplicationField orders the results by application field.
+func ByApplicationField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newOauthClientStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newApplicationStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newOauthClientStep() *sqlgraph.Step {
+func newApplicationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(OauthClientInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, OauthClientTable, OauthClientColumn),
+		sqlgraph.To(ApplicationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ApplicationTable, ApplicationColumn),
 	)
 }

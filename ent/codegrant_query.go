@@ -18,12 +18,12 @@ import (
 // CodeGrantQuery is the builder for querying CodeGrant entities.
 type CodeGrantQuery struct {
 	config
-	ctx        *QueryContext
-	order      []codegrant.OrderOption
-	inters     []Interceptor
-	predicates []predicate.CodeGrant
-	withClient *ApplicationQuery
-	withFKs    bool
+	ctx             *QueryContext
+	order           []codegrant.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.CodeGrant
+	withApplication *ApplicationQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,8 +60,8 @@ func (cgq *CodeGrantQuery) Order(o ...codegrant.OrderOption) *CodeGrantQuery {
 	return cgq
 }
 
-// QueryClient chains the current query on the "client" edge.
-func (cgq *CodeGrantQuery) QueryClient() *ApplicationQuery {
+// QueryApplication chains the current query on the "application" edge.
+func (cgq *CodeGrantQuery) QueryApplication() *ApplicationQuery {
 	query := (&ApplicationClient{config: cgq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cgq.prepareQuery(ctx); err != nil {
@@ -74,7 +74,7 @@ func (cgq *CodeGrantQuery) QueryClient() *ApplicationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codegrant.Table, codegrant.FieldID, selector),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ClientTable, codegrant.ClientColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ApplicationTable, codegrant.ApplicationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cgq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,26 +269,26 @@ func (cgq *CodeGrantQuery) Clone() *CodeGrantQuery {
 		return nil
 	}
 	return &CodeGrantQuery{
-		config:     cgq.config,
-		ctx:        cgq.ctx.Clone(),
-		order:      append([]codegrant.OrderOption{}, cgq.order...),
-		inters:     append([]Interceptor{}, cgq.inters...),
-		predicates: append([]predicate.CodeGrant{}, cgq.predicates...),
-		withClient: cgq.withClient.Clone(),
+		config:          cgq.config,
+		ctx:             cgq.ctx.Clone(),
+		order:           append([]codegrant.OrderOption{}, cgq.order...),
+		inters:          append([]Interceptor{}, cgq.inters...),
+		predicates:      append([]predicate.CodeGrant{}, cgq.predicates...),
+		withApplication: cgq.withApplication.Clone(),
 		// clone intermediate query.
 		sql:  cgq.sql.Clone(),
 		path: cgq.path,
 	}
 }
 
-// WithClient tells the query-builder to eager-load the nodes that are connected to
-// the "client" edge. The optional arguments are used to configure the query builder of the edge.
-func (cgq *CodeGrantQuery) WithClient(opts ...func(*ApplicationQuery)) *CodeGrantQuery {
+// WithApplication tells the query-builder to eager-load the nodes that are connected to
+// the "application" edge. The optional arguments are used to configure the query builder of the edge.
+func (cgq *CodeGrantQuery) WithApplication(opts ...func(*ApplicationQuery)) *CodeGrantQuery {
 	query := (&ApplicationClient{config: cgq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cgq.withClient = query
+	cgq.withApplication = query
 	return cgq
 }
 
@@ -372,10 +372,10 @@ func (cgq *CodeGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		withFKs     = cgq.withFKs
 		_spec       = cgq.querySpec()
 		loadedTypes = [1]bool{
-			cgq.withClient != nil,
+			cgq.withApplication != nil,
 		}
 	)
-	if cgq.withClient != nil {
+	if cgq.withApplication != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -399,23 +399,23 @@ func (cgq *CodeGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cgq.withClient; query != nil {
-		if err := cgq.loadClient(ctx, query, nodes, nil,
-			func(n *CodeGrant, e *Application) { n.Edges.Client = e }); err != nil {
+	if query := cgq.withApplication; query != nil {
+		if err := cgq.loadApplication(ctx, query, nodes, nil,
+			func(n *CodeGrant, e *Application) { n.Edges.Application = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *ApplicationQuery, nodes []*CodeGrant, init func(*CodeGrant), assign func(*CodeGrant, *Application)) error {
+func (cgq *CodeGrantQuery) loadApplication(ctx context.Context, query *ApplicationQuery, nodes []*CodeGrant, init func(*CodeGrant), assign func(*CodeGrant, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*CodeGrant)
 	for i := range nodes {
-		if nodes[i].application_code_grants == nil {
+		if nodes[i].application_code_grant == nil {
 			continue
 		}
-		fk := *nodes[i].application_code_grants
+		fk := *nodes[i].application_code_grant
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -432,7 +432,7 @@ func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *ApplicationQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "application_code_grants" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "application_code_grant" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

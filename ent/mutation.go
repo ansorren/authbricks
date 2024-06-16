@@ -66,10 +66,10 @@ type ApplicationMutation struct {
 	name               *string
 	public             *bool
 	clearedFields      map[string]struct{}
-	m2m_grants         *string
-	clearedm2m_grants  bool
-	code_grants        *string
-	clearedcode_grants bool
+	m2m_grant          *string
+	clearedm2m_grant   bool
+	code_grant         *string
+	clearedcode_grant  bool
 	credentials        map[string]struct{}
 	removedcredentials map[string]struct{}
 	clearedcredentials bool
@@ -256,82 +256,82 @@ func (m *ApplicationMutation) ResetPublic() {
 	m.public = nil
 }
 
-// SetM2mGrantsID sets the "m2m_grants" edge to the M2MGrant entity by id.
-func (m *ApplicationMutation) SetM2mGrantsID(id string) {
-	m.m2m_grants = &id
+// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by id.
+func (m *ApplicationMutation) SetM2mGrantID(id string) {
+	m.m2m_grant = &id
 }
 
-// ClearM2mGrants clears the "m2m_grants" edge to the M2MGrant entity.
-func (m *ApplicationMutation) ClearM2mGrants() {
-	m.clearedm2m_grants = true
+// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
+func (m *ApplicationMutation) ClearM2mGrant() {
+	m.clearedm2m_grant = true
 }
 
-// M2mGrantsCleared reports if the "m2m_grants" edge to the M2MGrant entity was cleared.
-func (m *ApplicationMutation) M2mGrantsCleared() bool {
-	return m.clearedm2m_grants
+// M2mGrantCleared reports if the "m2m_grant" edge to the M2MGrant entity was cleared.
+func (m *ApplicationMutation) M2mGrantCleared() bool {
+	return m.clearedm2m_grant
 }
 
-// M2mGrantsID returns the "m2m_grants" edge ID in the mutation.
-func (m *ApplicationMutation) M2mGrantsID() (id string, exists bool) {
-	if m.m2m_grants != nil {
-		return *m.m2m_grants, true
+// M2mGrantID returns the "m2m_grant" edge ID in the mutation.
+func (m *ApplicationMutation) M2mGrantID() (id string, exists bool) {
+	if m.m2m_grant != nil {
+		return *m.m2m_grant, true
 	}
 	return
 }
 
-// M2mGrantsIDs returns the "m2m_grants" edge IDs in the mutation.
+// M2mGrantIDs returns the "m2m_grant" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// M2mGrantsID instead. It exists only for internal usage by the builders.
-func (m *ApplicationMutation) M2mGrantsIDs() (ids []string) {
-	if id := m.m2m_grants; id != nil {
+// M2mGrantID instead. It exists only for internal usage by the builders.
+func (m *ApplicationMutation) M2mGrantIDs() (ids []string) {
+	if id := m.m2m_grant; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetM2mGrants resets all changes to the "m2m_grants" edge.
-func (m *ApplicationMutation) ResetM2mGrants() {
-	m.m2m_grants = nil
-	m.clearedm2m_grants = false
+// ResetM2mGrant resets all changes to the "m2m_grant" edge.
+func (m *ApplicationMutation) ResetM2mGrant() {
+	m.m2m_grant = nil
+	m.clearedm2m_grant = false
 }
 
-// SetCodeGrantsID sets the "code_grants" edge to the CodeGrant entity by id.
-func (m *ApplicationMutation) SetCodeGrantsID(id string) {
-	m.code_grants = &id
+// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by id.
+func (m *ApplicationMutation) SetCodeGrantID(id string) {
+	m.code_grant = &id
 }
 
-// ClearCodeGrants clears the "code_grants" edge to the CodeGrant entity.
-func (m *ApplicationMutation) ClearCodeGrants() {
-	m.clearedcode_grants = true
+// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
+func (m *ApplicationMutation) ClearCodeGrant() {
+	m.clearedcode_grant = true
 }
 
-// CodeGrantsCleared reports if the "code_grants" edge to the CodeGrant entity was cleared.
-func (m *ApplicationMutation) CodeGrantsCleared() bool {
-	return m.clearedcode_grants
+// CodeGrantCleared reports if the "code_grant" edge to the CodeGrant entity was cleared.
+func (m *ApplicationMutation) CodeGrantCleared() bool {
+	return m.clearedcode_grant
 }
 
-// CodeGrantsID returns the "code_grants" edge ID in the mutation.
-func (m *ApplicationMutation) CodeGrantsID() (id string, exists bool) {
-	if m.code_grants != nil {
-		return *m.code_grants, true
+// CodeGrantID returns the "code_grant" edge ID in the mutation.
+func (m *ApplicationMutation) CodeGrantID() (id string, exists bool) {
+	if m.code_grant != nil {
+		return *m.code_grant, true
 	}
 	return
 }
 
-// CodeGrantsIDs returns the "code_grants" edge IDs in the mutation.
+// CodeGrantIDs returns the "code_grant" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CodeGrantsID instead. It exists only for internal usage by the builders.
-func (m *ApplicationMutation) CodeGrantsIDs() (ids []string) {
-	if id := m.code_grants; id != nil {
+// CodeGrantID instead. It exists only for internal usage by the builders.
+func (m *ApplicationMutation) CodeGrantIDs() (ids []string) {
+	if id := m.code_grant; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetCodeGrants resets all changes to the "code_grants" edge.
-func (m *ApplicationMutation) ResetCodeGrants() {
-	m.code_grants = nil
-	m.clearedcode_grants = false
+// ResetCodeGrant resets all changes to the "code_grant" edge.
+func (m *ApplicationMutation) ResetCodeGrant() {
+	m.code_grant = nil
+	m.clearedcode_grant = false
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by ids.
@@ -578,11 +578,11 @@ func (m *ApplicationMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ApplicationMutation) AddedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.m2m_grants != nil {
-		edges = append(edges, application.EdgeM2mGrants)
+	if m.m2m_grant != nil {
+		edges = append(edges, application.EdgeM2mGrant)
 	}
-	if m.code_grants != nil {
-		edges = append(edges, application.EdgeCodeGrants)
+	if m.code_grant != nil {
+		edges = append(edges, application.EdgeCodeGrant)
 	}
 	if m.credentials != nil {
 		edges = append(edges, application.EdgeCredentials)
@@ -597,12 +597,12 @@ func (m *ApplicationMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ApplicationMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case application.EdgeM2mGrants:
-		if id := m.m2m_grants; id != nil {
+	case application.EdgeM2mGrant:
+		if id := m.m2m_grant; id != nil {
 			return []ent.Value{*id}
 		}
-	case application.EdgeCodeGrants:
-		if id := m.code_grants; id != nil {
+	case application.EdgeCodeGrant:
+		if id := m.code_grant; id != nil {
 			return []ent.Value{*id}
 		}
 	case application.EdgeCredentials:
@@ -645,11 +645,11 @@ func (m *ApplicationMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ApplicationMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 4)
-	if m.clearedm2m_grants {
-		edges = append(edges, application.EdgeM2mGrants)
+	if m.clearedm2m_grant {
+		edges = append(edges, application.EdgeM2mGrant)
 	}
-	if m.clearedcode_grants {
-		edges = append(edges, application.EdgeCodeGrants)
+	if m.clearedcode_grant {
+		edges = append(edges, application.EdgeCodeGrant)
 	}
 	if m.clearedcredentials {
 		edges = append(edges, application.EdgeCredentials)
@@ -664,10 +664,10 @@ func (m *ApplicationMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ApplicationMutation) EdgeCleared(name string) bool {
 	switch name {
-	case application.EdgeM2mGrants:
-		return m.clearedm2m_grants
-	case application.EdgeCodeGrants:
-		return m.clearedcode_grants
+	case application.EdgeM2mGrant:
+		return m.clearedm2m_grant
+	case application.EdgeCodeGrant:
+		return m.clearedcode_grant
 	case application.EdgeCredentials:
 		return m.clearedcredentials
 	case application.EdgeService:
@@ -680,11 +680,11 @@ func (m *ApplicationMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ApplicationMutation) ClearEdge(name string) error {
 	switch name {
-	case application.EdgeM2mGrants:
-		m.ClearM2mGrants()
+	case application.EdgeM2mGrant:
+		m.ClearM2mGrant()
 		return nil
-	case application.EdgeCodeGrants:
-		m.ClearCodeGrants()
+	case application.EdgeCodeGrant:
+		m.ClearCodeGrant()
 		return nil
 	case application.EdgeService:
 		m.ClearService()
@@ -697,11 +697,11 @@ func (m *ApplicationMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ApplicationMutation) ResetEdge(name string) error {
 	switch name {
-	case application.EdgeM2mGrants:
-		m.ResetM2mGrants()
+	case application.EdgeM2mGrant:
+		m.ResetM2mGrant()
 		return nil
-	case application.EdgeCodeGrants:
-		m.ResetCodeGrants()
+	case application.EdgeCodeGrant:
+		m.ResetCodeGrant()
 		return nil
 	case application.EdgeCredentials:
 		m.ResetCredentials()
@@ -2473,19 +2473,19 @@ func (m *AuthorizationPayloadMutation) ResetEdge(name string) error {
 // CodeGrantMutation represents an operation that mutates the CodeGrant nodes in the graph.
 type CodeGrantMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *string
-	scopes          *[]string
-	appendscopes    []string
-	callbacks       *[]string
-	appendcallbacks []string
-	clearedFields   map[string]struct{}
-	client          *string
-	clearedclient   bool
-	done            bool
-	oldValue        func(context.Context) (*CodeGrant, error)
-	predicates      []predicate.CodeGrant
+	op                 Op
+	typ                string
+	id                 *string
+	scopes             *[]string
+	appendscopes       []string
+	callbacks          *[]string
+	appendcallbacks    []string
+	clearedFields      map[string]struct{}
+	application        *string
+	clearedapplication bool
+	done               bool
+	oldValue           func(context.Context) (*CodeGrant, error)
+	predicates         []predicate.CodeGrant
 }
 
 var _ ent.Mutation = (*CodeGrantMutation)(nil)
@@ -2694,43 +2694,43 @@ func (m *CodeGrantMutation) ResetCallbacks() {
 	m.appendcallbacks = nil
 }
 
-// SetClientID sets the "client" edge to the Application entity by id.
-func (m *CodeGrantMutation) SetClientID(id string) {
-	m.client = &id
+// SetApplicationID sets the "application" edge to the Application entity by id.
+func (m *CodeGrantMutation) SetApplicationID(id string) {
+	m.application = &id
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (m *CodeGrantMutation) ClearClient() {
-	m.clearedclient = true
+// ClearApplication clears the "application" edge to the Application entity.
+func (m *CodeGrantMutation) ClearApplication() {
+	m.clearedapplication = true
 }
 
-// ClientCleared reports if the "client" edge to the Application entity was cleared.
-func (m *CodeGrantMutation) ClientCleared() bool {
-	return m.clearedclient
+// ApplicationCleared reports if the "application" edge to the Application entity was cleared.
+func (m *CodeGrantMutation) ApplicationCleared() bool {
+	return m.clearedapplication
 }
 
-// ClientID returns the "client" edge ID in the mutation.
-func (m *CodeGrantMutation) ClientID() (id string, exists bool) {
-	if m.client != nil {
-		return *m.client, true
+// ApplicationID returns the "application" edge ID in the mutation.
+func (m *CodeGrantMutation) ApplicationID() (id string, exists bool) {
+	if m.application != nil {
+		return *m.application, true
 	}
 	return
 }
 
-// ClientIDs returns the "client" edge IDs in the mutation.
+// ApplicationIDs returns the "application" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ClientID instead. It exists only for internal usage by the builders.
-func (m *CodeGrantMutation) ClientIDs() (ids []string) {
-	if id := m.client; id != nil {
+// ApplicationID instead. It exists only for internal usage by the builders.
+func (m *CodeGrantMutation) ApplicationIDs() (ids []string) {
+	if id := m.application; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetClient resets all changes to the "client" edge.
-func (m *CodeGrantMutation) ResetClient() {
-	m.client = nil
-	m.clearedclient = false
+// ResetApplication resets all changes to the "application" edge.
+func (m *CodeGrantMutation) ResetApplication() {
+	m.application = nil
+	m.clearedapplication = false
 }
 
 // Where appends a list predicates to the CodeGrantMutation builder.
@@ -2884,8 +2884,8 @@ func (m *CodeGrantMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CodeGrantMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.client != nil {
-		edges = append(edges, codegrant.EdgeClient)
+	if m.application != nil {
+		edges = append(edges, codegrant.EdgeApplication)
 	}
 	return edges
 }
@@ -2894,8 +2894,8 @@ func (m *CodeGrantMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *CodeGrantMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case codegrant.EdgeClient:
-		if id := m.client; id != nil {
+	case codegrant.EdgeApplication:
+		if id := m.application; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -2917,8 +2917,8 @@ func (m *CodeGrantMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CodeGrantMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedclient {
-		edges = append(edges, codegrant.EdgeClient)
+	if m.clearedapplication {
+		edges = append(edges, codegrant.EdgeApplication)
 	}
 	return edges
 }
@@ -2927,8 +2927,8 @@ func (m *CodeGrantMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *CodeGrantMutation) EdgeCleared(name string) bool {
 	switch name {
-	case codegrant.EdgeClient:
-		return m.clearedclient
+	case codegrant.EdgeApplication:
+		return m.clearedapplication
 	}
 	return false
 }
@@ -2937,8 +2937,8 @@ func (m *CodeGrantMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CodeGrantMutation) ClearEdge(name string) error {
 	switch name {
-	case codegrant.EdgeClient:
-		m.ClearClient()
+	case codegrant.EdgeApplication:
+		m.ClearApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown CodeGrant unique edge %s", name)
@@ -2948,8 +2948,8 @@ func (m *CodeGrantMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CodeGrantMutation) ResetEdge(name string) error {
 	switch name {
-	case codegrant.EdgeClient:
-		m.ResetClient()
+	case codegrant.EdgeApplication:
+		m.ResetApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown CodeGrant edge %s", name)
@@ -3344,17 +3344,17 @@ func (m *CookieStoreMutation) ResetEdge(name string) error {
 // CredentialsMutation represents an operation that mutates the Credentials nodes in the graph.
 type CredentialsMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *string
-	client_id           *string
-	client_secret       *string
-	clearedFields       map[string]struct{}
-	oauth_client        *string
-	clearedoauth_client bool
-	done                bool
-	oldValue            func(context.Context) (*Credentials, error)
-	predicates          []predicate.Credentials
+	op                 Op
+	typ                string
+	id                 *string
+	client_id          *string
+	client_secret      *string
+	clearedFields      map[string]struct{}
+	application        *string
+	clearedapplication bool
+	done               bool
+	oldValue           func(context.Context) (*Credentials, error)
+	predicates         []predicate.Credentials
 }
 
 var _ ent.Mutation = (*CredentialsMutation)(nil)
@@ -3533,43 +3533,43 @@ func (m *CredentialsMutation) ResetClientSecret() {
 	m.client_secret = nil
 }
 
-// SetOauthClientID sets the "oauth_client" edge to the Application entity by id.
-func (m *CredentialsMutation) SetOauthClientID(id string) {
-	m.oauth_client = &id
+// SetApplicationID sets the "application" edge to the Application entity by id.
+func (m *CredentialsMutation) SetApplicationID(id string) {
+	m.application = &id
 }
 
-// ClearOauthClient clears the "oauth_client" edge to the Application entity.
-func (m *CredentialsMutation) ClearOauthClient() {
-	m.clearedoauth_client = true
+// ClearApplication clears the "application" edge to the Application entity.
+func (m *CredentialsMutation) ClearApplication() {
+	m.clearedapplication = true
 }
 
-// OauthClientCleared reports if the "oauth_client" edge to the Application entity was cleared.
-func (m *CredentialsMutation) OauthClientCleared() bool {
-	return m.clearedoauth_client
+// ApplicationCleared reports if the "application" edge to the Application entity was cleared.
+func (m *CredentialsMutation) ApplicationCleared() bool {
+	return m.clearedapplication
 }
 
-// OauthClientID returns the "oauth_client" edge ID in the mutation.
-func (m *CredentialsMutation) OauthClientID() (id string, exists bool) {
-	if m.oauth_client != nil {
-		return *m.oauth_client, true
+// ApplicationID returns the "application" edge ID in the mutation.
+func (m *CredentialsMutation) ApplicationID() (id string, exists bool) {
+	if m.application != nil {
+		return *m.application, true
 	}
 	return
 }
 
-// OauthClientIDs returns the "oauth_client" edge IDs in the mutation.
+// ApplicationIDs returns the "application" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// OauthClientID instead. It exists only for internal usage by the builders.
-func (m *CredentialsMutation) OauthClientIDs() (ids []string) {
-	if id := m.oauth_client; id != nil {
+// ApplicationID instead. It exists only for internal usage by the builders.
+func (m *CredentialsMutation) ApplicationIDs() (ids []string) {
+	if id := m.application; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetOauthClient resets all changes to the "oauth_client" edge.
-func (m *CredentialsMutation) ResetOauthClient() {
-	m.oauth_client = nil
-	m.clearedoauth_client = false
+// ResetApplication resets all changes to the "application" edge.
+func (m *CredentialsMutation) ResetApplication() {
+	m.application = nil
+	m.clearedapplication = false
 }
 
 // Where appends a list predicates to the CredentialsMutation builder.
@@ -3723,8 +3723,8 @@ func (m *CredentialsMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CredentialsMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.oauth_client != nil {
-		edges = append(edges, credentials.EdgeOauthClient)
+	if m.application != nil {
+		edges = append(edges, credentials.EdgeApplication)
 	}
 	return edges
 }
@@ -3733,8 +3733,8 @@ func (m *CredentialsMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *CredentialsMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case credentials.EdgeOauthClient:
-		if id := m.oauth_client; id != nil {
+	case credentials.EdgeApplication:
+		if id := m.application; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -3756,8 +3756,8 @@ func (m *CredentialsMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CredentialsMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedoauth_client {
-		edges = append(edges, credentials.EdgeOauthClient)
+	if m.clearedapplication {
+		edges = append(edges, credentials.EdgeApplication)
 	}
 	return edges
 }
@@ -3766,8 +3766,8 @@ func (m *CredentialsMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *CredentialsMutation) EdgeCleared(name string) bool {
 	switch name {
-	case credentials.EdgeOauthClient:
-		return m.clearedoauth_client
+	case credentials.EdgeApplication:
+		return m.clearedapplication
 	}
 	return false
 }
@@ -3776,8 +3776,8 @@ func (m *CredentialsMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CredentialsMutation) ClearEdge(name string) error {
 	switch name {
-	case credentials.EdgeOauthClient:
-		m.ClearOauthClient()
+	case credentials.EdgeApplication:
+		m.ClearApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown Credentials unique edge %s", name)
@@ -3787,8 +3787,8 @@ func (m *CredentialsMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CredentialsMutation) ResetEdge(name string) error {
 	switch name {
-	case credentials.EdgeOauthClient:
-		m.ResetOauthClient()
+	case credentials.EdgeApplication:
+		m.ResetApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown Credentials edge %s", name)
@@ -4219,17 +4219,17 @@ func (m *KeySetMutation) ResetEdge(name string) error {
 // M2MGrantMutation represents an operation that mutates the M2MGrant nodes in the graph.
 type M2MGrantMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	scopes        *[]string
-	appendscopes  []string
-	clearedFields map[string]struct{}
-	client        *string
-	clearedclient bool
-	done          bool
-	oldValue      func(context.Context) (*M2MGrant, error)
-	predicates    []predicate.M2MGrant
+	op                 Op
+	typ                string
+	id                 *string
+	scopes             *[]string
+	appendscopes       []string
+	clearedFields      map[string]struct{}
+	application        *string
+	clearedapplication bool
+	done               bool
+	oldValue           func(context.Context) (*M2MGrant, error)
+	predicates         []predicate.M2MGrant
 }
 
 var _ ent.Mutation = (*M2MGrantMutation)(nil)
@@ -4387,43 +4387,43 @@ func (m *M2MGrantMutation) ResetScopes() {
 	m.appendscopes = nil
 }
 
-// SetClientID sets the "client" edge to the Application entity by id.
-func (m *M2MGrantMutation) SetClientID(id string) {
-	m.client = &id
+// SetApplicationID sets the "application" edge to the Application entity by id.
+func (m *M2MGrantMutation) SetApplicationID(id string) {
+	m.application = &id
 }
 
-// ClearClient clears the "client" edge to the Application entity.
-func (m *M2MGrantMutation) ClearClient() {
-	m.clearedclient = true
+// ClearApplication clears the "application" edge to the Application entity.
+func (m *M2MGrantMutation) ClearApplication() {
+	m.clearedapplication = true
 }
 
-// ClientCleared reports if the "client" edge to the Application entity was cleared.
-func (m *M2MGrantMutation) ClientCleared() bool {
-	return m.clearedclient
+// ApplicationCleared reports if the "application" edge to the Application entity was cleared.
+func (m *M2MGrantMutation) ApplicationCleared() bool {
+	return m.clearedapplication
 }
 
-// ClientID returns the "client" edge ID in the mutation.
-func (m *M2MGrantMutation) ClientID() (id string, exists bool) {
-	if m.client != nil {
-		return *m.client, true
+// ApplicationID returns the "application" edge ID in the mutation.
+func (m *M2MGrantMutation) ApplicationID() (id string, exists bool) {
+	if m.application != nil {
+		return *m.application, true
 	}
 	return
 }
 
-// ClientIDs returns the "client" edge IDs in the mutation.
+// ApplicationIDs returns the "application" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ClientID instead. It exists only for internal usage by the builders.
-func (m *M2MGrantMutation) ClientIDs() (ids []string) {
-	if id := m.client; id != nil {
+// ApplicationID instead. It exists only for internal usage by the builders.
+func (m *M2MGrantMutation) ApplicationIDs() (ids []string) {
+	if id := m.application; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetClient resets all changes to the "client" edge.
-func (m *M2MGrantMutation) ResetClient() {
-	m.client = nil
-	m.clearedclient = false
+// ResetApplication resets all changes to the "application" edge.
+func (m *M2MGrantMutation) ResetApplication() {
+	m.application = nil
+	m.clearedapplication = false
 }
 
 // Where appends a list predicates to the M2MGrantMutation builder.
@@ -4560,8 +4560,8 @@ func (m *M2MGrantMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *M2MGrantMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.client != nil {
-		edges = append(edges, m2mgrant.EdgeClient)
+	if m.application != nil {
+		edges = append(edges, m2mgrant.EdgeApplication)
 	}
 	return edges
 }
@@ -4570,8 +4570,8 @@ func (m *M2MGrantMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *M2MGrantMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case m2mgrant.EdgeClient:
-		if id := m.client; id != nil {
+	case m2mgrant.EdgeApplication:
+		if id := m.application; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -4593,8 +4593,8 @@ func (m *M2MGrantMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *M2MGrantMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedclient {
-		edges = append(edges, m2mgrant.EdgeClient)
+	if m.clearedapplication {
+		edges = append(edges, m2mgrant.EdgeApplication)
 	}
 	return edges
 }
@@ -4603,8 +4603,8 @@ func (m *M2MGrantMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *M2MGrantMutation) EdgeCleared(name string) bool {
 	switch name {
-	case m2mgrant.EdgeClient:
-		return m.clearedclient
+	case m2mgrant.EdgeApplication:
+		return m.clearedapplication
 	}
 	return false
 }
@@ -4613,8 +4613,8 @@ func (m *M2MGrantMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *M2MGrantMutation) ClearEdge(name string) error {
 	switch name {
-	case m2mgrant.EdgeClient:
-		m.ClearClient()
+	case m2mgrant.EdgeApplication:
+		m.ClearApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown M2MGrant unique edge %s", name)
@@ -4624,8 +4624,8 @@ func (m *M2MGrantMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *M2MGrantMutation) ResetEdge(name string) error {
 	switch name {
-	case m2mgrant.EdgeClient:
-		m.ResetClient()
+	case m2mgrant.EdgeApplication:
+		m.ResetApplication()
 		return nil
 	}
 	return fmt.Errorf("unknown M2MGrant edge %s", name)

@@ -22,29 +22,29 @@ type M2MGrant struct {
 	Scopes []string `json:"scopes"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the M2MGrantQuery when eager-loading is set.
-	Edges                  M2MGrantEdges `json:"edges"`
-	application_m2m_grants *string
-	selectValues           sql.SelectValues
+	Edges                 M2MGrantEdges `json:"edges"`
+	application_m2m_grant *string
+	selectValues          sql.SelectValues
 }
 
 // M2MGrantEdges holds the relations/edges for other nodes in the graph.
 type M2MGrantEdges struct {
-	// Client holds the value of the client edge.
-	Client *Application `json:"client,omitempty"`
+	// Application holds the value of the application edge.
+	Application *Application `json:"application,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// ClientOrErr returns the Client value or an error if the edge
+// ApplicationOrErr returns the Application value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e M2MGrantEdges) ClientOrErr() (*Application, error) {
-	if e.Client != nil {
-		return e.Client, nil
+func (e M2MGrantEdges) ApplicationOrErr() (*Application, error) {
+	if e.Application != nil {
+		return e.Application, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: application.Label}
 	}
-	return nil, &NotLoadedError{edge: "client"}
+	return nil, &NotLoadedError{edge: "application"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -56,7 +56,7 @@ func (*M2MGrant) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case m2mgrant.FieldID:
 			values[i] = new(sql.NullString)
-		case m2mgrant.ForeignKeys[0]: // application_m2m_grants
+		case m2mgrant.ForeignKeys[0]: // application_m2m_grant
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -89,10 +89,10 @@ func (mg *M2MGrant) assignValues(columns []string, values []any) error {
 			}
 		case m2mgrant.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field application_m2m_grants", values[i])
+				return fmt.Errorf("unexpected type %T for field application_m2m_grant", values[i])
 			} else if value.Valid {
-				mg.application_m2m_grants = new(string)
-				*mg.application_m2m_grants = value.String
+				mg.application_m2m_grant = new(string)
+				*mg.application_m2m_grant = value.String
 			}
 		default:
 			mg.selectValues.Set(columns[i], values[i])
@@ -107,9 +107,9 @@ func (mg *M2MGrant) Value(name string) (ent.Value, error) {
 	return mg.selectValues.Get(name)
 }
 
-// QueryClient queries the "client" edge of the M2MGrant entity.
-func (mg *M2MGrant) QueryClient() *ApplicationQuery {
-	return NewM2MGrantClient(mg.config).QueryClient(mg)
+// QueryApplication queries the "application" edge of the M2MGrant entity.
+func (mg *M2MGrant) QueryApplication() *ApplicationQuery {
+	return NewM2MGrantClient(mg.config).QueryApplication(mg)
 }
 
 // Update returns a builder for updating this M2MGrant.

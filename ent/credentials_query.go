@@ -22,7 +22,7 @@ type CredentialsQuery struct {
 	order           []credentials.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Credentials
-	withOauthClient *ApplicationQuery
+	withApplication *ApplicationQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -60,8 +60,8 @@ func (cq *CredentialsQuery) Order(o ...credentials.OrderOption) *CredentialsQuer
 	return cq
 }
 
-// QueryOauthClient chains the current query on the "oauth_client" edge.
-func (cq *CredentialsQuery) QueryOauthClient() *ApplicationQuery {
+// QueryApplication chains the current query on the "application" edge.
+func (cq *CredentialsQuery) QueryApplication() *ApplicationQuery {
 	query := (&ApplicationClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -74,7 +74,7 @@ func (cq *CredentialsQuery) QueryOauthClient() *ApplicationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(credentials.Table, credentials.FieldID, selector),
 			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, credentials.OauthClientTable, credentials.OauthClientColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, credentials.ApplicationTable, credentials.ApplicationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -274,21 +274,21 @@ func (cq *CredentialsQuery) Clone() *CredentialsQuery {
 		order:           append([]credentials.OrderOption{}, cq.order...),
 		inters:          append([]Interceptor{}, cq.inters...),
 		predicates:      append([]predicate.Credentials{}, cq.predicates...),
-		withOauthClient: cq.withOauthClient.Clone(),
+		withApplication: cq.withApplication.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
 }
 
-// WithOauthClient tells the query-builder to eager-load the nodes that are connected to
-// the "oauth_client" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CredentialsQuery) WithOauthClient(opts ...func(*ApplicationQuery)) *CredentialsQuery {
+// WithApplication tells the query-builder to eager-load the nodes that are connected to
+// the "application" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CredentialsQuery) WithApplication(opts ...func(*ApplicationQuery)) *CredentialsQuery {
 	query := (&ApplicationClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withOauthClient = query
+	cq.withApplication = query
 	return cq
 }
 
@@ -372,10 +372,10 @@ func (cq *CredentialsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [1]bool{
-			cq.withOauthClient != nil,
+			cq.withApplication != nil,
 		}
 	)
-	if cq.withOauthClient != nil {
+	if cq.withApplication != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -399,16 +399,16 @@ func (cq *CredentialsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withOauthClient; query != nil {
-		if err := cq.loadOauthClient(ctx, query, nodes, nil,
-			func(n *Credentials, e *Application) { n.Edges.OauthClient = e }); err != nil {
+	if query := cq.withApplication; query != nil {
+		if err := cq.loadApplication(ctx, query, nodes, nil,
+			func(n *Credentials, e *Application) { n.Edges.Application = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *CredentialsQuery) loadOauthClient(ctx context.Context, query *ApplicationQuery, nodes []*Credentials, init func(*Credentials), assign func(*Credentials, *Application)) error {
+func (cq *CredentialsQuery) loadApplication(ctx context.Context, query *ApplicationQuery, nodes []*Credentials, init func(*Credentials), assign func(*Credentials, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Credentials)
 	for i := range nodes {

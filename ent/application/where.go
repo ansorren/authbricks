@@ -148,21 +148,21 @@ func PublicNEQ(v bool) predicate.Application {
 	return predicate.Application(sql.FieldNEQ(FieldPublic, v))
 }
 
-// HasM2mGrants applies the HasEdge predicate on the "m2m_grants" edge.
-func HasM2mGrants() predicate.Application {
+// HasM2mGrant applies the HasEdge predicate on the "m2m_grant" edge.
+func HasM2mGrant() predicate.Application {
 	return predicate.Application(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantsTable, M2mGrantsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantTable, M2mGrantColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasM2mGrantsWith applies the HasEdge predicate on the "m2m_grants" edge with a given conditions (other predicates).
-func HasM2mGrantsWith(preds ...predicate.M2MGrant) predicate.Application {
+// HasM2mGrantWith applies the HasEdge predicate on the "m2m_grant" edge with a given conditions (other predicates).
+func HasM2mGrantWith(preds ...predicate.M2MGrant) predicate.Application {
 	return predicate.Application(func(s *sql.Selector) {
-		step := newM2mGrantsStep()
+		step := newM2mGrantStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -171,21 +171,21 @@ func HasM2mGrantsWith(preds ...predicate.M2MGrant) predicate.Application {
 	})
 }
 
-// HasCodeGrants applies the HasEdge predicate on the "code_grants" edge.
-func HasCodeGrants() predicate.Application {
+// HasCodeGrant applies the HasEdge predicate on the "code_grant" edge.
+func HasCodeGrant() predicate.Application {
 	return predicate.Application(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantsTable, CodeGrantsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantTable, CodeGrantColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasCodeGrantsWith applies the HasEdge predicate on the "code_grants" edge with a given conditions (other predicates).
-func HasCodeGrantsWith(preds ...predicate.CodeGrant) predicate.Application {
+// HasCodeGrantWith applies the HasEdge predicate on the "code_grant" edge with a given conditions (other predicates).
+func HasCodeGrantWith(preds ...predicate.CodeGrant) predicate.Application {
 	return predicate.Application(func(s *sql.Selector) {
-		step := newCodeGrantsStep()
+		step := newCodeGrantStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

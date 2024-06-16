@@ -24,29 +24,29 @@ type CodeGrant struct {
 	Callbacks []string `json:"callbacks"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodeGrantQuery when eager-loading is set.
-	Edges                   CodeGrantEdges `json:"edges"`
-	application_code_grants *string
-	selectValues            sql.SelectValues
+	Edges                  CodeGrantEdges `json:"edges"`
+	application_code_grant *string
+	selectValues           sql.SelectValues
 }
 
 // CodeGrantEdges holds the relations/edges for other nodes in the graph.
 type CodeGrantEdges struct {
-	// Client holds the value of the client edge.
-	Client *Application `json:"client,omitempty"`
+	// Application holds the value of the application edge.
+	Application *Application `json:"application,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// ClientOrErr returns the Client value or an error if the edge
+// ApplicationOrErr returns the Application value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CodeGrantEdges) ClientOrErr() (*Application, error) {
-	if e.Client != nil {
-		return e.Client, nil
+func (e CodeGrantEdges) ApplicationOrErr() (*Application, error) {
+	if e.Application != nil {
+		return e.Application, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: application.Label}
 	}
-	return nil, &NotLoadedError{edge: "client"}
+	return nil, &NotLoadedError{edge: "application"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -58,7 +58,7 @@ func (*CodeGrant) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case codegrant.FieldID:
 			values[i] = new(sql.NullString)
-		case codegrant.ForeignKeys[0]: // application_code_grants
+		case codegrant.ForeignKeys[0]: // application_code_grant
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -99,10 +99,10 @@ func (cg *CodeGrant) assignValues(columns []string, values []any) error {
 			}
 		case codegrant.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field application_code_grants", values[i])
+				return fmt.Errorf("unexpected type %T for field application_code_grant", values[i])
 			} else if value.Valid {
-				cg.application_code_grants = new(string)
-				*cg.application_code_grants = value.String
+				cg.application_code_grant = new(string)
+				*cg.application_code_grant = value.String
 			}
 		default:
 			cg.selectValues.Set(columns[i], values[i])
@@ -117,9 +117,9 @@ func (cg *CodeGrant) Value(name string) (ent.Value, error) {
 	return cg.selectValues.Get(name)
 }
 
-// QueryClient queries the "client" edge of the CodeGrant entity.
-func (cg *CodeGrant) QueryClient() *ApplicationQuery {
-	return NewCodeGrantClient(cg.config).QueryClient(cg)
+// QueryApplication queries the "application" edge of the CodeGrant entity.
+func (cg *CodeGrant) QueryApplication() *ApplicationQuery {
+	return NewCodeGrantClient(cg.config).QueryApplication(cg)
 }
 
 // Update returns a builder for updating this CodeGrant.

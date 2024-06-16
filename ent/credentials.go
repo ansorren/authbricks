@@ -30,22 +30,22 @@ type Credentials struct {
 
 // CredentialsEdges holds the relations/edges for other nodes in the graph.
 type CredentialsEdges struct {
-	// OauthClient holds the value of the oauth_client edge.
-	OauthClient *Application `json:"oauth_client,omitempty"`
+	// Application holds the value of the application edge.
+	Application *Application `json:"application,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// OauthClientOrErr returns the OauthClient value or an error if the edge
+// ApplicationOrErr returns the Application value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CredentialsEdges) OauthClientOrErr() (*Application, error) {
-	if e.OauthClient != nil {
-		return e.OauthClient, nil
+func (e CredentialsEdges) ApplicationOrErr() (*Application, error) {
+	if e.Application != nil {
+		return e.Application, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: application.Label}
 	}
-	return nil, &NotLoadedError{edge: "oauth_client"}
+	return nil, &NotLoadedError{edge: "application"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -110,9 +110,9 @@ func (c *Credentials) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryOauthClient queries the "oauth_client" edge of the Credentials entity.
-func (c *Credentials) QueryOauthClient() *ApplicationQuery {
-	return NewCredentialsClient(c.config).QueryOauthClient(c)
+// QueryApplication queries the "application" edge of the Credentials entity.
+func (c *Credentials) QueryApplication() *ApplicationQuery {
+	return NewCredentialsClient(c.config).QueryApplication(c)
 }
 
 // Update returns a builder for updating this Credentials.

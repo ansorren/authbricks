@@ -56,23 +56,23 @@ func (cu *CredentialsUpdate) SetNillableClientSecret(s *string) *CredentialsUpda
 	return cu
 }
 
-// SetOauthClientID sets the "oauth_client" edge to the Application entity by ID.
-func (cu *CredentialsUpdate) SetOauthClientID(id string) *CredentialsUpdate {
-	cu.mutation.SetOauthClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cu *CredentialsUpdate) SetApplicationID(id string) *CredentialsUpdate {
+	cu.mutation.SetApplicationID(id)
 	return cu
 }
 
-// SetNillableOauthClientID sets the "oauth_client" edge to the Application entity by ID if the given value is not nil.
-func (cu *CredentialsUpdate) SetNillableOauthClientID(id *string) *CredentialsUpdate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cu *CredentialsUpdate) SetNillableApplicationID(id *string) *CredentialsUpdate {
 	if id != nil {
-		cu = cu.SetOauthClientID(*id)
+		cu = cu.SetApplicationID(*id)
 	}
 	return cu
 }
 
-// SetOauthClient sets the "oauth_client" edge to the Application entity.
-func (cu *CredentialsUpdate) SetOauthClient(a *Application) *CredentialsUpdate {
-	return cu.SetOauthClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cu *CredentialsUpdate) SetApplication(a *Application) *CredentialsUpdate {
+	return cu.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CredentialsMutation object of the builder.
@@ -80,9 +80,9 @@ func (cu *CredentialsUpdate) Mutation() *CredentialsMutation {
 	return cu.mutation
 }
 
-// ClearOauthClient clears the "oauth_client" edge to the Application entity.
-func (cu *CredentialsUpdate) ClearOauthClient() *CredentialsUpdate {
-	cu.mutation.ClearOauthClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (cu *CredentialsUpdate) ClearApplication() *CredentialsUpdate {
+	cu.mutation.ClearApplication()
 	return cu
 }
 
@@ -141,12 +141,12 @@ func (cu *CredentialsUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.ClientSecret(); ok {
 		_spec.SetField(credentials.FieldClientSecret, field.TypeString, value)
 	}
-	if cu.mutation.OauthClientCleared() {
+	if cu.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   credentials.OauthClientTable,
-			Columns: []string{credentials.OauthClientColumn},
+			Table:   credentials.ApplicationTable,
+			Columns: []string{credentials.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -154,12 +154,12 @@ func (cu *CredentialsUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.OauthClientIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   credentials.OauthClientTable,
-			Columns: []string{credentials.OauthClientColumn},
+			Table:   credentials.ApplicationTable,
+			Columns: []string{credentials.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -218,23 +218,23 @@ func (cuo *CredentialsUpdateOne) SetNillableClientSecret(s *string) *Credentials
 	return cuo
 }
 
-// SetOauthClientID sets the "oauth_client" edge to the Application entity by ID.
-func (cuo *CredentialsUpdateOne) SetOauthClientID(id string) *CredentialsUpdateOne {
-	cuo.mutation.SetOauthClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cuo *CredentialsUpdateOne) SetApplicationID(id string) *CredentialsUpdateOne {
+	cuo.mutation.SetApplicationID(id)
 	return cuo
 }
 
-// SetNillableOauthClientID sets the "oauth_client" edge to the Application entity by ID if the given value is not nil.
-func (cuo *CredentialsUpdateOne) SetNillableOauthClientID(id *string) *CredentialsUpdateOne {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cuo *CredentialsUpdateOne) SetNillableApplicationID(id *string) *CredentialsUpdateOne {
 	if id != nil {
-		cuo = cuo.SetOauthClientID(*id)
+		cuo = cuo.SetApplicationID(*id)
 	}
 	return cuo
 }
 
-// SetOauthClient sets the "oauth_client" edge to the Application entity.
-func (cuo *CredentialsUpdateOne) SetOauthClient(a *Application) *CredentialsUpdateOne {
-	return cuo.SetOauthClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cuo *CredentialsUpdateOne) SetApplication(a *Application) *CredentialsUpdateOne {
+	return cuo.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CredentialsMutation object of the builder.
@@ -242,9 +242,9 @@ func (cuo *CredentialsUpdateOne) Mutation() *CredentialsMutation {
 	return cuo.mutation
 }
 
-// ClearOauthClient clears the "oauth_client" edge to the Application entity.
-func (cuo *CredentialsUpdateOne) ClearOauthClient() *CredentialsUpdateOne {
-	cuo.mutation.ClearOauthClient()
+// ClearApplication clears the "application" edge to the Application entity.
+func (cuo *CredentialsUpdateOne) ClearApplication() *CredentialsUpdateOne {
+	cuo.mutation.ClearApplication()
 	return cuo
 }
 
@@ -333,12 +333,12 @@ func (cuo *CredentialsUpdateOne) sqlSave(ctx context.Context) (_node *Credential
 	if value, ok := cuo.mutation.ClientSecret(); ok {
 		_spec.SetField(credentials.FieldClientSecret, field.TypeString, value)
 	}
-	if cuo.mutation.OauthClientCleared() {
+	if cuo.mutation.ApplicationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   credentials.OauthClientTable,
-			Columns: []string{credentials.OauthClientColumn},
+			Table:   credentials.ApplicationTable,
+			Columns: []string{credentials.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -346,12 +346,12 @@ func (cuo *CredentialsUpdateOne) sqlSave(ctx context.Context) (_node *Credential
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.OauthClientIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   credentials.OauthClientTable,
-			Columns: []string{credentials.OauthClientColumn},
+			Table:   credentials.ApplicationTable,
+			Columns: []string{credentials.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),

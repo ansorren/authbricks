@@ -38,23 +38,23 @@ func (cgc *CodeGrantCreate) SetID(s string) *CodeGrantCreate {
 	return cgc
 }
 
-// SetClientID sets the "client" edge to the Application entity by ID.
-func (cgc *CodeGrantCreate) SetClientID(id string) *CodeGrantCreate {
-	cgc.mutation.SetClientID(id)
+// SetApplicationID sets the "application" edge to the Application entity by ID.
+func (cgc *CodeGrantCreate) SetApplicationID(id string) *CodeGrantCreate {
+	cgc.mutation.SetApplicationID(id)
 	return cgc
 }
 
-// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
-func (cgc *CodeGrantCreate) SetNillableClientID(id *string) *CodeGrantCreate {
+// SetNillableApplicationID sets the "application" edge to the Application entity by ID if the given value is not nil.
+func (cgc *CodeGrantCreate) SetNillableApplicationID(id *string) *CodeGrantCreate {
 	if id != nil {
-		cgc = cgc.SetClientID(*id)
+		cgc = cgc.SetApplicationID(*id)
 	}
 	return cgc
 }
 
-// SetClient sets the "client" edge to the Application entity.
-func (cgc *CodeGrantCreate) SetClient(a *Application) *CodeGrantCreate {
-	return cgc.SetClientID(a.ID)
+// SetApplication sets the "application" edge to the Application entity.
+func (cgc *CodeGrantCreate) SetApplication(a *Application) *CodeGrantCreate {
+	return cgc.SetApplicationID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -145,12 +145,12 @@ func (cgc *CodeGrantCreate) createSpec() (*CodeGrant, *sqlgraph.CreateSpec) {
 		_spec.SetField(codegrant.FieldCallbacks, field.TypeJSON, value)
 		_node.Callbacks = value
 	}
-	if nodes := cgc.mutation.ClientIDs(); len(nodes) > 0 {
+	if nodes := cgc.mutation.ApplicationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   codegrant.ClientTable,
-			Columns: []string{codegrant.ClientColumn},
+			Table:   codegrant.ApplicationTable,
+			Columns: []string{codegrant.ApplicationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
@@ -159,7 +159,7 @@ func (cgc *CodeGrantCreate) createSpec() (*CodeGrant, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.application_code_grants = &nodes[0]
+		_node.application_code_grant = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
