@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
 	"go.authbricks.com/bricks/ent/codegrant"
@@ -19,9 +20,9 @@ import (
 	"go.authbricks.com/bricks/ent/credentials"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
-	"go.authbricks.com/bricks/ent/oauthserver"
 	"go.authbricks.com/bricks/ent/refreshtoken"
+	"go.authbricks.com/bricks/ent/service"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 	"go.authbricks.com/bricks/ent/session"
 	"go.authbricks.com/bricks/ent/signingkey"
 	"go.authbricks.com/bricks/ent/standardclaims"
@@ -87,6 +88,7 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			application.Table:          application.ValidColumn,
 			authorizationcode.Table:    authorizationcode.ValidColumn,
 			authorizationpayload.Table: authorizationpayload.ValidColumn,
 			codegrant.Table:            codegrant.ValidColumn,
@@ -94,9 +96,9 @@ func checkColumn(table, column string) error {
 			credentials.Table:          credentials.ValidColumn,
 			keyset.Table:               keyset.ValidColumn,
 			m2mgrant.Table:             m2mgrant.ValidColumn,
-			oauthclient.Table:          oauthclient.ValidColumn,
-			oauthserver.Table:          oauthserver.ValidColumn,
 			refreshtoken.Table:         refreshtoken.ValidColumn,
+			service.Table:              service.ValidColumn,
+			serviceconfig.Table:        serviceconfig.ValidColumn,
 			session.Table:              session.ValidColumn,
 			signingkey.Table:           signingkey.ValidColumn,
 			standardclaims.Table:       standardclaims.ValidColumn,

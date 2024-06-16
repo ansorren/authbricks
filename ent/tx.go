@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Application is the client for interacting with the Application builders.
+	Application *ApplicationClient
 	// AuthorizationCode is the client for interacting with the AuthorizationCode builders.
 	AuthorizationCode *AuthorizationCodeClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
@@ -26,12 +28,12 @@ type Tx struct {
 	KeySet *KeySetClient
 	// M2MGrant is the client for interacting with the M2MGrant builders.
 	M2MGrant *M2MGrantClient
-	// OAuthClient is the client for interacting with the OAuthClient builders.
-	OAuthClient *OAuthClientClient
-	// OAuthServer is the client for interacting with the OAuthServer builders.
-	OAuthServer *OAuthServerClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
+	// Service is the client for interacting with the Service builders.
+	Service *ServiceClient
+	// ServiceConfig is the client for interacting with the ServiceConfig builders.
+	ServiceConfig *ServiceConfigClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// SigningKey is the client for interacting with the SigningKey builders.
@@ -173,6 +175,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Application = NewApplicationClient(tx.config)
 	tx.AuthorizationCode = NewAuthorizationCodeClient(tx.config)
 	tx.AuthorizationPayload = NewAuthorizationPayloadClient(tx.config)
 	tx.CodeGrant = NewCodeGrantClient(tx.config)
@@ -180,9 +183,9 @@ func (tx *Tx) init() {
 	tx.Credentials = NewCredentialsClient(tx.config)
 	tx.KeySet = NewKeySetClient(tx.config)
 	tx.M2MGrant = NewM2MGrantClient(tx.config)
-	tx.OAuthClient = NewOAuthClientClient(tx.config)
-	tx.OAuthServer = NewOAuthServerClient(tx.config)
 	tx.RefreshToken = NewRefreshTokenClient(tx.config)
+	tx.Service = NewServiceClient(tx.config)
+	tx.ServiceConfig = NewServiceConfigClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.SigningKey = NewSigningKeyClient(tx.config)
 	tx.StandardClaims = NewStandardClaimsClient(tx.config)
@@ -197,7 +200,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AuthorizationCode.QueryXXX(), the query will be executed
+// applies a query, for example: Application.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

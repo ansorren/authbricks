@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // M2MGrantCreate is the builder for creating a M2MGrant entity.
@@ -32,13 +32,13 @@ func (mgc *M2MGrantCreate) SetID(s string) *M2MGrantCreate {
 	return mgc
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (mgc *M2MGrantCreate) SetClientID(id string) *M2MGrantCreate {
 	mgc.mutation.SetClientID(id)
 	return mgc
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (mgc *M2MGrantCreate) SetNillableClientID(id *string) *M2MGrantCreate {
 	if id != nil {
 		mgc = mgc.SetClientID(*id)
@@ -46,9 +46,9 @@ func (mgc *M2MGrantCreate) SetNillableClientID(id *string) *M2MGrantCreate {
 	return mgc
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (mgc *M2MGrantCreate) SetClient(o *OAuthClient) *M2MGrantCreate {
-	return mgc.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (mgc *M2MGrantCreate) SetClient(a *Application) *M2MGrantCreate {
+	return mgc.SetClientID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -140,13 +140,13 @@ func (mgc *M2MGrantCreate) createSpec() (*M2MGrant, *sqlgraph.CreateSpec) {
 			Columns: []string{m2mgrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.oauth_client_m2m_grants = &nodes[0]
+		_node.application_m2m_grants = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

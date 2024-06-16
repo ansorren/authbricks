@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/predicate"
 )
 
@@ -41,13 +41,13 @@ func (mgu *M2MGrantUpdate) AppendScopes(s []string) *M2MGrantUpdate {
 	return mgu
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (mgu *M2MGrantUpdate) SetClientID(id string) *M2MGrantUpdate {
 	mgu.mutation.SetClientID(id)
 	return mgu
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (mgu *M2MGrantUpdate) SetNillableClientID(id *string) *M2MGrantUpdate {
 	if id != nil {
 		mgu = mgu.SetClientID(*id)
@@ -55,9 +55,9 @@ func (mgu *M2MGrantUpdate) SetNillableClientID(id *string) *M2MGrantUpdate {
 	return mgu
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (mgu *M2MGrantUpdate) SetClient(o *OAuthClient) *M2MGrantUpdate {
-	return mgu.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (mgu *M2MGrantUpdate) SetClient(a *Application) *M2MGrantUpdate {
+	return mgu.SetClientID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -65,7 +65,7 @@ func (mgu *M2MGrantUpdate) Mutation() *M2MGrantMutation {
 	return mgu.mutation
 }
 
-// ClearClient clears the "client" edge to the OAuthClient entity.
+// ClearClient clears the "client" edge to the Application entity.
 func (mgu *M2MGrantUpdate) ClearClient() *M2MGrantUpdate {
 	mgu.mutation.ClearClient()
 	return mgu
@@ -123,7 +123,7 @@ func (mgu *M2MGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{m2mgrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -136,7 +136,7 @@ func (mgu *M2MGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{m2mgrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -176,13 +176,13 @@ func (mguo *M2MGrantUpdateOne) AppendScopes(s []string) *M2MGrantUpdateOne {
 	return mguo
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (mguo *M2MGrantUpdateOne) SetClientID(id string) *M2MGrantUpdateOne {
 	mguo.mutation.SetClientID(id)
 	return mguo
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (mguo *M2MGrantUpdateOne) SetNillableClientID(id *string) *M2MGrantUpdateOne {
 	if id != nil {
 		mguo = mguo.SetClientID(*id)
@@ -190,9 +190,9 @@ func (mguo *M2MGrantUpdateOne) SetNillableClientID(id *string) *M2MGrantUpdateOn
 	return mguo
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (mguo *M2MGrantUpdateOne) SetClient(o *OAuthClient) *M2MGrantUpdateOne {
-	return mguo.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (mguo *M2MGrantUpdateOne) SetClient(a *Application) *M2MGrantUpdateOne {
+	return mguo.SetClientID(a.ID)
 }
 
 // Mutation returns the M2MGrantMutation object of the builder.
@@ -200,7 +200,7 @@ func (mguo *M2MGrantUpdateOne) Mutation() *M2MGrantMutation {
 	return mguo.mutation
 }
 
-// ClearClient clears the "client" edge to the OAuthClient entity.
+// ClearClient clears the "client" edge to the Application entity.
 func (mguo *M2MGrantUpdateOne) ClearClient() *M2MGrantUpdateOne {
 	mguo.mutation.ClearClient()
 	return mguo
@@ -288,7 +288,7 @@ func (mguo *M2MGrantUpdateOne) sqlSave(ctx context.Context) (_node *M2MGrant, er
 			Columns: []string{m2mgrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -301,7 +301,7 @@ func (mguo *M2MGrantUpdateOne) sqlSave(ctx context.Context) (_node *M2MGrant, er
 			Columns: []string{m2mgrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

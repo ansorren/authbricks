@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/predicate"
 )
 
@@ -22,7 +22,7 @@ type CredentialsQuery struct {
 	order           []credentials.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Credentials
-	withOauthClient *OAuthClientQuery
+	withOauthClient *ApplicationQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (cq *CredentialsQuery) Order(o ...credentials.OrderOption) *CredentialsQuer
 }
 
 // QueryOauthClient chains the current query on the "oauth_client" edge.
-func (cq *CredentialsQuery) QueryOauthClient() *OAuthClientQuery {
-	query := (&OAuthClientClient{config: cq.config}).Query()
+func (cq *CredentialsQuery) QueryOauthClient() *ApplicationQuery {
+	query := (&ApplicationClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (cq *CredentialsQuery) QueryOauthClient() *OAuthClientQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(credentials.Table, credentials.FieldID, selector),
-			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.To(application.Table, application.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, credentials.OauthClientTable, credentials.OauthClientColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
@@ -283,8 +283,8 @@ func (cq *CredentialsQuery) Clone() *CredentialsQuery {
 
 // WithOauthClient tells the query-builder to eager-load the nodes that are connected to
 // the "oauth_client" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CredentialsQuery) WithOauthClient(opts ...func(*OAuthClientQuery)) *CredentialsQuery {
-	query := (&OAuthClientClient{config: cq.config}).Query()
+func (cq *CredentialsQuery) WithOauthClient(opts ...func(*ApplicationQuery)) *CredentialsQuery {
+	query := (&ApplicationClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -401,21 +401,21 @@ func (cq *CredentialsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	}
 	if query := cq.withOauthClient; query != nil {
 		if err := cq.loadOauthClient(ctx, query, nodes, nil,
-			func(n *Credentials, e *OAuthClient) { n.Edges.OauthClient = e }); err != nil {
+			func(n *Credentials, e *Application) { n.Edges.OauthClient = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cq *CredentialsQuery) loadOauthClient(ctx context.Context, query *OAuthClientQuery, nodes []*Credentials, init func(*Credentials), assign func(*Credentials, *OAuthClient)) error {
+func (cq *CredentialsQuery) loadOauthClient(ctx context.Context, query *ApplicationQuery, nodes []*Credentials, init func(*Credentials), assign func(*Credentials, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Credentials)
 	for i := range nodes {
-		if nodes[i].oauth_client_credentials == nil {
+		if nodes[i].application_credentials == nil {
 			continue
 		}
-		fk := *nodes[i].oauth_client_credentials
+		fk := *nodes[i].application_credentials
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -424,7 +424,7 @@ func (cq *CredentialsQuery) loadOauthClient(ctx context.Context, query *OAuthCli
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(oauthclient.IDIn(ids...))
+	query.Where(application.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -432,7 +432,7 @@ func (cq *CredentialsQuery) loadOauthClient(ctx context.Context, query *OAuthCli
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "oauth_client_credentials" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "application_credentials" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

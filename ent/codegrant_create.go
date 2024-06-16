@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/codegrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // CodeGrantCreate is the builder for creating a CodeGrant entity.
@@ -38,13 +38,13 @@ func (cgc *CodeGrantCreate) SetID(s string) *CodeGrantCreate {
 	return cgc
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (cgc *CodeGrantCreate) SetClientID(id string) *CodeGrantCreate {
 	cgc.mutation.SetClientID(id)
 	return cgc
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (cgc *CodeGrantCreate) SetNillableClientID(id *string) *CodeGrantCreate {
 	if id != nil {
 		cgc = cgc.SetClientID(*id)
@@ -52,9 +52,9 @@ func (cgc *CodeGrantCreate) SetNillableClientID(id *string) *CodeGrantCreate {
 	return cgc
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (cgc *CodeGrantCreate) SetClient(o *OAuthClient) *CodeGrantCreate {
-	return cgc.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (cgc *CodeGrantCreate) SetClient(a *Application) *CodeGrantCreate {
+	return cgc.SetClientID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -153,13 +153,13 @@ func (cgc *CodeGrantCreate) createSpec() (*CodeGrant, *sqlgraph.CreateSpec) {
 			Columns: []string{codegrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.oauth_client_code_grants = &nodes[0]
+		_node.application_code_grants = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

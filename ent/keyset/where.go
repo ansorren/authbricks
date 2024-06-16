@@ -63,21 +63,21 @@ func IDContainsFold(id string) predicate.KeySet {
 	return predicate.KeySet(sql.FieldContainsFold(FieldID, id))
 }
 
-// HasOauthServer applies the HasEdge predicate on the "oauth_server" edge.
-func HasOauthServer() predicate.KeySet {
+// HasServiceConfig applies the HasEdge predicate on the "service_config" edge.
+func HasServiceConfig() predicate.KeySet {
 	return predicate.KeySet(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, OauthServerTable, OauthServerColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ServiceConfigTable, ServiceConfigColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasOauthServerWith applies the HasEdge predicate on the "oauth_server" edge with a given conditions (other predicates).
-func HasOauthServerWith(preds ...predicate.OAuthServer) predicate.KeySet {
+// HasServiceConfigWith applies the HasEdge predicate on the "service_config" edge with a given conditions (other predicates).
+func HasServiceConfigWith(preds ...predicate.ServiceConfig) predicate.KeySet {
 	return predicate.KeySet(func(s *sql.Selector) {
-		step := newOauthServerStep()
+		step := newServiceConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

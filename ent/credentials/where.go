@@ -215,7 +215,7 @@ func HasOauthClient() predicate.Credentials {
 }
 
 // HasOauthClientWith applies the HasEdge predicate on the "oauth_client" edge with a given conditions (other predicates).
-func HasOauthClientWith(preds ...predicate.OAuthClient) predicate.Credentials {
+func HasOauthClientWith(preds ...predicate.Application) predicate.Credentials {
 	return predicate.Credentials(func(s *sql.Selector) {
 		step := newOauthClientStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

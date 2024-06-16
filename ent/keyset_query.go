@@ -12,21 +12,21 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/oauthserver"
 	"go.authbricks.com/bricks/ent/predicate"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
 // KeySetQuery is the builder for querying KeySet entities.
 type KeySetQuery struct {
 	config
-	ctx             *QueryContext
-	order           []keyset.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.KeySet
-	withOauthServer *OAuthServerQuery
-	withSigningKeys *SigningKeyQuery
-	withFKs         bool
+	ctx               *QueryContext
+	order             []keyset.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.KeySet
+	withServiceConfig *ServiceConfigQuery
+	withSigningKeys   *SigningKeyQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,9 +63,9 @@ func (ksq *KeySetQuery) Order(o ...keyset.OrderOption) *KeySetQuery {
 	return ksq
 }
 
-// QueryOauthServer chains the current query on the "oauth_server" edge.
-func (ksq *KeySetQuery) QueryOauthServer() *OAuthServerQuery {
-	query := (&OAuthServerClient{config: ksq.config}).Query()
+// QueryServiceConfig chains the current query on the "service_config" edge.
+func (ksq *KeySetQuery) QueryServiceConfig() *ServiceConfigQuery {
+	query := (&ServiceConfigClient{config: ksq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ksq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,8 +76,8 @@ func (ksq *KeySetQuery) QueryOauthServer() *OAuthServerQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(keyset.Table, keyset.FieldID, selector),
-			sqlgraph.To(oauthserver.Table, oauthserver.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, keyset.OauthServerTable, keyset.OauthServerColumn),
+			sqlgraph.To(serviceconfig.Table, serviceconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServiceConfigTable, keyset.ServiceConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ksq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,27 +294,27 @@ func (ksq *KeySetQuery) Clone() *KeySetQuery {
 		return nil
 	}
 	return &KeySetQuery{
-		config:          ksq.config,
-		ctx:             ksq.ctx.Clone(),
-		order:           append([]keyset.OrderOption{}, ksq.order...),
-		inters:          append([]Interceptor{}, ksq.inters...),
-		predicates:      append([]predicate.KeySet{}, ksq.predicates...),
-		withOauthServer: ksq.withOauthServer.Clone(),
-		withSigningKeys: ksq.withSigningKeys.Clone(),
+		config:            ksq.config,
+		ctx:               ksq.ctx.Clone(),
+		order:             append([]keyset.OrderOption{}, ksq.order...),
+		inters:            append([]Interceptor{}, ksq.inters...),
+		predicates:        append([]predicate.KeySet{}, ksq.predicates...),
+		withServiceConfig: ksq.withServiceConfig.Clone(),
+		withSigningKeys:   ksq.withSigningKeys.Clone(),
 		// clone intermediate query.
 		sql:  ksq.sql.Clone(),
 		path: ksq.path,
 	}
 }
 
-// WithOauthServer tells the query-builder to eager-load the nodes that are connected to
-// the "oauth_server" edge. The optional arguments are used to configure the query builder of the edge.
-func (ksq *KeySetQuery) WithOauthServer(opts ...func(*OAuthServerQuery)) *KeySetQuery {
-	query := (&OAuthServerClient{config: ksq.config}).Query()
+// WithServiceConfig tells the query-builder to eager-load the nodes that are connected to
+// the "service_config" edge. The optional arguments are used to configure the query builder of the edge.
+func (ksq *KeySetQuery) WithServiceConfig(opts ...func(*ServiceConfigQuery)) *KeySetQuery {
+	query := (&ServiceConfigClient{config: ksq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ksq.withOauthServer = query
+	ksq.withServiceConfig = query
 	return ksq
 }
 
@@ -387,11 +387,11 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 		withFKs     = ksq.withFKs
 		_spec       = ksq.querySpec()
 		loadedTypes = [2]bool{
-			ksq.withOauthServer != nil,
+			ksq.withServiceConfig != nil,
 			ksq.withSigningKeys != nil,
 		}
 	)
-	if ksq.withOauthServer != nil {
+	if ksq.withServiceConfig != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -415,9 +415,9 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := ksq.withOauthServer; query != nil {
-		if err := ksq.loadOauthServer(ctx, query, nodes, nil,
-			func(n *KeySet, e *OAuthServer) { n.Edges.OauthServer = e }); err != nil {
+	if query := ksq.withServiceConfig; query != nil {
+		if err := ksq.loadServiceConfig(ctx, query, nodes, nil,
+			func(n *KeySet, e *ServiceConfig) { n.Edges.ServiceConfig = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -431,14 +431,14 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	return nodes, nil
 }
 
-func (ksq *KeySetQuery) loadOauthServer(ctx context.Context, query *OAuthServerQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *OAuthServer)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*KeySet)
+func (ksq *KeySetQuery) loadServiceConfig(ctx context.Context, query *ServiceConfigQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *ServiceConfig)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*KeySet)
 	for i := range nodes {
-		if nodes[i].oauth_server_key_set == nil {
+		if nodes[i].service_config_key_sets == nil {
 			continue
 		}
-		fk := *nodes[i].oauth_server_key_set
+		fk := *nodes[i].service_config_key_sets
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -447,7 +447,7 @@ func (ksq *KeySetQuery) loadOauthServer(ctx context.Context, query *OAuthServerQ
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(oauthserver.IDIn(ids...))
+	query.Where(serviceconfig.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -455,7 +455,7 @@ func (ksq *KeySetQuery) loadOauthServer(ctx context.Context, query *OAuthServerQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "oauth_server_key_set" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "service_config_key_sets" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

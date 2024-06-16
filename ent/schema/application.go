@@ -6,13 +6,13 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// OAuthClient holds the schema definition for the OAuthClient entity.
-type OAuthClient struct {
+// Application holds the schema definition for the Application entity.
+type Application struct {
 	ent.Schema
 }
 
-// Fields of the OAuthClient.
-func (OAuthClient) Fields() []ent.Field {
+// Fields of the Application.
+func (Application) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Unique().NotEmpty().StructTag(`json:"id"`),
 		field.String("name").Unique().NotEmpty().StructTag(`json:"name"`),
@@ -20,12 +20,12 @@ func (OAuthClient) Fields() []ent.Field {
 	}
 }
 
-// Edges of the OAuthClient.
-func (OAuthClient) Edges() []ent.Edge {
+// Edges of the Application.
+func (Application) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("m2m_grants", M2MGrant.Type).Unique(),
 		edge.To("code_grants", CodeGrant.Type).Unique(),
 		edge.To("credentials", Credentials.Type),
-		edge.From("server", OAuthServer.Type).Ref("clients").Unique(),
+		edge.From("service", Service.Type).Ref("applications").Unique(),
 	}
 }

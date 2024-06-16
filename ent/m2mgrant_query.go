@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/predicate"
 )
 
@@ -22,7 +22,7 @@ type M2MGrantQuery struct {
 	order      []m2mgrant.OrderOption
 	inters     []Interceptor
 	predicates []predicate.M2MGrant
-	withClient *OAuthClientQuery
+	withClient *ApplicationQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (mgq *M2MGrantQuery) Order(o ...m2mgrant.OrderOption) *M2MGrantQuery {
 }
 
 // QueryClient chains the current query on the "client" edge.
-func (mgq *M2MGrantQuery) QueryClient() *OAuthClientQuery {
-	query := (&OAuthClientClient{config: mgq.config}).Query()
+func (mgq *M2MGrantQuery) QueryClient() *ApplicationQuery {
+	query := (&ApplicationClient{config: mgq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := mgq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (mgq *M2MGrantQuery) QueryClient() *OAuthClientQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(m2mgrant.Table, m2mgrant.FieldID, selector),
-			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.To(application.Table, application.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ClientTable, m2mgrant.ClientColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mgq.driver.Dialect(), step)
@@ -283,8 +283,8 @@ func (mgq *M2MGrantQuery) Clone() *M2MGrantQuery {
 
 // WithClient tells the query-builder to eager-load the nodes that are connected to
 // the "client" edge. The optional arguments are used to configure the query builder of the edge.
-func (mgq *M2MGrantQuery) WithClient(opts ...func(*OAuthClientQuery)) *M2MGrantQuery {
-	query := (&OAuthClientClient{config: mgq.config}).Query()
+func (mgq *M2MGrantQuery) WithClient(opts ...func(*ApplicationQuery)) *M2MGrantQuery {
+	query := (&ApplicationClient{config: mgq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -401,21 +401,21 @@ func (mgq *M2MGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*M2
 	}
 	if query := mgq.withClient; query != nil {
 		if err := mgq.loadClient(ctx, query, nodes, nil,
-			func(n *M2MGrant, e *OAuthClient) { n.Edges.Client = e }); err != nil {
+			func(n *M2MGrant, e *Application) { n.Edges.Client = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *OAuthClientQuery, nodes []*M2MGrant, init func(*M2MGrant), assign func(*M2MGrant, *OAuthClient)) error {
+func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *ApplicationQuery, nodes []*M2MGrant, init func(*M2MGrant), assign func(*M2MGrant, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*M2MGrant)
 	for i := range nodes {
-		if nodes[i].oauth_client_m2m_grants == nil {
+		if nodes[i].application_m2m_grants == nil {
 			continue
 		}
-		fk := *nodes[i].oauth_client_m2m_grants
+		fk := *nodes[i].application_m2m_grants
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -424,7 +424,7 @@ func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *OAuthClientQuer
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(oauthclient.IDIn(ids...))
+	query.Where(application.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -432,7 +432,7 @@ func (mgq *M2MGrantQuery) loadClient(ctx context.Context, query *OAuthClientQuer
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "oauth_client_m2m_grants" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "application_m2m_grants" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

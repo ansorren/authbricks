@@ -20,11 +20,11 @@ const (
 	Table = "m2m_grants"
 	// ClientTable is the table that holds the client relation/edge.
 	ClientTable = "m2m_grants"
-	// ClientInverseTable is the table name for the OAuthClient entity.
-	// It exists in this package in order to avoid circular dependency with the "oauthclient" package.
-	ClientInverseTable = "oauth_clients"
+	// ClientInverseTable is the table name for the Application entity.
+	// It exists in this package in order to avoid circular dependency with the "application" package.
+	ClientInverseTable = "applications"
 	// ClientColumn is the table column denoting the client relation/edge.
-	ClientColumn = "oauth_client_m2m_grants"
+	ClientColumn = "application_m2m_grants"
 )
 
 // Columns holds all SQL columns for m2mgrant fields.
@@ -36,7 +36,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "m2m_grants"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"oauth_client_m2m_grants",
+	"application_m2m_grants",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

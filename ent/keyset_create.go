@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/oauthserver"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
@@ -26,23 +26,23 @@ func (ksc *KeySetCreate) SetID(s string) *KeySetCreate {
 	return ksc
 }
 
-// SetOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID.
-func (ksc *KeySetCreate) SetOauthServerID(id int) *KeySetCreate {
-	ksc.mutation.SetOauthServerID(id)
+// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
+func (ksc *KeySetCreate) SetServiceConfigID(id string) *KeySetCreate {
+	ksc.mutation.SetServiceConfigID(id)
 	return ksc
 }
 
-// SetNillableOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID if the given value is not nil.
-func (ksc *KeySetCreate) SetNillableOauthServerID(id *int) *KeySetCreate {
+// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
+func (ksc *KeySetCreate) SetNillableServiceConfigID(id *string) *KeySetCreate {
 	if id != nil {
-		ksc = ksc.SetOauthServerID(*id)
+		ksc = ksc.SetServiceConfigID(*id)
 	}
 	return ksc
 }
 
-// SetOauthServer sets the "oauth_server" edge to the OAuthServer entity.
-func (ksc *KeySetCreate) SetOauthServer(o *OAuthServer) *KeySetCreate {
-	return ksc.SetOauthServerID(o.ID)
+// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
+func (ksc *KeySetCreate) SetServiceConfig(s *ServiceConfig) *KeySetCreate {
+	return ksc.SetServiceConfigID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -134,21 +134,21 @@ func (ksc *KeySetCreate) createSpec() (*KeySet, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if nodes := ksc.mutation.OauthServerIDs(); len(nodes) > 0 {
+	if nodes := ksc.mutation.ServiceConfigIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.OauthServerTable,
-			Columns: []string{keyset.OauthServerColumn},
+			Table:   keyset.ServiceConfigTable,
+			Columns: []string{keyset.ServiceConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthserver.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.oauth_server_key_set = &nodes[0]
+		_node.service_config_key_sets = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ksc.mutation.SigningKeysIDs(); len(nodes) > 0 {

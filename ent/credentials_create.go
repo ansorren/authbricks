@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // CredentialsCreate is the builder for creating a Credentials entity.
@@ -38,13 +38,13 @@ func (cc *CredentialsCreate) SetID(s string) *CredentialsCreate {
 	return cc
 }
 
-// SetOauthClientID sets the "oauth_client" edge to the OAuthClient entity by ID.
+// SetOauthClientID sets the "oauth_client" edge to the Application entity by ID.
 func (cc *CredentialsCreate) SetOauthClientID(id string) *CredentialsCreate {
 	cc.mutation.SetOauthClientID(id)
 	return cc
 }
 
-// SetNillableOauthClientID sets the "oauth_client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableOauthClientID sets the "oauth_client" edge to the Application entity by ID if the given value is not nil.
 func (cc *CredentialsCreate) SetNillableOauthClientID(id *string) *CredentialsCreate {
 	if id != nil {
 		cc = cc.SetOauthClientID(*id)
@@ -52,9 +52,9 @@ func (cc *CredentialsCreate) SetNillableOauthClientID(id *string) *CredentialsCr
 	return cc
 }
 
-// SetOauthClient sets the "oauth_client" edge to the OAuthClient entity.
-func (cc *CredentialsCreate) SetOauthClient(o *OAuthClient) *CredentialsCreate {
-	return cc.SetOauthClientID(o.ID)
+// SetOauthClient sets the "oauth_client" edge to the Application entity.
+func (cc *CredentialsCreate) SetOauthClient(a *Application) *CredentialsCreate {
+	return cc.SetOauthClientID(a.ID)
 }
 
 // Mutation returns the CredentialsMutation object of the builder.
@@ -158,13 +158,13 @@ func (cc *CredentialsCreate) createSpec() (*Credentials, *sqlgraph.CreateSpec) {
 			Columns: []string{credentials.OauthClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.oauth_client_credentials = &nodes[0]
+		_node.application_credentials = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -23,6 +23,6 @@ func (CodeGrant) Fields() []ent.Field {
 // Edges of the CodeGrant.
 func (CodeGrant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("client", OAuthClient.Type).Ref("code_grants").Unique(),
+		edge.From("client", Application.Type).Ref("code_grants").Unique(),
 	}
 }

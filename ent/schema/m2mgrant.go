@@ -22,6 +22,6 @@ func (M2MGrant) Fields() []ent.Field {
 // Edges of the M2MGrant.
 func (M2MGrant) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("client", OAuthClient.Type).Ref("m2m_grants").Unique(),
+		edge.From("client", Application.Type).Ref("m2m_grants").Unique(),
 	}
 }

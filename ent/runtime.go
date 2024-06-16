@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
 	"go.authbricks.com/bricks/ent/codegrant"
@@ -10,9 +11,10 @@ import (
 	"go.authbricks.com/bricks/ent/credentials"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/schema"
+	"go.authbricks.com/bricks/ent/service"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 	"go.authbricks.com/bricks/ent/session"
 	"go.authbricks.com/bricks/ent/signingkey"
 	"go.authbricks.com/bricks/ent/standardclaims"
@@ -24,6 +26,20 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	applicationFields := schema.Application{}.Fields()
+	_ = applicationFields
+	// applicationDescName is the schema descriptor for name field.
+	applicationDescName := applicationFields[1].Descriptor()
+	// application.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	application.NameValidator = applicationDescName.Validators[0].(func(string) error)
+	// applicationDescPublic is the schema descriptor for public field.
+	applicationDescPublic := applicationFields[2].Descriptor()
+	// application.DefaultPublic holds the default value on creation for the public field.
+	application.DefaultPublic = applicationDescPublic.Default.(bool)
+	// applicationDescID is the schema descriptor for id field.
+	applicationDescID := applicationFields[0].Descriptor()
+	// application.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	application.IDValidator = applicationDescID.Validators[0].(func(string) error)
 	authorizationcodeFields := schema.AuthorizationCode{}.Fields()
 	_ = authorizationcodeFields
 	// authorizationcodeDescID is the schema descriptor for id field.
@@ -78,20 +94,6 @@ func init() {
 	m2mgrantDescID := m2mgrantFields[0].Descriptor()
 	// m2mgrant.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	m2mgrant.IDValidator = m2mgrantDescID.Validators[0].(func(string) error)
-	oauthclientFields := schema.OAuthClient{}.Fields()
-	_ = oauthclientFields
-	// oauthclientDescName is the schema descriptor for name field.
-	oauthclientDescName := oauthclientFields[1].Descriptor()
-	// oauthclient.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	oauthclient.NameValidator = oauthclientDescName.Validators[0].(func(string) error)
-	// oauthclientDescPublic is the schema descriptor for public field.
-	oauthclientDescPublic := oauthclientFields[2].Descriptor()
-	// oauthclient.DefaultPublic holds the default value on creation for the public field.
-	oauthclient.DefaultPublic = oauthclientDescPublic.Default.(bool)
-	// oauthclientDescID is the schema descriptor for id field.
-	oauthclientDescID := oauthclientFields[0].Descriptor()
-	// oauthclient.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	oauthclient.IDValidator = oauthclientDescID.Validators[0].(func(string) error)
 	refreshtokenFields := schema.RefreshToken{}.Fields()
 	_ = refreshtokenFields
 	// refreshtokenDescCreatedAt is the schema descriptor for created_at field.
@@ -106,6 +108,26 @@ func init() {
 	refreshtokenDescID := refreshtokenFields[0].Descriptor()
 	// refreshtoken.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	refreshtoken.IDValidator = refreshtokenDescID.Validators[0].(func(string) error)
+	serviceFields := schema.Service{}.Fields()
+	_ = serviceFields
+	// serviceDescName is the schema descriptor for name field.
+	serviceDescName := serviceFields[1].Descriptor()
+	// service.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	service.NameValidator = serviceDescName.Validators[0].(func(string) error)
+	// serviceDescIssuer is the schema descriptor for issuer field.
+	serviceDescIssuer := serviceFields[2].Descriptor()
+	// service.IssuerValidator is a validator for the "issuer" field. It is called by the builders before save.
+	service.IssuerValidator = serviceDescIssuer.Validators[0].(func(string) error)
+	// serviceDescID is the schema descriptor for id field.
+	serviceDescID := serviceFields[0].Descriptor()
+	// service.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	service.IDValidator = serviceDescID.Validators[0].(func(string) error)
+	serviceconfigFields := schema.ServiceConfig{}.Fields()
+	_ = serviceconfigFields
+	// serviceconfigDescID is the schema descriptor for id field.
+	serviceconfigDescID := serviceconfigFields[0].Descriptor()
+	// serviceconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	serviceconfig.IDValidator = serviceconfigDescID.Validators[0].(func(string) error)
 	sessionFields := schema.Session{}.Fields()
 	_ = sessionFields
 	// sessionDescCreatedAt is the schema descriptor for created_at field.

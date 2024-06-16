@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/codegrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/predicate"
 )
 
@@ -53,13 +53,13 @@ func (cgu *CodeGrantUpdate) AppendCallbacks(s []string) *CodeGrantUpdate {
 	return cgu
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (cgu *CodeGrantUpdate) SetClientID(id string) *CodeGrantUpdate {
 	cgu.mutation.SetClientID(id)
 	return cgu
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (cgu *CodeGrantUpdate) SetNillableClientID(id *string) *CodeGrantUpdate {
 	if id != nil {
 		cgu = cgu.SetClientID(*id)
@@ -67,9 +67,9 @@ func (cgu *CodeGrantUpdate) SetNillableClientID(id *string) *CodeGrantUpdate {
 	return cgu
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (cgu *CodeGrantUpdate) SetClient(o *OAuthClient) *CodeGrantUpdate {
-	return cgu.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (cgu *CodeGrantUpdate) SetClient(a *Application) *CodeGrantUpdate {
+	return cgu.SetClientID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -77,7 +77,7 @@ func (cgu *CodeGrantUpdate) Mutation() *CodeGrantMutation {
 	return cgu.mutation
 }
 
-// ClearClient clears the "client" edge to the OAuthClient entity.
+// ClearClient clears the "client" edge to the Application entity.
 func (cgu *CodeGrantUpdate) ClearClient() *CodeGrantUpdate {
 	cgu.mutation.ClearClient()
 	return cgu
@@ -143,7 +143,7 @@ func (cgu *CodeGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{codegrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -156,7 +156,7 @@ func (cgu *CodeGrantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{codegrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -208,13 +208,13 @@ func (cguo *CodeGrantUpdateOne) AppendCallbacks(s []string) *CodeGrantUpdateOne 
 	return cguo
 }
 
-// SetClientID sets the "client" edge to the OAuthClient entity by ID.
+// SetClientID sets the "client" edge to the Application entity by ID.
 func (cguo *CodeGrantUpdateOne) SetClientID(id string) *CodeGrantUpdateOne {
 	cguo.mutation.SetClientID(id)
 	return cguo
 }
 
-// SetNillableClientID sets the "client" edge to the OAuthClient entity by ID if the given value is not nil.
+// SetNillableClientID sets the "client" edge to the Application entity by ID if the given value is not nil.
 func (cguo *CodeGrantUpdateOne) SetNillableClientID(id *string) *CodeGrantUpdateOne {
 	if id != nil {
 		cguo = cguo.SetClientID(*id)
@@ -222,9 +222,9 @@ func (cguo *CodeGrantUpdateOne) SetNillableClientID(id *string) *CodeGrantUpdate
 	return cguo
 }
 
-// SetClient sets the "client" edge to the OAuthClient entity.
-func (cguo *CodeGrantUpdateOne) SetClient(o *OAuthClient) *CodeGrantUpdateOne {
-	return cguo.SetClientID(o.ID)
+// SetClient sets the "client" edge to the Application entity.
+func (cguo *CodeGrantUpdateOne) SetClient(a *Application) *CodeGrantUpdateOne {
+	return cguo.SetClientID(a.ID)
 }
 
 // Mutation returns the CodeGrantMutation object of the builder.
@@ -232,7 +232,7 @@ func (cguo *CodeGrantUpdateOne) Mutation() *CodeGrantMutation {
 	return cguo.mutation
 }
 
-// ClearClient clears the "client" edge to the OAuthClient entity.
+// ClearClient clears the "client" edge to the Application entity.
 func (cguo *CodeGrantUpdateOne) ClearClient() *CodeGrantUpdateOne {
 	cguo.mutation.ClearClient()
 	return cguo
@@ -328,7 +328,7 @@ func (cguo *CodeGrantUpdateOne) sqlSave(ctx context.Context) (_node *CodeGrant, 
 			Columns: []string{codegrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -341,7 +341,7 @@ func (cguo *CodeGrantUpdateOne) sqlSave(ctx context.Context) (_node *CodeGrant, 
 			Columns: []string{codegrant.ClientColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(application.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

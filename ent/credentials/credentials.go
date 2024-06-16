@@ -22,11 +22,11 @@ const (
 	Table = "credentials"
 	// OauthClientTable is the table that holds the oauth_client relation/edge.
 	OauthClientTable = "credentials"
-	// OauthClientInverseTable is the table name for the OAuthClient entity.
-	// It exists in this package in order to avoid circular dependency with the "oauthclient" package.
-	OauthClientInverseTable = "oauth_clients"
+	// OauthClientInverseTable is the table name for the Application entity.
+	// It exists in this package in order to avoid circular dependency with the "application" package.
+	OauthClientInverseTable = "applications"
 	// OauthClientColumn is the table column denoting the oauth_client relation/edge.
-	OauthClientColumn = "oauth_client_credentials"
+	OauthClientColumn = "application_credentials"
 )
 
 // Columns holds all SQL columns for credentials fields.
@@ -39,7 +39,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "credentials"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"oauth_client_credentials",
+	"application_credentials",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

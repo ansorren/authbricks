@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/oauthserver"
 	"go.authbricks.com/bricks/ent/predicate"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
@@ -29,23 +29,23 @@ func (ksu *KeySetUpdate) Where(ps ...predicate.KeySet) *KeySetUpdate {
 	return ksu
 }
 
-// SetOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID.
-func (ksu *KeySetUpdate) SetOauthServerID(id int) *KeySetUpdate {
-	ksu.mutation.SetOauthServerID(id)
+// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
+func (ksu *KeySetUpdate) SetServiceConfigID(id string) *KeySetUpdate {
+	ksu.mutation.SetServiceConfigID(id)
 	return ksu
 }
 
-// SetNillableOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID if the given value is not nil.
-func (ksu *KeySetUpdate) SetNillableOauthServerID(id *int) *KeySetUpdate {
+// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
+func (ksu *KeySetUpdate) SetNillableServiceConfigID(id *string) *KeySetUpdate {
 	if id != nil {
-		ksu = ksu.SetOauthServerID(*id)
+		ksu = ksu.SetServiceConfigID(*id)
 	}
 	return ksu
 }
 
-// SetOauthServer sets the "oauth_server" edge to the OAuthServer entity.
-func (ksu *KeySetUpdate) SetOauthServer(o *OAuthServer) *KeySetUpdate {
-	return ksu.SetOauthServerID(o.ID)
+// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
+func (ksu *KeySetUpdate) SetServiceConfig(s *ServiceConfig) *KeySetUpdate {
+	return ksu.SetServiceConfigID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -68,9 +68,9 @@ func (ksu *KeySetUpdate) Mutation() *KeySetMutation {
 	return ksu.mutation
 }
 
-// ClearOauthServer clears the "oauth_server" edge to the OAuthServer entity.
-func (ksu *KeySetUpdate) ClearOauthServer() *KeySetUpdate {
-	ksu.mutation.ClearOauthServer()
+// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
+func (ksu *KeySetUpdate) ClearServiceConfig() *KeySetUpdate {
+	ksu.mutation.ClearServiceConfig()
 	return ksu
 }
 
@@ -131,28 +131,28 @@ func (ksu *KeySetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if ksu.mutation.OauthServerCleared() {
+	if ksu.mutation.ServiceConfigCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.OauthServerTable,
-			Columns: []string{keyset.OauthServerColumn},
+			Table:   keyset.ServiceConfigTable,
+			Columns: []string{keyset.ServiceConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthserver.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ksu.mutation.OauthServerIDs(); len(nodes) > 0 {
+	if nodes := ksu.mutation.ServiceConfigIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.OauthServerTable,
-			Columns: []string{keyset.OauthServerColumn},
+			Table:   keyset.ServiceConfigTable,
+			Columns: []string{keyset.ServiceConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthserver.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -225,23 +225,23 @@ type KeySetUpdateOne struct {
 	mutation *KeySetMutation
 }
 
-// SetOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID.
-func (ksuo *KeySetUpdateOne) SetOauthServerID(id int) *KeySetUpdateOne {
-	ksuo.mutation.SetOauthServerID(id)
+// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
+func (ksuo *KeySetUpdateOne) SetServiceConfigID(id string) *KeySetUpdateOne {
+	ksuo.mutation.SetServiceConfigID(id)
 	return ksuo
 }
 
-// SetNillableOauthServerID sets the "oauth_server" edge to the OAuthServer entity by ID if the given value is not nil.
-func (ksuo *KeySetUpdateOne) SetNillableOauthServerID(id *int) *KeySetUpdateOne {
+// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
+func (ksuo *KeySetUpdateOne) SetNillableServiceConfigID(id *string) *KeySetUpdateOne {
 	if id != nil {
-		ksuo = ksuo.SetOauthServerID(*id)
+		ksuo = ksuo.SetServiceConfigID(*id)
 	}
 	return ksuo
 }
 
-// SetOauthServer sets the "oauth_server" edge to the OAuthServer entity.
-func (ksuo *KeySetUpdateOne) SetOauthServer(o *OAuthServer) *KeySetUpdateOne {
-	return ksuo.SetOauthServerID(o.ID)
+// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
+func (ksuo *KeySetUpdateOne) SetServiceConfig(s *ServiceConfig) *KeySetUpdateOne {
+	return ksuo.SetServiceConfigID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -264,9 +264,9 @@ func (ksuo *KeySetUpdateOne) Mutation() *KeySetMutation {
 	return ksuo.mutation
 }
 
-// ClearOauthServer clears the "oauth_server" edge to the OAuthServer entity.
-func (ksuo *KeySetUpdateOne) ClearOauthServer() *KeySetUpdateOne {
-	ksuo.mutation.ClearOauthServer()
+// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
+func (ksuo *KeySetUpdateOne) ClearServiceConfig() *KeySetUpdateOne {
+	ksuo.mutation.ClearServiceConfig()
 	return ksuo
 }
 
@@ -357,28 +357,28 @@ func (ksuo *KeySetUpdateOne) sqlSave(ctx context.Context) (_node *KeySet, err er
 			}
 		}
 	}
-	if ksuo.mutation.OauthServerCleared() {
+	if ksuo.mutation.ServiceConfigCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.OauthServerTable,
-			Columns: []string{keyset.OauthServerColumn},
+			Table:   keyset.ServiceConfigTable,
+			Columns: []string{keyset.ServiceConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthserver.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ksuo.mutation.OauthServerIDs(); len(nodes) > 0 {
+	if nodes := ksuo.mutation.ServiceConfigIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.OauthServerTable,
-			Columns: []string{keyset.OauthServerColumn},
+			Table:   keyset.ServiceConfigTable,
+			Columns: []string{keyset.ServiceConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(oauthserver.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

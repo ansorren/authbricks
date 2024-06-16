@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/m2mgrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // M2MGrant is the model entity for the M2MGrant schema.
@@ -22,15 +22,15 @@ type M2MGrant struct {
 	Scopes []string `json:"scopes"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the M2MGrantQuery when eager-loading is set.
-	Edges                   M2MGrantEdges `json:"edges"`
-	oauth_client_m2m_grants *string
-	selectValues            sql.SelectValues
+	Edges                  M2MGrantEdges `json:"edges"`
+	application_m2m_grants *string
+	selectValues           sql.SelectValues
 }
 
 // M2MGrantEdges holds the relations/edges for other nodes in the graph.
 type M2MGrantEdges struct {
 	// Client holds the value of the client edge.
-	Client *OAuthClient `json:"client,omitempty"`
+	Client *Application `json:"client,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -38,11 +38,11 @@ type M2MGrantEdges struct {
 
 // ClientOrErr returns the Client value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e M2MGrantEdges) ClientOrErr() (*OAuthClient, error) {
+func (e M2MGrantEdges) ClientOrErr() (*Application, error) {
 	if e.Client != nil {
 		return e.Client, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: oauthclient.Label}
+		return nil, &NotFoundError{label: application.Label}
 	}
 	return nil, &NotLoadedError{edge: "client"}
 }
@@ -56,7 +56,7 @@ func (*M2MGrant) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case m2mgrant.FieldID:
 			values[i] = new(sql.NullString)
-		case m2mgrant.ForeignKeys[0]: // oauth_client_m2m_grants
+		case m2mgrant.ForeignKeys[0]: // application_m2m_grants
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -89,10 +89,10 @@ func (mg *M2MGrant) assignValues(columns []string, values []any) error {
 			}
 		case m2mgrant.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field oauth_client_m2m_grants", values[i])
+				return fmt.Errorf("unexpected type %T for field application_m2m_grants", values[i])
 			} else if value.Valid {
-				mg.oauth_client_m2m_grants = new(string)
-				*mg.oauth_client_m2m_grants = value.String
+				mg.application_m2m_grants = new(string)
+				*mg.application_m2m_grants = value.String
 			}
 		default:
 			mg.selectValues.Set(columns[i], values[i])
@@ -108,7 +108,7 @@ func (mg *M2MGrant) Value(name string) (ent.Value, error) {
 }
 
 // QueryClient queries the "client" edge of the M2MGrant entity.
-func (mg *M2MGrant) QueryClient() *OAuthClientQuery {
+func (mg *M2MGrant) QueryClient() *ApplicationQuery {
 	return NewM2MGrantClient(mg.config).QueryClient(mg)
 }
 

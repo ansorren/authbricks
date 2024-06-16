@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/oauthserver"
+	"go.authbricks.com/bricks/ent/serviceconfig"
 )
 
 // KeySet is the model entity for the KeySet schema.
@@ -19,15 +19,15 @@ type KeySet struct {
 	ID string `json:"id" hcl:"id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the KeySetQuery when eager-loading is set.
-	Edges                KeySetEdges `json:"edges"`
-	oauth_server_key_set *int
-	selectValues         sql.SelectValues
+	Edges                   KeySetEdges `json:"edges"`
+	service_config_key_sets *string
+	selectValues            sql.SelectValues
 }
 
 // KeySetEdges holds the relations/edges for other nodes in the graph.
 type KeySetEdges struct {
-	// OauthServer holds the value of the oauth_server edge.
-	OauthServer *OAuthServer `json:"oauth_server,omitempty"`
+	// ServiceConfig holds the value of the service_config edge.
+	ServiceConfig *ServiceConfig `json:"service_config,omitempty"`
 	// SigningKeys holds the value of the signing_keys edge.
 	SigningKeys []*SigningKey `json:"signing_keys,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -35,15 +35,15 @@ type KeySetEdges struct {
 	loadedTypes [2]bool
 }
 
-// OauthServerOrErr returns the OauthServer value or an error if the edge
+// ServiceConfigOrErr returns the ServiceConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e KeySetEdges) OauthServerOrErr() (*OAuthServer, error) {
-	if e.OauthServer != nil {
-		return e.OauthServer, nil
+func (e KeySetEdges) ServiceConfigOrErr() (*ServiceConfig, error) {
+	if e.ServiceConfig != nil {
+		return e.ServiceConfig, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: oauthserver.Label}
+		return nil, &NotFoundError{label: serviceconfig.Label}
 	}
-	return nil, &NotLoadedError{edge: "oauth_server"}
+	return nil, &NotLoadedError{edge: "service_config"}
 }
 
 // SigningKeysOrErr returns the SigningKeys value or an error if the edge
@@ -62,8 +62,8 @@ func (*KeySet) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case keyset.FieldID:
 			values[i] = new(sql.NullString)
-		case keyset.ForeignKeys[0]: // oauth_server_key_set
-			values[i] = new(sql.NullInt64)
+		case keyset.ForeignKeys[0]: // service_config_key_sets
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -86,11 +86,11 @@ func (ks *KeySet) assignValues(columns []string, values []any) error {
 				ks.ID = value.String
 			}
 		case keyset.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field oauth_server_key_set", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field service_config_key_sets", values[i])
 			} else if value.Valid {
-				ks.oauth_server_key_set = new(int)
-				*ks.oauth_server_key_set = int(value.Int64)
+				ks.service_config_key_sets = new(string)
+				*ks.service_config_key_sets = value.String
 			}
 		default:
 			ks.selectValues.Set(columns[i], values[i])
@@ -105,9 +105,9 @@ func (ks *KeySet) Value(name string) (ent.Value, error) {
 	return ks.selectValues.Get(name)
 }
 
-// QueryOauthServer queries the "oauth_server" edge of the KeySet entity.
-func (ks *KeySet) QueryOauthServer() *OAuthServerQuery {
-	return NewKeySetClient(ks.config).QueryOauthServer(ks)
+// QueryServiceConfig queries the "service_config" edge of the KeySet entity.
+func (ks *KeySet) QueryServiceConfig() *ServiceConfigQuery {
+	return NewKeySetClient(ks.config).QueryServiceConfig(ks)
 }
 
 // QuerySigningKeys queries the "signing_keys" edge of the KeySet entity.

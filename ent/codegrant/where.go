@@ -75,7 +75,7 @@ func HasClient() predicate.CodeGrant {
 }
 
 // HasClientWith applies the HasEdge predicate on the "client" edge with a given conditions (other predicates).
-func HasClientWith(preds ...predicate.OAuthClient) predicate.CodeGrant {
+func HasClientWith(preds ...predicate.Application) predicate.CodeGrant {
 	return predicate.CodeGrant(func(s *sql.Selector) {
 		step := newClientStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

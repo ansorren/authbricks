@@ -9,6 +9,18 @@ import (
 	"go.authbricks.com/bricks/ent"
 )
 
+// The ApplicationFunc type is an adapter to allow the use of ordinary
+// function as Application mutator.
+type ApplicationFunc func(context.Context, *ent.ApplicationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ApplicationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ApplicationMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ApplicationMutation", m)
+}
+
 // The AuthorizationCodeFunc type is an adapter to allow the use of ordinary
 // function as AuthorizationCode mutator.
 type AuthorizationCodeFunc func(context.Context, *ent.AuthorizationCodeMutation) (ent.Value, error)
@@ -93,30 +105,6 @@ func (f M2MGrantFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.M2MGrantMutation", m)
 }
 
-// The OAuthClientFunc type is an adapter to allow the use of ordinary
-// function as OAuthClient mutator.
-type OAuthClientFunc func(context.Context, *ent.OAuthClientMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f OAuthClientFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.OAuthClientMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthClientMutation", m)
-}
-
-// The OAuthServerFunc type is an adapter to allow the use of ordinary
-// function as OAuthServer mutator.
-type OAuthServerFunc func(context.Context, *ent.OAuthServerMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f OAuthServerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.OAuthServerMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthServerMutation", m)
-}
-
 // The RefreshTokenFunc type is an adapter to allow the use of ordinary
 // function as RefreshToken mutator.
 type RefreshTokenFunc func(context.Context, *ent.RefreshTokenMutation) (ent.Value, error)
@@ -127,6 +115,30 @@ func (f RefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RefreshTokenMutation", m)
+}
+
+// The ServiceFunc type is an adapter to allow the use of ordinary
+// function as Service mutator.
+type ServiceFunc func(context.Context, *ent.ServiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ServiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ServiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceMutation", m)
+}
+
+// The ServiceConfigFunc type is an adapter to allow the use of ordinary
+// function as ServiceConfig mutator.
+type ServiceConfigFunc func(context.Context, *ent.ServiceConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ServiceConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ServiceConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceConfigMutation", m)
 }
 
 // The SessionFunc type is an adapter to allow the use of ordinary

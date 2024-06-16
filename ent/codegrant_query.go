@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/codegrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 	"go.authbricks.com/bricks/ent/predicate"
 )
 
@@ -22,7 +22,7 @@ type CodeGrantQuery struct {
 	order      []codegrant.OrderOption
 	inters     []Interceptor
 	predicates []predicate.CodeGrant
-	withClient *OAuthClientQuery
+	withClient *ApplicationQuery
 	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -61,8 +61,8 @@ func (cgq *CodeGrantQuery) Order(o ...codegrant.OrderOption) *CodeGrantQuery {
 }
 
 // QueryClient chains the current query on the "client" edge.
-func (cgq *CodeGrantQuery) QueryClient() *OAuthClientQuery {
-	query := (&OAuthClientClient{config: cgq.config}).Query()
+func (cgq *CodeGrantQuery) QueryClient() *ApplicationQuery {
+	query := (&ApplicationClient{config: cgq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cgq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (cgq *CodeGrantQuery) QueryClient() *OAuthClientQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(codegrant.Table, codegrant.FieldID, selector),
-			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.To(application.Table, application.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ClientTable, codegrant.ClientColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cgq.driver.Dialect(), step)
@@ -283,8 +283,8 @@ func (cgq *CodeGrantQuery) Clone() *CodeGrantQuery {
 
 // WithClient tells the query-builder to eager-load the nodes that are connected to
 // the "client" edge. The optional arguments are used to configure the query builder of the edge.
-func (cgq *CodeGrantQuery) WithClient(opts ...func(*OAuthClientQuery)) *CodeGrantQuery {
-	query := (&OAuthClientClient{config: cgq.config}).Query()
+func (cgq *CodeGrantQuery) WithClient(opts ...func(*ApplicationQuery)) *CodeGrantQuery {
+	query := (&ApplicationClient{config: cgq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -401,21 +401,21 @@ func (cgq *CodeGrantQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	}
 	if query := cgq.withClient; query != nil {
 		if err := cgq.loadClient(ctx, query, nodes, nil,
-			func(n *CodeGrant, e *OAuthClient) { n.Edges.Client = e }); err != nil {
+			func(n *CodeGrant, e *Application) { n.Edges.Client = e }); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *OAuthClientQuery, nodes []*CodeGrant, init func(*CodeGrant), assign func(*CodeGrant, *OAuthClient)) error {
+func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *ApplicationQuery, nodes []*CodeGrant, init func(*CodeGrant), assign func(*CodeGrant, *Application)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*CodeGrant)
 	for i := range nodes {
-		if nodes[i].oauth_client_code_grants == nil {
+		if nodes[i].application_code_grants == nil {
 			continue
 		}
-		fk := *nodes[i].oauth_client_code_grants
+		fk := *nodes[i].application_code_grants
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -424,7 +424,7 @@ func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *OAuthClientQue
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(oauthclient.IDIn(ids...))
+	query.Where(application.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -432,7 +432,7 @@ func (cgq *CodeGrantQuery) loadClient(ctx context.Context, query *OAuthClientQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "oauth_client_code_grants" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "application_code_grants" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

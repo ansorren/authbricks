@@ -8,8 +8,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // Credentials is the model entity for the Credentials schema.
@@ -23,15 +23,15 @@ type Credentials struct {
 	ClientSecret string `json:"client_secret"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CredentialsQuery when eager-loading is set.
-	Edges                    CredentialsEdges `json:"edges"`
-	oauth_client_credentials *string
-	selectValues             sql.SelectValues
+	Edges                   CredentialsEdges `json:"edges"`
+	application_credentials *string
+	selectValues            sql.SelectValues
 }
 
 // CredentialsEdges holds the relations/edges for other nodes in the graph.
 type CredentialsEdges struct {
 	// OauthClient holds the value of the oauth_client edge.
-	OauthClient *OAuthClient `json:"oauth_client,omitempty"`
+	OauthClient *Application `json:"oauth_client,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -39,11 +39,11 @@ type CredentialsEdges struct {
 
 // OauthClientOrErr returns the OauthClient value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CredentialsEdges) OauthClientOrErr() (*OAuthClient, error) {
+func (e CredentialsEdges) OauthClientOrErr() (*Application, error) {
 	if e.OauthClient != nil {
 		return e.OauthClient, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: oauthclient.Label}
+		return nil, &NotFoundError{label: application.Label}
 	}
 	return nil, &NotLoadedError{edge: "oauth_client"}
 }
@@ -55,7 +55,7 @@ func (*Credentials) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case credentials.FieldID, credentials.FieldClientID, credentials.FieldClientSecret:
 			values[i] = new(sql.NullString)
-		case credentials.ForeignKeys[0]: // oauth_client_credentials
+		case credentials.ForeignKeys[0]: // application_credentials
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -92,10 +92,10 @@ func (c *Credentials) assignValues(columns []string, values []any) error {
 			}
 		case credentials.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field oauth_client_credentials", values[i])
+				return fmt.Errorf("unexpected type %T for field application_credentials", values[i])
 			} else if value.Valid {
-				c.oauth_client_credentials = new(string)
-				*c.oauth_client_credentials = value.String
+				c.application_credentials = new(string)
+				*c.application_credentials = value.String
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -111,7 +111,7 @@ func (c *Credentials) Value(name string) (ent.Value, error) {
 }
 
 // QueryOauthClient queries the "oauth_client" edge of the Credentials entity.
-func (c *Credentials) QueryOauthClient() *OAuthClientQuery {
+func (c *Credentials) QueryOauthClient() *ApplicationQuery {
 	return NewCredentialsClient(c.config).QueryOauthClient(c)
 }
 

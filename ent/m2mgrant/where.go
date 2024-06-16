@@ -75,7 +75,7 @@ func HasClient() predicate.M2MGrant {
 }
 
 // HasClientWith applies the HasEdge predicate on the "client" edge with a given conditions (other predicates).
-func HasClientWith(preds ...predicate.OAuthClient) predicate.M2MGrant {
+func HasClientWith(preds ...predicate.Application) predicate.M2MGrant {
 	return predicate.M2MGrant(func(s *sql.Selector) {
 		step := newClientStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

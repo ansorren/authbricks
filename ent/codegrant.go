@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/codegrant"
-	"go.authbricks.com/bricks/ent/oauthclient"
 )
 
 // CodeGrant is the model entity for the CodeGrant schema.
@@ -24,15 +24,15 @@ type CodeGrant struct {
 	Callbacks []string `json:"callbacks"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CodeGrantQuery when eager-loading is set.
-	Edges                    CodeGrantEdges `json:"edges"`
-	oauth_client_code_grants *string
-	selectValues             sql.SelectValues
+	Edges                   CodeGrantEdges `json:"edges"`
+	application_code_grants *string
+	selectValues            sql.SelectValues
 }
 
 // CodeGrantEdges holds the relations/edges for other nodes in the graph.
 type CodeGrantEdges struct {
 	// Client holds the value of the client edge.
-	Client *OAuthClient `json:"client,omitempty"`
+	Client *Application `json:"client,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -40,11 +40,11 @@ type CodeGrantEdges struct {
 
 // ClientOrErr returns the Client value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e CodeGrantEdges) ClientOrErr() (*OAuthClient, error) {
+func (e CodeGrantEdges) ClientOrErr() (*Application, error) {
 	if e.Client != nil {
 		return e.Client, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: oauthclient.Label}
+		return nil, &NotFoundError{label: application.Label}
 	}
 	return nil, &NotLoadedError{edge: "client"}
 }
@@ -58,7 +58,7 @@ func (*CodeGrant) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case codegrant.FieldID:
 			values[i] = new(sql.NullString)
-		case codegrant.ForeignKeys[0]: // oauth_client_code_grants
+		case codegrant.ForeignKeys[0]: // application_code_grants
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -99,10 +99,10 @@ func (cg *CodeGrant) assignValues(columns []string, values []any) error {
 			}
 		case codegrant.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field oauth_client_code_grants", values[i])
+				return fmt.Errorf("unexpected type %T for field application_code_grants", values[i])
 			} else if value.Valid {
-				cg.oauth_client_code_grants = new(string)
-				*cg.oauth_client_code_grants = value.String
+				cg.application_code_grants = new(string)
+				*cg.application_code_grants = value.String
 			}
 		default:
 			cg.selectValues.Set(columns[i], values[i])
@@ -118,7 +118,7 @@ func (cg *CodeGrant) Value(name string) (ent.Value, error) {
 }
 
 // QueryClient queries the "client" edge of the CodeGrant entity.
-func (cg *CodeGrant) QueryClient() *OAuthClientQuery {
+func (cg *CodeGrant) QueryClient() *ApplicationQuery {
 	return NewCodeGrantClient(cg.config).QueryClient(cg)
 }
 

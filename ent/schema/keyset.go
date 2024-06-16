@@ -21,7 +21,7 @@ func (KeySet) Fields() []ent.Field {
 // Edges of the KeySet.
 func (KeySet) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("oauth_server", OAuthServer.Type).Ref("key_set").Unique(),
+		edge.From("service_config", ServiceConfig.Type).Ref("key_sets").Unique(),
 		edge.To("signing_keys", SigningKey.Type),
 	}
 }

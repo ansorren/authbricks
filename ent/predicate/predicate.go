@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Application is the predicate function for application builders.
+type Application func(*sql.Selector)
+
 // AuthorizationCode is the predicate function for authorizationcode builders.
 type AuthorizationCode func(*sql.Selector)
 
@@ -27,14 +30,14 @@ type KeySet func(*sql.Selector)
 // M2MGrant is the predicate function for m2mgrant builders.
 type M2MGrant func(*sql.Selector)
 
-// OAuthClient is the predicate function for oauthclient builders.
-type OAuthClient func(*sql.Selector)
-
-// OAuthServer is the predicate function for oauthserver builders.
-type OAuthServer func(*sql.Selector)
-
 // RefreshToken is the predicate function for refreshtoken builders.
 type RefreshToken func(*sql.Selector)
+
+// Service is the predicate function for service builders.
+type Service func(*sql.Selector)
+
+// ServiceConfig is the predicate function for serviceconfig builders.
+type ServiceConfig func(*sql.Selector)
 
 // Session is the predicate function for session builders.
 type Session func(*sql.Selector)
