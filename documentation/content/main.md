@@ -35,16 +35,16 @@ import (
 	"context"
     
     "go.authbricks.com/bricks/api"
-	"go.authbricks.com/bricks/db"
+	"go.authbricks.com/bricks/database"
 )
 
 func main() {
-	d, err := db.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
     if err != nil {
         panic(err)
     }
     
-    a, err := api.New(d)
+    a, err := api.New(db)
     if err != nil {
         panic(err)
     }
@@ -67,16 +67,16 @@ import (
     "context"
     
     "go.authbricks.com/bricks/api"
-    "go.authbricks.com/bricks/db"
+    "go.authbricks.com/bricks/database"
 )
 
 func main() {
-    d, err := db.NewMySQL(context.Background(), "user:password@tcp(localhost:3306)/db")
+    db, err := database.NewMySQL(context.Background(), "user:password@tcp(localhost:3306)/db")
     if err != nil {
         panic(err)
     }
     
-    a, err := api.New(d)
+    a, err := api.New(db)
     if err != nil {
         panic(err)
     }
@@ -95,16 +95,16 @@ import (
     "context"
     
     "go.authbricks.com/bricks/api"
-    "go.authbricks.com/bricks/db"
+    "go.authbricks.com/bricks/database"
 )
 
 func main() {
-    d, err := db.NewSQLite(context.Background(), "file.db")
+    db, err := database.NewSQLite(context.Background(), "file:file.db?_fk=1")
     if err != nil {
         panic(err)
     }
     
-    a, err := api.New(d)
+    a, err := api.New(db)
     if err != nil {
         panic(err)
     }

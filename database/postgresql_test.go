@@ -1,19 +1,20 @@
-package db
+package database
 
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"testing"
 
-	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewMySQL(t *testing.T) {
-	db, err := NewMySQL(context.Background(), "user:pass@tcp(127.0.0.1:3306)/db?parseTime=True")
+func TestNewPostgres(t *testing.T) {
+	db, err := NewPostgres(context.Background(), "postgres://user:pass@localhost:5432/postgres?sslmode=disable")
 	require.Nil(t, err)
-
 	client := db.Client()
+
 	creds, err := client.Credentials.Create().
 		SetID(uuid.New().String()).
 		SetClientID(uuid.New().String()).
@@ -26,5 +27,6 @@ func TestNewMySQL(t *testing.T) {
 
 	all, err := client.Credentials.Query().All(context.Background())
 	require.Nil(t, err)
+
 	fmt.Println(all)
 }
