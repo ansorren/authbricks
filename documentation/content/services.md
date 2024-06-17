@@ -15,6 +15,12 @@ two different services called `customers` and `employees`
 ```go
 serviceConfig := config.Service{
 	Name: "customers",
+    Identifier: "customers",
+    Description: "Service for authenticating customers",
+    ServiceMetadata: map[string]string{
+        "foo": "bar",
+    },
+    AllowedClientMetadata: []string{"bar"},
 	Scopes: []string{"read", "write"}, 
 	GrantTypes: []string{"authorization_code"},
 	ResponseTypes: []string{"code"},
@@ -29,7 +35,7 @@ if err != nil {
 
 # Define an Application
 Once you have defined a service, you can create a new application (also known as OAuth Client) for that service.
-
+[service.go](..%2F..%2Fconfig%2Fservice.go)
 ```go
 svc, err := db.GetService(context.Background(), "customers")
 if err != nil {
