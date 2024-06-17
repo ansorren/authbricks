@@ -13,7 +13,7 @@ For example, if your business needs to authenticate both your customers and your
 two different services called `customers` and `employees`
 
 ```go
-serviceConfig := service.Config{
+serviceConfig := config.Service{
 	Name: "customers",
 	Scopes: []string{"read", "write"}, 
 	GrantTypes: []string{"authorization_code"},
@@ -36,7 +36,7 @@ if err != nil {
     panic(err)
 }
 
-appConfig := application.Config{
+appConfig := config.Application{
     Name: "myapp",
     RedirectURIs: []string{"http://localhost:8080/callback"},
     GrantTypes: []string{"authorization_code"},
@@ -55,12 +55,16 @@ if err != nil {
 Once you have created an application, you can generate credentials for it.
 
 ```go
-
-credentialsConfig := credentials.Config{
-    ClientID: "myapp",
-    ClientSecret: "mysecret",
+app, err := db.GetApplication(context.Background(), "myapp")
+if err != nil {
+    panic(err)
 }
-creds, err := app.CreateCredentials(context.Background(), credentialsConfig)
+
+credentialsConfig := config.Credentials{
+    ClientID: crypto.GenerateClientID(),
+    ClientSecret: crypto.GenerateClientSecret(),
+}
+creds, err := app.CreateOrUpdateCredentials(context.Background(), credentialsConfig)
 if err != nil {
     panic(err)
 }
