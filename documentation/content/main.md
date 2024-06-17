@@ -105,7 +105,7 @@ func main() {
         panic(err)
     }
     
-    a, err := api.New(db)[kittens.md](kittens.md)
+    a, err := api.New(db)
     if err != nil {
         panic(err)
     }
