@@ -35,7 +35,6 @@ if err != nil {
 
 # Define an Application
 Once you have defined a service, you can create a new application (also known as OAuth Client) for that service.
-[service.go](..%2F..%2Fconfig%2Fservice.go)
 ```go
 svc, err := db.GetService(context.Background(), "customers")
 if err != nil {
