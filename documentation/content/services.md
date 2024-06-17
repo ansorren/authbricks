@@ -10,19 +10,19 @@ In this section, we will define a new service.
 
 In terms of OAuth / OIDC specifications, you can think of a `service` as your Authorization server.
 For example, if your business needs to authenticate both your customers and your employees, you could define 
-two different services called `customers` and `employees`
+two different services called `customers` and `employees`.
 
 ```go
 serviceConfig := config.Service{
 	Name: "customers",
     Identifier: "customers",
     Description: "Service for authenticating customers",
-    ServiceMetadata: map[string]string{
+    ServiceMetadata: config.ServiceMetadata{
         "foo": "bar",
     },
-    AllowedClientMetadata: []string{"bar"},
+    AllowedClientMetadata: []string{"baz"},
 	Scopes: []string{"read", "write"}, 
-	GrantTypes: []string{"authorization_code"},
+	GrantTypes: []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
 	ResponseTypes: []string{"code"},
 }
 

@@ -56,6 +56,9 @@ func TestServiceValidate(t *testing.T) {
 				Identifier: "test",
 				Scopes:     []string{"test"},
 				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
 			},
 			ExpectedError: false,
 		},
