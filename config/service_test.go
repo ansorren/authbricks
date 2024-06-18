@@ -50,6 +50,152 @@ func TestServiceValidate(t *testing.T) {
 			ExpectedError: true,
 		},
 		{
+			Name: "empty authorization endpoint URL",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "",
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "invalid PKCE configuration",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint:                        "http://localhost:8080/oauth2/authorize",
+					PKCERequired:                    false,
+					S256CodeChallengeMethodRequired: true,
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "empty introspection endpoint URL",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "empty token endpoint URL",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "empty authentication method for token endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{""},
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "invalid authentication method for token endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{"invalid"},
+				},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "empty userinfo endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{"invalid"},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "",
+				},
+			},
+			ExpectedError: true,
+		},
+		{
 			Name: "valid Service",
 			Service: Service{
 				Name:       "test",
@@ -58,6 +204,19 @@ func TestServiceValidate(t *testing.T) {
 				GrantTypes: []string{GrantTypeAuthorizationCode},
 				ServiceMetadata: ServiceMetadata{
 					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
 				},
 			},
 			ExpectedError: false,

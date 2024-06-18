@@ -2,6 +2,7 @@ package config
 
 import "fmt"
 
+// AuthorizationEndpoint is used to configure the authorization endpoint.
 type AuthorizationEndpoint struct {
 	// Endpoint is the URL of the authorization endpoint.
 	Endpoint string
@@ -13,9 +14,14 @@ type AuthorizationEndpoint struct {
 	S256CodeChallengeMethodRequired bool
 }
 
+// Validate validates the authorization endpoint configuration.
 func (a AuthorizationEndpoint) Validate() error {
 	if a.Endpoint == "" {
 		return fmt.Errorf("authorization endpoint URL is required")
+	}
+
+	if !a.PKCERequired && a.S256CodeChallengeMethodRequired {
+		return fmt.Errorf("code challenge method S256 can only be required when PKCE is required")
 	}
 	return nil
 }

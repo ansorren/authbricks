@@ -1,6 +1,10 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/pkg/errors"
+)
 
 const (
 	// GrantTypeAuthorizationCode is the authorization code grant type.
@@ -29,6 +33,10 @@ type Service struct {
 	Scopes                []string
 	GrantTypes            []string
 	ResponseTypes         []string
+	AuthorizationEndpoint AuthorizationEndpoint
+	IntrospectionEndpoint IntrospectionEndpoint
+	TokenEndpoint         TokenEndpoint
+	UserInfoEndpoint      UserInfoEndpoint
 }
 
 // contains checks if the given string is in the given slice of strings.
@@ -68,5 +76,20 @@ func (s Service) Validate() error {
 	if !allowedGrantTypes(s.GrantTypes) {
 		return fmt.Errorf("invalid grant type - %v - allowed grant types are %v", s.GrantTypes, AllowedGrantTypes)
 	}
+
+	// Validate the endpoints.
+	if err := s.AuthorizationEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "authorization endpoint validation failed")
+	}
+	if err := s.IntrospectionEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "introspection endpoint validation failed")
+	}
+	if err := s.TokenEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "token endpoint validation failed")
+	}
+	if err := s.UserInfoEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "userinfo endpoint validation failed")
+	}
+
 	return nil
 }
