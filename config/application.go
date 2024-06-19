@@ -14,7 +14,6 @@ type Application struct {
 	S256CodeChallengeMethodRequired bool
 	// AllowedAuthenticationMethods is the list of allowed authentication methods.
 	AllowedAuthenticationMethods []string
-
 	// Scopes is the list of scopes that the application is allowed to request.
 	// By default, if empty, the application is not allowed to request any scopes.
 	Scopes []string
