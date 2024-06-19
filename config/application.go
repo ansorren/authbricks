@@ -2,10 +2,14 @@ package config
 
 // Application is used to configure an application.
 type Application struct {
-	Name          string
-	RedirectURIs  []string
+	// Name is the name of the application.
+	Name string
+	// RedirectURIs is the list of allowed redirect URIs.
+	RedirectURIs []string
+	// ResponseTypes is the list of allowed response types.
 	ResponseTypes []string
-	GrantTypes    []string
+	// GrantTypes is the list of allowed grant types.
+	GrantTypes []string
 	// PKCERequired is true if the authorization endpoint requires PKCE, even for confidential clients.
 	// Public clients are always required to use PKCE.
 	PKCERequired bool
