@@ -44,8 +44,8 @@ if err != nil {
 appConfig := config.Application{
     Name: "myapp",
     RedirectURIs: []string{"http://localhost:8080/callback"},
-    GrantTypes: []string{"authorization_code"},
-    ResponseTypes: []string{"code"},
+    GrantTypes: []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
+    ResponseTypes: []string{config.ResponseTypeCode},
     Scopes: []string{"read", "write"},
 }
 
