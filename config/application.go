@@ -25,7 +25,7 @@ var (
 
 // Application is used to configure an application.
 type Application struct {
-	// Name is the Name of the application.
+	// Name is the name of the application.
 	Name string
 	// RedirectURIs is the list of allowed redirect URIs.
 	RedirectURIs []string
