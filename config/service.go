@@ -49,8 +49,8 @@ func contains(slice []string, s string) bool {
 	return false
 }
 
-// allowedGrantTypes checks if the given grant types are allowed.
-func allowedGrantTypes(grantTypes []string) bool {
+// grantTypesAreAllowed checks if the given grant types are allowed.
+func grantTypesAreAllowed(grantTypes []string) bool {
 	for _, gt := range grantTypes {
 		if !contains(AllowedGrantTypes, gt) {
 			return false
@@ -73,7 +73,7 @@ func (s Service) Validate() error {
 	if len(s.GrantTypes) == 0 {
 		return fmt.Errorf("at least one grant type is required")
 	}
-	if !allowedGrantTypes(s.GrantTypes) {
+	if !grantTypesAreAllowed(s.GrantTypes) {
 		return fmt.Errorf("invalid grant type - %v - allowed grant types are %v", s.GrantTypes, AllowedGrantTypes)
 	}
 
