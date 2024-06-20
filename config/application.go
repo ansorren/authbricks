@@ -20,6 +20,7 @@ const (
 )
 
 var (
+	// AllowedResponseTypes is the list of allowed response types.
 	AllowedResponseTypes = []string{ResponseTypeCode, ResponseTypeIDToken, ResponseTypeNone, ResponseTypeCodeIDToken}
 )
 
@@ -46,6 +47,7 @@ type Application struct {
 	Scopes []string
 }
 
+// responseTypesAreAllowed checks if the given response types are allowed.
 func responseTypesAreAllowed(responseTypes []string) bool {
 	for _, rt := range responseTypes {
 		if !contains(AllowedResponseTypes, rt) {
@@ -80,6 +82,7 @@ func (a Application) Validate() error {
 	return nil
 }
 
+// validateRedirectURIs validates the redirect URIs.
 func validateRedirectURIs(redirectURIs []string) error {
 	if len(redirectURIs) == 0 {
 		return fmt.Errorf("at least one redirect URI is required")
