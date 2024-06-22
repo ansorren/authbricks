@@ -10,11 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestApplication(t *testing.T) {
+func TestCredentials(t *testing.T) {
 	db, cancel := testutils.DB(t)
 	defer cancel(t)
 
 	client := New(db)
+	require.NotNil(t, client)
 
 	serviceConfig := config.Service{
 		Name:        "test-service",
@@ -61,35 +62,15 @@ func TestApplication(t *testing.T) {
 	}
 	app, err := client.CreateApplication(context.Background(), cfg)
 	require.Nil(t, err)
-	require.NotNil(t, app)
-	require.NotEmpty(t, app.ID)
-	require.Equal(t, cfg.Name, app.Name)
-	require.Equal(t, cfg.Description, app.Description)
-	require.Equal(t, cfg.Public, app.Public)
-	require.Equal(t, cfg.RedirectURIs, app.RedirectUris)
-	require.Equal(t, cfg.ResponseTypes, app.ResponseTypes)
-	require.Equal(t, cfg.GrantTypes, app.GrantTypes)
-	require.Equal(t, cfg.Scopes, app.Scopes)
-	require.Equal(t, cfg.PKCERequired, app.PkceRequired)
 
-	// Get application
-	app, err = client.GetApplication(context.Background(), cfg.Name)
+	credsConfig := config.Credentials{
+		Application:  app.Name,
+		ClientID:     "test-client-id",
+		ClientSecret: "test-client-secret",
+	}
+	creds, err := client.CreateCredentials(context.Background(), credsConfig)
 	require.Nil(t, err)
-	require.NotNil(t, app)
+	require.NotNil(t, creds)
+	require.NotEmpty(t, creds.ID)
 
-	// List applications - expected one
-	apps, err := client.ListApplications(context.Background())
-	require.Nil(t, err)
-	require.NotNil(t, apps)
-	require.Len(t, apps, 1)
-
-	// Delete application
-	err = client.DeleteApplication(context.Background(), cfg.Name)
-	require.Nil(t, err)
-
-	// List applications - expected none
-	apps, err = client.ListApplications(context.Background())
-	require.Nil(t, err)
-	require.NotNil(t, apps)
-	require.Len(t, apps, 0)
 }
