@@ -73,4 +73,83 @@ func TestCredentials(t *testing.T) {
 	require.NotNil(t, creds)
 	require.NotEmpty(t, creds.ID)
 
+	// Get credentials
+	creds, err = client.GetCredentialsByID(context.Background(), creds.ID)
+	require.Nil(t, err)
+	require.NotNil(t, creds)
+	require.Equal(t, credsConfig.ClientID, creds.ClientID)
+	require.Equal(t, credsConfig.ClientSecret, creds.ClientSecret)
+
+	// Get credentials by client ID
+	creds, err = client.GetCredentialsByClientID(context.Background(), credsConfig.ClientID)
+	require.Nil(t, err)
+	require.NotNil(t, creds)
+	require.Equal(t, credsConfig.ClientID, creds.ClientID)
+	require.Equal(t, credsConfig.ClientSecret, creds.ClientSecret)
+
+	// Get credentials by application
+	credsList, err := client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+	require.NotNil(t, credsList)
+	require.Len(t, credsList, 1)
+	require.Equal(t, credsConfig.ClientID, credsList[0].ClientID)
+	require.Equal(t, credsConfig.ClientSecret, credsList[0].ClientSecret)
+
+	// Delete credentials by ID
+	err = client.DeleteCredentialsByID(context.Background(), creds.ID)
+	require.Nil(t, err)
+
+	// List credentials - expected none
+	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+	require.Len(t, credsList, 0)
+
+	// recreate credentials
+	creds, err = client.CreateCredentials(context.Background(), credsConfig)
+	require.Nil(t, err)
+	require.NotNil(t, creds)
+
+	// List credentials - expected one
+	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+	require.Len(t, credsList, 1)
+
+	// Delete credentials by client ID
+	err = client.DeleteCredentialsByClientID(context.Background(), credsConfig.ClientID)
+	require.Nil(t, err)
+
+	// List credentials - expected none
+	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+	require.Len(t, credsList, 0)
+
+	// recreate credentials
+	creds, err = client.CreateCredentials(context.Background(), credsConfig)
+	require.Nil(t, err)
+	require.NotNil(t, creds)
+
+	// List credentials - expected one
+	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+	require.Len(t, credsList, 1)
+
+	// update credentials by ID
+	credsConfig.ClientID = "updated-client-id"
+	creds, err = client.UpdateCredentialsByID(context.Background(), creds.ID, credsConfig)
+	require.Nil(t, err)
+	require.Equal(t, credsConfig.ClientID, creds.ClientID)
+
+	// update credentials by  client ID
+	credsConfig.ClientSecret = "updated-client-secret"
+	creds, err = client.UpdateCredentialsByClientID(context.Background(), credsConfig)
+	require.Nil(t, err)
+	require.Equal(t, credsConfig.ClientSecret, creds.ClientSecret)
+
+	// Delete credentials by application
+	err = client.DeleteCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
+
+	// List credentials - expected none
+	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
+	require.Nil(t, err)
 }
