@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/service"
 )
 
 // KeySet is the model entity for the KeySet schema.
@@ -19,15 +19,15 @@ type KeySet struct {
 	ID string `json:"id" hcl:"id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the KeySetQuery when eager-loading is set.
-	Edges                   KeySetEdges `json:"edges"`
-	service_config_key_sets *string
-	selectValues            sql.SelectValues
+	Edges            KeySetEdges `json:"edges"`
+	service_key_sets *string
+	selectValues     sql.SelectValues
 }
 
 // KeySetEdges holds the relations/edges for other nodes in the graph.
 type KeySetEdges struct {
-	// ServiceConfig holds the value of the service_config edge.
-	ServiceConfig *ServiceConfig `json:"service_config,omitempty"`
+	// Services holds the value of the services edge.
+	Services *Service `json:"services,omitempty"`
 	// SigningKeys holds the value of the signing_keys edge.
 	SigningKeys []*SigningKey `json:"signing_keys,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -35,15 +35,15 @@ type KeySetEdges struct {
 	loadedTypes [2]bool
 }
 
-// ServiceConfigOrErr returns the ServiceConfig value or an error if the edge
+// ServicesOrErr returns the Services value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e KeySetEdges) ServiceConfigOrErr() (*ServiceConfig, error) {
-	if e.ServiceConfig != nil {
-		return e.ServiceConfig, nil
+func (e KeySetEdges) ServicesOrErr() (*Service, error) {
+	if e.Services != nil {
+		return e.Services, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: serviceconfig.Label}
+		return nil, &NotFoundError{label: service.Label}
 	}
-	return nil, &NotLoadedError{edge: "service_config"}
+	return nil, &NotLoadedError{edge: "services"}
 }
 
 // SigningKeysOrErr returns the SigningKeys value or an error if the edge
@@ -62,7 +62,7 @@ func (*KeySet) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case keyset.FieldID:
 			values[i] = new(sql.NullString)
-		case keyset.ForeignKeys[0]: // service_config_key_sets
+		case keyset.ForeignKeys[0]: // service_key_sets
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -87,10 +87,10 @@ func (ks *KeySet) assignValues(columns []string, values []any) error {
 			}
 		case keyset.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_config_key_sets", values[i])
+				return fmt.Errorf("unexpected type %T for field service_key_sets", values[i])
 			} else if value.Valid {
-				ks.service_config_key_sets = new(string)
-				*ks.service_config_key_sets = value.String
+				ks.service_key_sets = new(string)
+				*ks.service_key_sets = value.String
 			}
 		default:
 			ks.selectValues.Set(columns[i], values[i])
@@ -105,9 +105,9 @@ func (ks *KeySet) Value(name string) (ent.Value, error) {
 	return ks.selectValues.Get(name)
 }
 
-// QueryServiceConfig queries the "service_config" edge of the KeySet entity.
-func (ks *KeySet) QueryServiceConfig() *ServiceConfigQuery {
-	return NewKeySetClient(ks.config).QueryServiceConfig(ks)
+// QueryServices queries the "services" edge of the KeySet entity.
+func (ks *KeySet) QueryServices() *ServiceQuery {
+	return NewKeySetClient(ks.config).QueryServices(ks)
 }
 
 // QuerySigningKeys queries the "signing_keys" edge of the KeySet entity.

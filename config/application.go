@@ -28,6 +28,13 @@ var (
 type Application struct {
 	// Name is the name of the application.
 	Name string
+	// Service is the name of the service that the application belongs to.
+	Service string
+	// Description is the description of the application.
+	Description string
+	// Public is true if the application is a public client, like in the case of a single page application
+	// or a CLI tool.
+	Public bool
 	// RedirectURIs is the list of allowed redirect URIs.
 	RedirectURIs []string
 	// ResponseTypes is the list of allowed response types.
@@ -62,6 +69,15 @@ func (a Application) Validate() error {
 	if a.Name == "" {
 		return fmt.Errorf("application Name is required")
 	}
+
+	if a.Service == "" {
+		return fmt.Errorf("service Name is required")
+	}
+
+	if a.Public && !a.PKCERequired {
+		return fmt.Errorf("public applications are required to use PKCE")
+	}
+
 	if err := validateRedirectURIs(a.RedirectURIs); err != nil {
 		return err
 	}

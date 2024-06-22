@@ -9,11 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/service"
 )
@@ -59,42 +58,106 @@ func (au *ApplicationUpdate) SetNillablePublic(b *bool) *ApplicationUpdate {
 	return au
 }
 
-// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
-func (au *ApplicationUpdate) SetM2mGrantID(id string) *ApplicationUpdate {
-	au.mutation.SetM2mGrantID(id)
+// SetDescription sets the "description" field.
+func (au *ApplicationUpdate) SetDescription(s string) *ApplicationUpdate {
+	au.mutation.SetDescription(s)
 	return au
 }
 
-// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
-func (au *ApplicationUpdate) SetNillableM2mGrantID(id *string) *ApplicationUpdate {
-	if id != nil {
-		au = au.SetM2mGrantID(*id)
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableDescription(s *string) *ApplicationUpdate {
+	if s != nil {
+		au.SetDescription(*s)
 	}
 	return au
 }
 
-// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
-func (au *ApplicationUpdate) SetM2mGrant(m *M2MGrant) *ApplicationUpdate {
-	return au.SetM2mGrantID(m.ID)
-}
-
-// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
-func (au *ApplicationUpdate) SetCodeGrantID(id string) *ApplicationUpdate {
-	au.mutation.SetCodeGrantID(id)
+// SetRedirectUris sets the "redirect_uris" field.
+func (au *ApplicationUpdate) SetRedirectUris(s []string) *ApplicationUpdate {
+	au.mutation.SetRedirectUris(s)
 	return au
 }
 
-// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
-func (au *ApplicationUpdate) SetNillableCodeGrantID(id *string) *ApplicationUpdate {
-	if id != nil {
-		au = au.SetCodeGrantID(*id)
+// AppendRedirectUris appends s to the "redirect_uris" field.
+func (au *ApplicationUpdate) AppendRedirectUris(s []string) *ApplicationUpdate {
+	au.mutation.AppendRedirectUris(s)
+	return au
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (au *ApplicationUpdate) SetResponseTypes(s []string) *ApplicationUpdate {
+	au.mutation.SetResponseTypes(s)
+	return au
+}
+
+// AppendResponseTypes appends s to the "response_types" field.
+func (au *ApplicationUpdate) AppendResponseTypes(s []string) *ApplicationUpdate {
+	au.mutation.AppendResponseTypes(s)
+	return au
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (au *ApplicationUpdate) SetGrantTypes(s []string) *ApplicationUpdate {
+	au.mutation.SetGrantTypes(s)
+	return au
+}
+
+// AppendGrantTypes appends s to the "grant_types" field.
+func (au *ApplicationUpdate) AppendGrantTypes(s []string) *ApplicationUpdate {
+	au.mutation.AppendGrantTypes(s)
+	return au
+}
+
+// SetScopes sets the "scopes" field.
+func (au *ApplicationUpdate) SetScopes(s []string) *ApplicationUpdate {
+	au.mutation.SetScopes(s)
+	return au
+}
+
+// AppendScopes appends s to the "scopes" field.
+func (au *ApplicationUpdate) AppendScopes(s []string) *ApplicationUpdate {
+	au.mutation.AppendScopes(s)
+	return au
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (au *ApplicationUpdate) SetPkceRequired(b bool) *ApplicationUpdate {
+	au.mutation.SetPkceRequired(b)
+	return au
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillablePkceRequired(b *bool) *ApplicationUpdate {
+	if b != nil {
+		au.SetPkceRequired(*b)
 	}
 	return au
 }
 
-// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
-func (au *ApplicationUpdate) SetCodeGrant(c *CodeGrant) *ApplicationUpdate {
-	return au.SetCodeGrantID(c.ID)
+// SetS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field.
+func (au *ApplicationUpdate) SetS256CodeChallengeMethodRequired(b bool) *ApplicationUpdate {
+	au.mutation.SetS256CodeChallengeMethodRequired(b)
+	return au
+}
+
+// SetNillableS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillableS256CodeChallengeMethodRequired(b *bool) *ApplicationUpdate {
+	if b != nil {
+		au.SetS256CodeChallengeMethodRequired(*b)
+	}
+	return au
+}
+
+// SetAllowedAuthenticationMethods sets the "allowed_authentication_methods" field.
+func (au *ApplicationUpdate) SetAllowedAuthenticationMethods(s []string) *ApplicationUpdate {
+	au.mutation.SetAllowedAuthenticationMethods(s)
+	return au
+}
+
+// AppendAllowedAuthenticationMethods appends s to the "allowed_authentication_methods" field.
+func (au *ApplicationUpdate) AppendAllowedAuthenticationMethods(s []string) *ApplicationUpdate {
+	au.mutation.AppendAllowedAuthenticationMethods(s)
+	return au
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -134,18 +197,6 @@ func (au *ApplicationUpdate) SetService(s *Service) *ApplicationUpdate {
 // Mutation returns the ApplicationMutation object of the builder.
 func (au *ApplicationUpdate) Mutation() *ApplicationMutation {
 	return au.mutation
-}
-
-// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
-func (au *ApplicationUpdate) ClearM2mGrant() *ApplicationUpdate {
-	au.mutation.ClearM2mGrant()
-	return au
-}
-
-// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
-func (au *ApplicationUpdate) ClearCodeGrant() *ApplicationUpdate {
-	au.mutation.ClearCodeGrant()
-	return au
 }
 
 // ClearCredentials clears all "credentials" edges to the Credentials entity.
@@ -230,63 +281,54 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Public(); ok {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
 	}
-	if au.mutation.M2mGrantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.M2mGrantTable,
-			Columns: []string{application.M2mGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := au.mutation.Description(); ok {
+		_spec.SetField(application.FieldDescription, field.TypeString, value)
 	}
-	if nodes := au.mutation.M2mGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.M2mGrantTable,
-			Columns: []string{application.M2mGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := au.mutation.RedirectUris(); ok {
+		_spec.SetField(application.FieldRedirectUris, field.TypeJSON, value)
 	}
-	if au.mutation.CodeGrantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.CodeGrantTable,
-			Columns: []string{application.CodeGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := au.mutation.AppendedRedirectUris(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldRedirectUris, value)
+		})
 	}
-	if nodes := au.mutation.CodeGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.CodeGrantTable,
-			Columns: []string{application.CodeGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := au.mutation.ResponseTypes(); ok {
+		_spec.SetField(application.FieldResponseTypes, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedResponseTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldResponseTypes, value)
+		})
+	}
+	if value, ok := au.mutation.GrantTypes(); ok {
+		_spec.SetField(application.FieldGrantTypes, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedGrantTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldGrantTypes, value)
+		})
+	}
+	if value, ok := au.mutation.Scopes(); ok {
+		_spec.SetField(application.FieldScopes, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedScopes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldScopes, value)
+		})
+	}
+	if value, ok := au.mutation.PkceRequired(); ok {
+		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
+	}
+	if value, ok := au.mutation.S256CodeChallengeMethodRequired(); ok {
+		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)
+	}
+	if value, ok := au.mutation.AllowedAuthenticationMethods(); ok {
+		_spec.SetField(application.FieldAllowedAuthenticationMethods, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedAllowedAuthenticationMethods(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldAllowedAuthenticationMethods, value)
+		})
 	}
 	if au.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -410,42 +452,106 @@ func (auo *ApplicationUpdateOne) SetNillablePublic(b *bool) *ApplicationUpdateOn
 	return auo
 }
 
-// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
-func (auo *ApplicationUpdateOne) SetM2mGrantID(id string) *ApplicationUpdateOne {
-	auo.mutation.SetM2mGrantID(id)
+// SetDescription sets the "description" field.
+func (auo *ApplicationUpdateOne) SetDescription(s string) *ApplicationUpdateOne {
+	auo.mutation.SetDescription(s)
 	return auo
 }
 
-// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
-func (auo *ApplicationUpdateOne) SetNillableM2mGrantID(id *string) *ApplicationUpdateOne {
-	if id != nil {
-		auo = auo.SetM2mGrantID(*id)
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableDescription(s *string) *ApplicationUpdateOne {
+	if s != nil {
+		auo.SetDescription(*s)
 	}
 	return auo
 }
 
-// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
-func (auo *ApplicationUpdateOne) SetM2mGrant(m *M2MGrant) *ApplicationUpdateOne {
-	return auo.SetM2mGrantID(m.ID)
-}
-
-// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
-func (auo *ApplicationUpdateOne) SetCodeGrantID(id string) *ApplicationUpdateOne {
-	auo.mutation.SetCodeGrantID(id)
+// SetRedirectUris sets the "redirect_uris" field.
+func (auo *ApplicationUpdateOne) SetRedirectUris(s []string) *ApplicationUpdateOne {
+	auo.mutation.SetRedirectUris(s)
 	return auo
 }
 
-// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
-func (auo *ApplicationUpdateOne) SetNillableCodeGrantID(id *string) *ApplicationUpdateOne {
-	if id != nil {
-		auo = auo.SetCodeGrantID(*id)
+// AppendRedirectUris appends s to the "redirect_uris" field.
+func (auo *ApplicationUpdateOne) AppendRedirectUris(s []string) *ApplicationUpdateOne {
+	auo.mutation.AppendRedirectUris(s)
+	return auo
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (auo *ApplicationUpdateOne) SetResponseTypes(s []string) *ApplicationUpdateOne {
+	auo.mutation.SetResponseTypes(s)
+	return auo
+}
+
+// AppendResponseTypes appends s to the "response_types" field.
+func (auo *ApplicationUpdateOne) AppendResponseTypes(s []string) *ApplicationUpdateOne {
+	auo.mutation.AppendResponseTypes(s)
+	return auo
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (auo *ApplicationUpdateOne) SetGrantTypes(s []string) *ApplicationUpdateOne {
+	auo.mutation.SetGrantTypes(s)
+	return auo
+}
+
+// AppendGrantTypes appends s to the "grant_types" field.
+func (auo *ApplicationUpdateOne) AppendGrantTypes(s []string) *ApplicationUpdateOne {
+	auo.mutation.AppendGrantTypes(s)
+	return auo
+}
+
+// SetScopes sets the "scopes" field.
+func (auo *ApplicationUpdateOne) SetScopes(s []string) *ApplicationUpdateOne {
+	auo.mutation.SetScopes(s)
+	return auo
+}
+
+// AppendScopes appends s to the "scopes" field.
+func (auo *ApplicationUpdateOne) AppendScopes(s []string) *ApplicationUpdateOne {
+	auo.mutation.AppendScopes(s)
+	return auo
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (auo *ApplicationUpdateOne) SetPkceRequired(b bool) *ApplicationUpdateOne {
+	auo.mutation.SetPkceRequired(b)
+	return auo
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillablePkceRequired(b *bool) *ApplicationUpdateOne {
+	if b != nil {
+		auo.SetPkceRequired(*b)
 	}
 	return auo
 }
 
-// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
-func (auo *ApplicationUpdateOne) SetCodeGrant(c *CodeGrant) *ApplicationUpdateOne {
-	return auo.SetCodeGrantID(c.ID)
+// SetS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field.
+func (auo *ApplicationUpdateOne) SetS256CodeChallengeMethodRequired(b bool) *ApplicationUpdateOne {
+	auo.mutation.SetS256CodeChallengeMethodRequired(b)
+	return auo
+}
+
+// SetNillableS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillableS256CodeChallengeMethodRequired(b *bool) *ApplicationUpdateOne {
+	if b != nil {
+		auo.SetS256CodeChallengeMethodRequired(*b)
+	}
+	return auo
+}
+
+// SetAllowedAuthenticationMethods sets the "allowed_authentication_methods" field.
+func (auo *ApplicationUpdateOne) SetAllowedAuthenticationMethods(s []string) *ApplicationUpdateOne {
+	auo.mutation.SetAllowedAuthenticationMethods(s)
+	return auo
+}
+
+// AppendAllowedAuthenticationMethods appends s to the "allowed_authentication_methods" field.
+func (auo *ApplicationUpdateOne) AppendAllowedAuthenticationMethods(s []string) *ApplicationUpdateOne {
+	auo.mutation.AppendAllowedAuthenticationMethods(s)
+	return auo
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -485,18 +591,6 @@ func (auo *ApplicationUpdateOne) SetService(s *Service) *ApplicationUpdateOne {
 // Mutation returns the ApplicationMutation object of the builder.
 func (auo *ApplicationUpdateOne) Mutation() *ApplicationMutation {
 	return auo.mutation
-}
-
-// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
-func (auo *ApplicationUpdateOne) ClearM2mGrant() *ApplicationUpdateOne {
-	auo.mutation.ClearM2mGrant()
-	return auo
-}
-
-// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
-func (auo *ApplicationUpdateOne) ClearCodeGrant() *ApplicationUpdateOne {
-	auo.mutation.ClearCodeGrant()
-	return auo
 }
 
 // ClearCredentials clears all "credentials" edges to the Credentials entity.
@@ -611,63 +705,54 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 	if value, ok := auo.mutation.Public(); ok {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
 	}
-	if auo.mutation.M2mGrantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.M2mGrantTable,
-			Columns: []string{application.M2mGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := auo.mutation.Description(); ok {
+		_spec.SetField(application.FieldDescription, field.TypeString, value)
 	}
-	if nodes := auo.mutation.M2mGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.M2mGrantTable,
-			Columns: []string{application.M2mGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := auo.mutation.RedirectUris(); ok {
+		_spec.SetField(application.FieldRedirectUris, field.TypeJSON, value)
 	}
-	if auo.mutation.CodeGrantCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.CodeGrantTable,
-			Columns: []string{application.CodeGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := auo.mutation.AppendedRedirectUris(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldRedirectUris, value)
+		})
 	}
-	if nodes := auo.mutation.CodeGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.CodeGrantTable,
-			Columns: []string{application.CodeGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := auo.mutation.ResponseTypes(); ok {
+		_spec.SetField(application.FieldResponseTypes, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedResponseTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldResponseTypes, value)
+		})
+	}
+	if value, ok := auo.mutation.GrantTypes(); ok {
+		_spec.SetField(application.FieldGrantTypes, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedGrantTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldGrantTypes, value)
+		})
+	}
+	if value, ok := auo.mutation.Scopes(); ok {
+		_spec.SetField(application.FieldScopes, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedScopes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldScopes, value)
+		})
+	}
+	if value, ok := auo.mutation.PkceRequired(); ok {
+		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
+	}
+	if value, ok := auo.mutation.S256CodeChallengeMethodRequired(); ok {
+		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)
+	}
+	if value, ok := auo.mutation.AllowedAuthenticationMethods(); ok {
+		_spec.SetField(application.FieldAllowedAuthenticationMethods, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedAllowedAuthenticationMethods(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, application.FieldAllowedAuthenticationMethods, value)
+		})
 	}
 	if auo.mutation.CredentialsCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -16,30 +16,28 @@ const (
 	FieldName = "name"
 	// FieldPublic holds the string denoting the public field in the database.
 	FieldPublic = "public"
-	// EdgeM2mGrant holds the string denoting the m2m_grant edge name in mutations.
-	EdgeM2mGrant = "m2m_grant"
-	// EdgeCodeGrant holds the string denoting the code_grant edge name in mutations.
-	EdgeCodeGrant = "code_grant"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
+	// FieldRedirectUris holds the string denoting the redirect_uris field in the database.
+	FieldRedirectUris = "redirect_uris"
+	// FieldResponseTypes holds the string denoting the response_types field in the database.
+	FieldResponseTypes = "response_types"
+	// FieldGrantTypes holds the string denoting the grant_types field in the database.
+	FieldGrantTypes = "grant_types"
+	// FieldScopes holds the string denoting the scopes field in the database.
+	FieldScopes = "scopes"
+	// FieldPkceRequired holds the string denoting the pkce_required field in the database.
+	FieldPkceRequired = "pkce_required"
+	// FieldS256CodeChallengeMethodRequired holds the string denoting the s256_code_challenge_method_required field in the database.
+	FieldS256CodeChallengeMethodRequired = "s256_code_challenge_method_required"
+	// FieldAllowedAuthenticationMethods holds the string denoting the allowed_authentication_methods field in the database.
+	FieldAllowedAuthenticationMethods = "allowed_authentication_methods"
 	// EdgeCredentials holds the string denoting the credentials edge name in mutations.
 	EdgeCredentials = "credentials"
 	// EdgeService holds the string denoting the service edge name in mutations.
 	EdgeService = "service"
 	// Table holds the table name of the application in the database.
 	Table = "applications"
-	// M2mGrantTable is the table that holds the m2m_grant relation/edge.
-	M2mGrantTable = "m2m_grants"
-	// M2mGrantInverseTable is the table name for the M2MGrant entity.
-	// It exists in this package in order to avoid circular dependency with the "m2mgrant" package.
-	M2mGrantInverseTable = "m2m_grants"
-	// M2mGrantColumn is the table column denoting the m2m_grant relation/edge.
-	M2mGrantColumn = "application_m2m_grant"
-	// CodeGrantTable is the table that holds the code_grant relation/edge.
-	CodeGrantTable = "code_grants"
-	// CodeGrantInverseTable is the table name for the CodeGrant entity.
-	// It exists in this package in order to avoid circular dependency with the "codegrant" package.
-	CodeGrantInverseTable = "code_grants"
-	// CodeGrantColumn is the table column denoting the code_grant relation/edge.
-	CodeGrantColumn = "application_code_grant"
 	// CredentialsTable is the table that holds the credentials relation/edge.
 	CredentialsTable = "credentials"
 	// CredentialsInverseTable is the table name for the Credentials entity.
@@ -61,6 +59,14 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldPublic,
+	FieldDescription,
+	FieldRedirectUris,
+	FieldResponseTypes,
+	FieldGrantTypes,
+	FieldScopes,
+	FieldPkceRequired,
+	FieldS256CodeChallengeMethodRequired,
+	FieldAllowedAuthenticationMethods,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "applications"
@@ -89,6 +95,10 @@ var (
 	NameValidator func(string) error
 	// DefaultPublic holds the default value on creation for the "public" field.
 	DefaultPublic bool
+	// DefaultPkceRequired holds the default value on creation for the "pkce_required" field.
+	DefaultPkceRequired bool
+	// DefaultS256CodeChallengeMethodRequired holds the default value on creation for the "s256_code_challenge_method_required" field.
+	DefaultS256CodeChallengeMethodRequired bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -111,18 +121,19 @@ func ByPublic(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPublic, opts...).ToFunc()
 }
 
-// ByM2mGrantField orders the results by m2m_grant field.
-func ByM2mGrantField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newM2mGrantStep(), sql.OrderByField(field, opts...))
-	}
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByCodeGrantField orders the results by code_grant field.
-func ByCodeGrantField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCodeGrantStep(), sql.OrderByField(field, opts...))
-	}
+// ByPkceRequired orders the results by the pkce_required field.
+func ByPkceRequired(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPkceRequired, opts...).ToFunc()
+}
+
+// ByS256CodeChallengeMethodRequired orders the results by the s256_code_challenge_method_required field.
+func ByS256CodeChallengeMethodRequired(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldS256CodeChallengeMethodRequired, opts...).ToFunc()
 }
 
 // ByCredentialsCount orders the results by credentials count.
@@ -144,20 +155,6 @@ func ByServiceField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newServiceStep(), sql.OrderByField(field, opts...))
 	}
-}
-func newM2mGrantStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(M2mGrantInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantTable, M2mGrantColumn),
-	)
-}
-func newCodeGrantStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CodeGrantInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantTable, CodeGrantColumn),
-	)
 }
 func newCredentialsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

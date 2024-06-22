@@ -73,6 +73,21 @@ func Public(v bool) predicate.Application {
 	return predicate.Application(sql.FieldEQ(FieldPublic, v))
 }
 
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldDescription, v))
+}
+
+// PkceRequired applies equality check predicate on the "pkce_required" field. It's identical to PkceRequiredEQ.
+func PkceRequired(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldPkceRequired, v))
+}
+
+// S256CodeChallengeMethodRequired applies equality check predicate on the "s256_code_challenge_method_required" field. It's identical to S256CodeChallengeMethodRequiredEQ.
+func S256CodeChallengeMethodRequired(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldS256CodeChallengeMethodRequired, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Application {
 	return predicate.Application(sql.FieldEQ(FieldName, v))
@@ -148,50 +163,89 @@ func PublicNEQ(v bool) predicate.Application {
 	return predicate.Application(sql.FieldNEQ(FieldPublic, v))
 }
 
-// HasM2mGrant applies the HasEdge predicate on the "m2m_grant" edge.
-func HasM2mGrant() predicate.Application {
-	return predicate.Application(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, M2mGrantTable, M2mGrantColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldDescription, v))
 }
 
-// HasM2mGrantWith applies the HasEdge predicate on the "m2m_grant" edge with a given conditions (other predicates).
-func HasM2mGrantWith(preds ...predicate.M2MGrant) predicate.Application {
-	return predicate.Application(func(s *sql.Selector) {
-		step := newM2mGrantStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldDescription, v))
 }
 
-// HasCodeGrant applies the HasEdge predicate on the "code_grant" edge.
-func HasCodeGrant() predicate.Application {
-	return predicate.Application(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, CodeGrantTable, CodeGrantColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.Application {
+	return predicate.Application(sql.FieldIn(FieldDescription, vs...))
 }
 
-// HasCodeGrantWith applies the HasEdge predicate on the "code_grant" edge with a given conditions (other predicates).
-func HasCodeGrantWith(preds ...predicate.CodeGrant) predicate.Application {
-	return predicate.Application(func(s *sql.Selector) {
-		step := newCodeGrantStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.Application {
+	return predicate.Application(sql.FieldNotIn(FieldDescription, vs...))
+}
+
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.Application {
+	return predicate.Application(sql.FieldGT(FieldDescription, v))
+}
+
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.Application {
+	return predicate.Application(sql.FieldGTE(FieldDescription, v))
+}
+
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.Application {
+	return predicate.Application(sql.FieldLT(FieldDescription, v))
+}
+
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.Application {
+	return predicate.Application(sql.FieldLTE(FieldDescription, v))
+}
+
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.Application {
+	return predicate.Application(sql.FieldContains(FieldDescription, v))
+}
+
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.Application {
+	return predicate.Application(sql.FieldHasPrefix(FieldDescription, v))
+}
+
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.Application {
+	return predicate.Application(sql.FieldHasSuffix(FieldDescription, v))
+}
+
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.Application {
+	return predicate.Application(sql.FieldEqualFold(FieldDescription, v))
+}
+
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.Application {
+	return predicate.Application(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// PkceRequiredEQ applies the EQ predicate on the "pkce_required" field.
+func PkceRequiredEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldPkceRequired, v))
+}
+
+// PkceRequiredNEQ applies the NEQ predicate on the "pkce_required" field.
+func PkceRequiredNEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldPkceRequired, v))
+}
+
+// S256CodeChallengeMethodRequiredEQ applies the EQ predicate on the "s256_code_challenge_method_required" field.
+func S256CodeChallengeMethodRequiredEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldS256CodeChallengeMethodRequired, v))
+}
+
+// S256CodeChallengeMethodRequiredNEQ applies the NEQ predicate on the "s256_code_challenge_method_required" field.
+func S256CodeChallengeMethodRequiredNEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldS256CodeChallengeMethodRequired, v))
 }
 
 // HasCredentials applies the HasEdge predicate on the "credentials" edge.

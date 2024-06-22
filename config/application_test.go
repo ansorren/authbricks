@@ -16,9 +16,27 @@ func TestApplication_Validate(t *testing.T) {
 			ErrorExpected: true,
 		},
 		{
-			Name: "empty redirect URIs",
+			Name: "empty service Name",
 			Application: Application{
 				Name: "app",
+			},
+			ErrorExpected: true,
+		},
+		{
+			Name: "public application with PKCE not required",
+			Application: Application{
+				Name:         "app",
+				Service:      "service",
+				Public:       true,
+				PKCERequired: false,
+			},
+			ErrorExpected: true,
+		},
+		{
+			Name: "empty redirect URIs",
+			Application: Application{
+				Name:    "app",
+				Service: "service",
 			},
 			ErrorExpected: true,
 		},
@@ -26,6 +44,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "redirect URIs with empty string",
 			Application: Application{
 				Name:         "app",
+				Service:      "service",
 				RedirectURIs: []string{""},
 			},
 			ErrorExpected: true,
@@ -34,6 +53,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "empty response types",
 			Application: Application{
 				Name:          "app",
+				Service:       "service",
 				RedirectURIs:  []string{"http://localhost:8080/callback"},
 				ResponseTypes: []string{},
 			},
@@ -43,6 +63,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "invalid response type",
 			Application: Application{
 				Name:          "app",
+				Service:       "service",
 				RedirectURIs:  []string{"http://localhost:8080/callback"},
 				ResponseTypes: []string{"invalid"},
 			},
@@ -52,6 +73,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "empty grant types",
 			Application: Application{
 				Name:          "app",
+				Service:       "service",
 				RedirectURIs:  []string{"http://localhost:8080/callback"},
 				ResponseTypes: []string{"code"},
 				GrantTypes:    []string{},
@@ -62,6 +84,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "invalid grant type",
 			Application: Application{
 				Name:          "app",
+				Service:       "service",
 				RedirectURIs:  []string{"http://localhost:8080/callback"},
 				ResponseTypes: []string{"code"},
 				GrantTypes:    []string{"invalid"},
@@ -72,6 +95,7 @@ func TestApplication_Validate(t *testing.T) {
 			Name: "valid",
 			Application: Application{
 				Name:          "app",
+				Service:       "service",
 				RedirectURIs:  []string{"http://localhost:8080/callback"},
 				ResponseTypes: []string{ResponseTypeCode},
 				GrantTypes:    []string{GrantTypeAuthorizationCode},
@@ -83,7 +107,7 @@ func TestApplication_Validate(t *testing.T) {
 		tt := tt
 		t.Run(tt.Name, func(t *testing.T) {
 			if err := tt.Application.Validate(); (err != nil) != tt.ErrorExpected {
-				t.Errorf("Application.Validate() error = %v, ErrorExpected %v", err, tt.ErrorExpected)
+				t.Errorf("Application.Validate() error = %v, Error Expected %v", err, tt.ErrorExpected)
 			}
 		})
 	}

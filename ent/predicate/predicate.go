@@ -15,9 +15,6 @@ type AuthorizationCode func(*sql.Selector)
 // AuthorizationPayload is the predicate function for authorizationpayload builders.
 type AuthorizationPayload func(*sql.Selector)
 
-// CodeGrant is the predicate function for codegrant builders.
-type CodeGrant func(*sql.Selector)
-
 // CookieStore is the predicate function for cookiestore builders.
 type CookieStore func(*sql.Selector)
 
@@ -27,17 +24,23 @@ type Credentials func(*sql.Selector)
 // KeySet is the predicate function for keyset builders.
 type KeySet func(*sql.Selector)
 
-// M2MGrant is the predicate function for m2mgrant builders.
-type M2MGrant func(*sql.Selector)
-
 // RefreshToken is the predicate function for refreshtoken builders.
 type RefreshToken func(*sql.Selector)
 
 // Service is the predicate function for service builders.
 type Service func(*sql.Selector)
 
-// ServiceConfig is the predicate function for serviceconfig builders.
-type ServiceConfig func(*sql.Selector)
+// ServiceAuthorizationEndpointConfig is the predicate function for serviceauthorizationendpointconfig builders.
+type ServiceAuthorizationEndpointConfig func(*sql.Selector)
+
+// ServiceIntrospectionEndpointConfig is the predicate function for serviceintrospectionendpointconfig builders.
+type ServiceIntrospectionEndpointConfig func(*sql.Selector)
+
+// ServiceTokenEndpointConfig is the predicate function for servicetokenendpointconfig builders.
+type ServiceTokenEndpointConfig func(*sql.Selector)
+
+// ServiceUserInfoEndpointConfig is the predicate function for serviceuserinfoendpointconfig builders.
+type ServiceUserInfoEndpointConfig func(*sql.Selector)
 
 // Session is the predicate function for session builders.
 type Session func(*sql.Selector)

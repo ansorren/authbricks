@@ -13,6 +13,14 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "public", Type: field.TypeBool, Default: false},
+		{Name: "description", Type: field.TypeString},
+		{Name: "redirect_uris", Type: field.TypeJSON},
+		{Name: "response_types", Type: field.TypeJSON},
+		{Name: "grant_types", Type: field.TypeJSON},
+		{Name: "scopes", Type: field.TypeJSON},
+		{Name: "pkce_required", Type: field.TypeBool, Default: false},
+		{Name: "s256_code_challenge_method_required", Type: field.TypeBool, Default: false},
+		{Name: "allowed_authentication_methods", Type: field.TypeJSON},
 		{Name: "service_applications", Type: field.TypeString, Nullable: true},
 	}
 	// ApplicationsTable holds the schema information for the "applications" table.
@@ -23,7 +31,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "applications_services_applications",
-				Columns:    []*schema.Column{ApplicationsColumns[3]},
+				Columns:    []*schema.Column{ApplicationsColumns[11]},
 				RefColumns: []*schema.Column{ServicesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -79,27 +87,6 @@ var (
 			},
 		},
 	}
-	// CodeGrantsColumns holds the columns for the "code_grants" table.
-	CodeGrantsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "scopes", Type: field.TypeJSON},
-		{Name: "callbacks", Type: field.TypeJSON},
-		{Name: "application_code_grant", Type: field.TypeString, Unique: true, Nullable: true},
-	}
-	// CodeGrantsTable holds the schema information for the "code_grants" table.
-	CodeGrantsTable = &schema.Table{
-		Name:       "code_grants",
-		Columns:    CodeGrantsColumns,
-		PrimaryKey: []*schema.Column{CodeGrantsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "code_grants_applications_code_grant",
-				Columns:    []*schema.Column{CodeGrantsColumns[3]},
-				RefColumns: []*schema.Column{ApplicationsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
 	// CookieStoresColumns holds the columns for the "cookie_stores" table.
 	CookieStoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -136,7 +123,7 @@ var (
 	// KeySetsColumns holds the columns for the "key_sets" table.
 	KeySetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "service_config_key_sets", Type: field.TypeString, Nullable: true},
+		{Name: "service_key_sets", Type: field.TypeString, Nullable: true},
 	}
 	// KeySetsTable holds the schema information for the "key_sets" table.
 	KeySetsTable = &schema.Table{
@@ -145,29 +132,9 @@ var (
 		PrimaryKey: []*schema.Column{KeySetsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "key_sets_service_configs_key_sets",
+				Symbol:     "key_sets_services_key_sets",
 				Columns:    []*schema.Column{KeySetsColumns[1]},
-				RefColumns: []*schema.Column{ServiceConfigsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// M2mGrantsColumns holds the columns for the "m2m_grants" table.
-	M2mGrantsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "scopes", Type: field.TypeJSON},
-		{Name: "application_m2m_grant", Type: field.TypeString, Unique: true, Nullable: true},
-	}
-	// M2mGrantsTable holds the schema information for the "m2m_grants" table.
-	M2mGrantsTable = &schema.Table{
-		Name:       "m2m_grants",
-		Columns:    M2mGrantsColumns,
-		PrimaryKey: []*schema.Column{M2mGrantsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "m2m_grants_applications_m2m_grant",
-				Columns:    []*schema.Column{M2mGrantsColumns[2]},
-				RefColumns: []*schema.Column{ApplicationsColumns[0]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -203,7 +170,12 @@ var (
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "issuer", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString},
 		{Name: "scopes", Type: field.TypeJSON},
+		{Name: "service_metadata", Type: field.TypeString},
+		{Name: "allowed_client_metadata", Type: field.TypeJSON},
+		{Name: "grant_types", Type: field.TypeJSON},
+		{Name: "response_types", Type: field.TypeJSON},
 	}
 	// ServicesTable holds the schema information for the "services" table.
 	ServicesTable = &schema.Table{
@@ -211,20 +183,84 @@ var (
 		Columns:    ServicesColumns,
 		PrimaryKey: []*schema.Column{ServicesColumns[0]},
 	}
-	// ServiceConfigsColumns holds the columns for the "service_configs" table.
-	ServiceConfigsColumns = []*schema.Column{
+	// ServiceAuthorizationEndpointConfigsColumns holds the columns for the "service_authorization_endpoint_configs" table.
+	ServiceAuthorizationEndpointConfigsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "service_service_config", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "pkce_required", Type: field.TypeBool},
+		{Name: "pkce_s256_code_challenge_method_required", Type: field.TypeBool},
+		{Name: "service_service_authorization_endpoint_config", Type: field.TypeString, Unique: true},
 	}
-	// ServiceConfigsTable holds the schema information for the "service_configs" table.
-	ServiceConfigsTable = &schema.Table{
-		Name:       "service_configs",
-		Columns:    ServiceConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceConfigsColumns[0]},
+	// ServiceAuthorizationEndpointConfigsTable holds the schema information for the "service_authorization_endpoint_configs" table.
+	ServiceAuthorizationEndpointConfigsTable = &schema.Table{
+		Name:       "service_authorization_endpoint_configs",
+		Columns:    ServiceAuthorizationEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{ServiceAuthorizationEndpointConfigsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "service_configs_services_service_config",
-				Columns:    []*schema.Column{ServiceConfigsColumns[1]},
+				Symbol:     "service_authorization_endpoint_configs_services_service_authorization_endpoint_config",
+				Columns:    []*schema.Column{ServiceAuthorizationEndpointConfigsColumns[4]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ServiceIntrospectionEndpointConfigsColumns holds the columns for the "service_introspection_endpoint_configs" table.
+	ServiceIntrospectionEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_introspection_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// ServiceIntrospectionEndpointConfigsTable holds the schema information for the "service_introspection_endpoint_configs" table.
+	ServiceIntrospectionEndpointConfigsTable = &schema.Table{
+		Name:       "service_introspection_endpoint_configs",
+		Columns:    ServiceIntrospectionEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{ServiceIntrospectionEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "service_introspection_endpoint_configs_services_service_introspection_endpoint_config",
+				Columns:    []*schema.Column{ServiceIntrospectionEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ServiceTokenEndpointConfigsColumns holds the columns for the "service_token_endpoint_configs" table.
+	ServiceTokenEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "allowed_authentication_methods", Type: field.TypeJSON},
+		{Name: "service_service_token_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// ServiceTokenEndpointConfigsTable holds the schema information for the "service_token_endpoint_configs" table.
+	ServiceTokenEndpointConfigsTable = &schema.Table{
+		Name:       "service_token_endpoint_configs",
+		Columns:    ServiceTokenEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{ServiceTokenEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "service_token_endpoint_configs_services_service_token_endpoint_config",
+				Columns:    []*schema.Column{ServiceTokenEndpointConfigsColumns[3]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ServiceUserInfoEndpointConfigsColumns holds the columns for the "service_user_info_endpoint_configs" table.
+	ServiceUserInfoEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_user_info_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// ServiceUserInfoEndpointConfigsTable holds the schema information for the "service_user_info_endpoint_configs" table.
+	ServiceUserInfoEndpointConfigsTable = &schema.Table{
+		Name:       "service_user_info_endpoint_configs",
+		Columns:    ServiceUserInfoEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{ServiceUserInfoEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "service_user_info_endpoint_configs_services_service_user_info_endpoint_config",
+				Columns:    []*schema.Column{ServiceUserInfoEndpointConfigsColumns[2]},
 				RefColumns: []*schema.Column{ServicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -337,14 +373,15 @@ var (
 		ApplicationsTable,
 		AuthorizationCodesTable,
 		AuthorizationPayloadsTable,
-		CodeGrantsTable,
 		CookieStoresTable,
 		CredentialsTable,
 		KeySetsTable,
-		M2mGrantsTable,
 		RefreshTokensTable,
 		ServicesTable,
-		ServiceConfigsTable,
+		ServiceAuthorizationEndpointConfigsTable,
+		ServiceIntrospectionEndpointConfigsTable,
+		ServiceTokenEndpointConfigsTable,
+		ServiceUserInfoEndpointConfigsTable,
 		SessionsTable,
 		SigningKeysTable,
 		StandardClaimsTable,
@@ -356,11 +393,12 @@ var (
 func init() {
 	ApplicationsTable.ForeignKeys[0].RefTable = ServicesTable
 	AuthorizationPayloadsTable.ForeignKeys[0].RefTable = SessionsTable
-	CodeGrantsTable.ForeignKeys[0].RefTable = ApplicationsTable
 	CredentialsTable.ForeignKeys[0].RefTable = ApplicationsTable
-	KeySetsTable.ForeignKeys[0].RefTable = ServiceConfigsTable
-	M2mGrantsTable.ForeignKeys[0].RefTable = ApplicationsTable
-	ServiceConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	KeySetsTable.ForeignKeys[0].RefTable = ServicesTable
+	ServiceAuthorizationEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	ServiceIntrospectionEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	ServiceTokenEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	ServiceUserInfoEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	SigningKeysTable.ForeignKeys[0].RefTable = KeySetsTable
 	StandardClaimsTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[0].RefTable = UserPoolsTable

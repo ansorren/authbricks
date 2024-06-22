@@ -13,7 +13,7 @@ func TestNewMySQL(t *testing.T) {
 	db, err := NewMySQL(context.Background(), "user:pass@tcp(127.0.0.1:3306)/db?parseTime=True")
 	require.Nil(t, err)
 
-	client := db.Client()
+	client := db.EntClient
 	creds, err := client.Credentials.Create().
 		SetID(uuid.New().String()).
 		SetClientID(uuid.New().String()).

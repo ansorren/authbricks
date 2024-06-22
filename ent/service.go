@@ -10,7 +10,10 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
 
 // Service is the model entity for the Service schema.
@@ -22,8 +25,18 @@ type Service struct {
 	Name string `json:"name" hcl:"name"`
 	// Issuer holds the value of the "issuer" field.
 	Issuer string `json:"issuer" hcl:"issuer"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description" hcl:"description"`
 	// Scopes holds the value of the "scopes" field.
 	Scopes []string `json:"scopes" hcl:"scopes"`
+	// ServiceMetadata holds the value of the "service_metadata" field.
+	ServiceMetadata string `json:"service_metadata" hcl:"service_metadata"`
+	// AllowedClientMetadata holds the value of the "allowed_client_metadata" field.
+	AllowedClientMetadata []string `json:"allowed_client_metadata" hcl:"allowed_client_metadata"`
+	// GrantTypes holds the value of the "grant_types" field.
+	GrantTypes []string `json:"grant_types" hcl:"grant_types"`
+	// ResponseTypes holds the value of the "response_types" field.
+	ResponseTypes []string `json:"response_types" hcl:"response_types"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ServiceQuery when eager-loading is set.
 	Edges        ServiceEdges `json:"edges"`
@@ -32,30 +45,80 @@ type Service struct {
 
 // ServiceEdges holds the relations/edges for other nodes in the graph.
 type ServiceEdges struct {
-	// ServiceConfig holds the value of the service_config edge.
-	ServiceConfig *ServiceConfig `json:"service_config,omitempty"`
+	// KeySets holds the value of the key_sets edge.
+	KeySets []*KeySet `json:"key_sets,omitempty"`
+	// ServiceAuthorizationEndpointConfig holds the value of the service_authorization_endpoint_config edge.
+	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfig `json:"service_authorization_endpoint_config,omitempty"`
+	// ServiceIntrospectionEndpointConfig holds the value of the service_introspection_endpoint_config edge.
+	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfig `json:"service_introspection_endpoint_config,omitempty"`
+	// ServiceTokenEndpointConfig holds the value of the service_token_endpoint_config edge.
+	ServiceTokenEndpointConfig *ServiceTokenEndpointConfig `json:"service_token_endpoint_config,omitempty"`
+	// ServiceUserInfoEndpointConfig holds the value of the service_user_info_endpoint_config edge.
+	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfig `json:"service_user_info_endpoint_config,omitempty"`
 	// Applications holds the value of the applications edge.
 	Applications []*Application `json:"applications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [6]bool
 }
 
-// ServiceConfigOrErr returns the ServiceConfig value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceConfigOrErr() (*ServiceConfig, error) {
-	if e.ServiceConfig != nil {
-		return e.ServiceConfig, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: serviceconfig.Label}
+// KeySetsOrErr returns the KeySets value or an error if the edge
+// was not loaded in eager-loading.
+func (e ServiceEdges) KeySetsOrErr() ([]*KeySet, error) {
+	if e.loadedTypes[0] {
+		return e.KeySets, nil
 	}
-	return nil, &NotLoadedError{edge: "service_config"}
+	return nil, &NotLoadedError{edge: "key_sets"}
+}
+
+// ServiceAuthorizationEndpointConfigOrErr returns the ServiceAuthorizationEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceAuthorizationEndpointConfigOrErr() (*ServiceAuthorizationEndpointConfig, error) {
+	if e.ServiceAuthorizationEndpointConfig != nil {
+		return e.ServiceAuthorizationEndpointConfig, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: serviceauthorizationendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_authorization_endpoint_config"}
+}
+
+// ServiceIntrospectionEndpointConfigOrErr returns the ServiceIntrospectionEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceIntrospectionEndpointConfigOrErr() (*ServiceIntrospectionEndpointConfig, error) {
+	if e.ServiceIntrospectionEndpointConfig != nil {
+		return e.ServiceIntrospectionEndpointConfig, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: serviceintrospectionendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_introspection_endpoint_config"}
+}
+
+// ServiceTokenEndpointConfigOrErr returns the ServiceTokenEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceTokenEndpointConfigOrErr() (*ServiceTokenEndpointConfig, error) {
+	if e.ServiceTokenEndpointConfig != nil {
+		return e.ServiceTokenEndpointConfig, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: servicetokenendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_token_endpoint_config"}
+}
+
+// ServiceUserInfoEndpointConfigOrErr returns the ServiceUserInfoEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceUserInfoEndpointConfigOrErr() (*ServiceUserInfoEndpointConfig, error) {
+	if e.ServiceUserInfoEndpointConfig != nil {
+		return e.ServiceUserInfoEndpointConfig, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: serviceuserinfoendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_user_info_endpoint_config"}
 }
 
 // ApplicationsOrErr returns the Applications value or an error if the edge
 // was not loaded in eager-loading.
 func (e ServiceEdges) ApplicationsOrErr() ([]*Application, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[5] {
 		return e.Applications, nil
 	}
 	return nil, &NotLoadedError{edge: "applications"}
@@ -66,9 +129,9 @@ func (*Service) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case service.FieldScopes:
+		case service.FieldScopes, service.FieldAllowedClientMetadata, service.FieldGrantTypes, service.FieldResponseTypes:
 			values[i] = new([]byte)
-		case service.FieldID, service.FieldName, service.FieldIssuer:
+		case service.FieldID, service.FieldName, service.FieldIssuer, service.FieldDescription, service.FieldServiceMetadata:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -103,12 +166,48 @@ func (s *Service) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Issuer = value.String
 			}
+		case service.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				s.Description = value.String
+			}
 		case service.FieldScopes:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field scopes", values[i])
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &s.Scopes); err != nil {
 					return fmt.Errorf("unmarshal field scopes: %w", err)
+				}
+			}
+		case service.FieldServiceMetadata:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field service_metadata", values[i])
+			} else if value.Valid {
+				s.ServiceMetadata = value.String
+			}
+		case service.FieldAllowedClientMetadata:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field allowed_client_metadata", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.AllowedClientMetadata); err != nil {
+					return fmt.Errorf("unmarshal field allowed_client_metadata: %w", err)
+				}
+			}
+		case service.FieldGrantTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field grant_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.GrantTypes); err != nil {
+					return fmt.Errorf("unmarshal field grant_types: %w", err)
+				}
+			}
+		case service.FieldResponseTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field response_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.ResponseTypes); err != nil {
+					return fmt.Errorf("unmarshal field response_types: %w", err)
 				}
 			}
 		default:
@@ -124,9 +223,29 @@ func (s *Service) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryServiceConfig queries the "service_config" edge of the Service entity.
-func (s *Service) QueryServiceConfig() *ServiceConfigQuery {
-	return NewServiceClient(s.config).QueryServiceConfig(s)
+// QueryKeySets queries the "key_sets" edge of the Service entity.
+func (s *Service) QueryKeySets() *KeySetQuery {
+	return NewServiceClient(s.config).QueryKeySets(s)
+}
+
+// QueryServiceAuthorizationEndpointConfig queries the "service_authorization_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceAuthorizationEndpointConfig() *ServiceAuthorizationEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceAuthorizationEndpointConfig(s)
+}
+
+// QueryServiceIntrospectionEndpointConfig queries the "service_introspection_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceIntrospectionEndpointConfig() *ServiceIntrospectionEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceIntrospectionEndpointConfig(s)
+}
+
+// QueryServiceTokenEndpointConfig queries the "service_token_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceTokenEndpointConfig(s)
+}
+
+// QueryServiceUserInfoEndpointConfig queries the "service_user_info_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceUserInfoEndpointConfig(s)
 }
 
 // QueryApplications queries the "applications" edge of the Service entity.
@@ -163,8 +282,23 @@ func (s *Service) String() string {
 	builder.WriteString("issuer=")
 	builder.WriteString(s.Issuer)
 	builder.WriteString(", ")
+	builder.WriteString("description=")
+	builder.WriteString(s.Description)
+	builder.WriteString(", ")
 	builder.WriteString("scopes=")
 	builder.WriteString(fmt.Sprintf("%v", s.Scopes))
+	builder.WriteString(", ")
+	builder.WriteString("service_metadata=")
+	builder.WriteString(s.ServiceMetadata)
+	builder.WriteString(", ")
+	builder.WriteString("allowed_client_metadata=")
+	builder.WriteString(fmt.Sprintf("%v", s.AllowedClientMetadata))
+	builder.WriteString(", ")
+	builder.WriteString("grant_types=")
+	builder.WriteString(fmt.Sprintf("%v", s.GrantTypes))
+	builder.WriteString(", ")
+	builder.WriteString("response_types=")
+	builder.WriteString(fmt.Sprintf("%v", s.ResponseTypes))
 	builder.WriteByte(')')
 	return builder.String()
 }

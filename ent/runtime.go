@@ -6,15 +6,16 @@ import (
 	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/schema"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
 	"go.authbricks.com/bricks/ent/signingkey"
 	"go.authbricks.com/bricks/ent/standardclaims"
@@ -36,6 +37,14 @@ func init() {
 	applicationDescPublic := applicationFields[2].Descriptor()
 	// application.DefaultPublic holds the default value on creation for the public field.
 	application.DefaultPublic = applicationDescPublic.Default.(bool)
+	// applicationDescPkceRequired is the schema descriptor for pkce_required field.
+	applicationDescPkceRequired := applicationFields[8].Descriptor()
+	// application.DefaultPkceRequired holds the default value on creation for the pkce_required field.
+	application.DefaultPkceRequired = applicationDescPkceRequired.Default.(bool)
+	// applicationDescS256CodeChallengeMethodRequired is the schema descriptor for s256_code_challenge_method_required field.
+	applicationDescS256CodeChallengeMethodRequired := applicationFields[9].Descriptor()
+	// application.DefaultS256CodeChallengeMethodRequired holds the default value on creation for the s256_code_challenge_method_required field.
+	application.DefaultS256CodeChallengeMethodRequired = applicationDescS256CodeChallengeMethodRequired.Default.(bool)
 	// applicationDescID is the schema descriptor for id field.
 	applicationDescID := applicationFields[0].Descriptor()
 	// application.IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -52,12 +61,6 @@ func init() {
 	authorizationpayloadDescID := authorizationpayloadFields[0].Descriptor()
 	// authorizationpayload.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	authorizationpayload.IDValidator = authorizationpayloadDescID.Validators[0].(func(string) error)
-	codegrantFields := schema.CodeGrant{}.Fields()
-	_ = codegrantFields
-	// codegrantDescID is the schema descriptor for id field.
-	codegrantDescID := codegrantFields[0].Descriptor()
-	// codegrant.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	codegrant.IDValidator = codegrantDescID.Validators[0].(func(string) error)
 	cookiestoreFields := schema.CookieStore{}.Fields()
 	_ = cookiestoreFields
 	// cookiestoreDescAuthKey is the schema descriptor for auth_key field.
@@ -88,12 +91,6 @@ func init() {
 	keysetDescID := keysetFields[0].Descriptor()
 	// keyset.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	keyset.IDValidator = keysetDescID.Validators[0].(func(string) error)
-	m2mgrantFields := schema.M2MGrant{}.Fields()
-	_ = m2mgrantFields
-	// m2mgrantDescID is the schema descriptor for id field.
-	m2mgrantDescID := m2mgrantFields[0].Descriptor()
-	// m2mgrant.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	m2mgrant.IDValidator = m2mgrantDescID.Validators[0].(func(string) error)
 	refreshtokenFields := schema.RefreshToken{}.Fields()
 	_ = refreshtokenFields
 	// refreshtokenDescCreatedAt is the schema descriptor for created_at field.
@@ -122,12 +119,46 @@ func init() {
 	serviceDescID := serviceFields[0].Descriptor()
 	// service.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	service.IDValidator = serviceDescID.Validators[0].(func(string) error)
-	serviceconfigFields := schema.ServiceConfig{}.Fields()
-	_ = serviceconfigFields
-	// serviceconfigDescID is the schema descriptor for id field.
-	serviceconfigDescID := serviceconfigFields[0].Descriptor()
-	// serviceconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	serviceconfig.IDValidator = serviceconfigDescID.Validators[0].(func(string) error)
+	serviceauthorizationendpointconfigFields := schema.ServiceAuthorizationEndpointConfig{}.Fields()
+	_ = serviceauthorizationendpointconfigFields
+	// serviceauthorizationendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	serviceauthorizationendpointconfigDescEndpoint := serviceauthorizationendpointconfigFields[1].Descriptor()
+	// serviceauthorizationendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	serviceauthorizationendpointconfig.EndpointValidator = serviceauthorizationendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// serviceauthorizationendpointconfigDescID is the schema descriptor for id field.
+	serviceauthorizationendpointconfigDescID := serviceauthorizationendpointconfigFields[0].Descriptor()
+	// serviceauthorizationendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	serviceauthorizationendpointconfig.IDValidator = serviceauthorizationendpointconfigDescID.Validators[0].(func(string) error)
+	serviceintrospectionendpointconfigFields := schema.ServiceIntrospectionEndpointConfig{}.Fields()
+	_ = serviceintrospectionendpointconfigFields
+	// serviceintrospectionendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	serviceintrospectionendpointconfigDescEndpoint := serviceintrospectionendpointconfigFields[1].Descriptor()
+	// serviceintrospectionendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	serviceintrospectionendpointconfig.EndpointValidator = serviceintrospectionendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// serviceintrospectionendpointconfigDescID is the schema descriptor for id field.
+	serviceintrospectionendpointconfigDescID := serviceintrospectionendpointconfigFields[0].Descriptor()
+	// serviceintrospectionendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	serviceintrospectionendpointconfig.IDValidator = serviceintrospectionendpointconfigDescID.Validators[0].(func(string) error)
+	servicetokenendpointconfigFields := schema.ServiceTokenEndpointConfig{}.Fields()
+	_ = servicetokenendpointconfigFields
+	// servicetokenendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	servicetokenendpointconfigDescEndpoint := servicetokenendpointconfigFields[1].Descriptor()
+	// servicetokenendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	servicetokenendpointconfig.EndpointValidator = servicetokenendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// servicetokenendpointconfigDescID is the schema descriptor for id field.
+	servicetokenendpointconfigDescID := servicetokenendpointconfigFields[0].Descriptor()
+	// servicetokenendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	servicetokenendpointconfig.IDValidator = servicetokenendpointconfigDescID.Validators[0].(func(string) error)
+	serviceuserinfoendpointconfigFields := schema.ServiceUserInfoEndpointConfig{}.Fields()
+	_ = serviceuserinfoendpointconfigFields
+	// serviceuserinfoendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	serviceuserinfoendpointconfigDescEndpoint := serviceuserinfoendpointconfigFields[1].Descriptor()
+	// serviceuserinfoendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	serviceuserinfoendpointconfig.EndpointValidator = serviceuserinfoendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// serviceuserinfoendpointconfigDescID is the schema descriptor for id field.
+	serviceuserinfoendpointconfigDescID := serviceuserinfoendpointconfigFields[0].Descriptor()
+	// serviceuserinfoendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	serviceuserinfoendpointconfig.IDValidator = serviceuserinfoendpointconfigDescID.Validators[0].(func(string) error)
 	sessionFields := schema.Session{}.Fields()
 	_ = sessionFields
 	// sessionDescCreatedAt is the schema descriptor for created_at field.
