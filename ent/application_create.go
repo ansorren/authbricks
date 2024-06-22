@@ -10,9 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/service"
 )
 
@@ -43,48 +41,74 @@ func (ac *ApplicationCreate) SetNillablePublic(b *bool) *ApplicationCreate {
 	return ac
 }
 
+// SetDescription sets the "description" field.
+func (ac *ApplicationCreate) SetDescription(s string) *ApplicationCreate {
+	ac.mutation.SetDescription(s)
+	return ac
+}
+
+// SetRedirectUris sets the "redirect_uris" field.
+func (ac *ApplicationCreate) SetRedirectUris(s []string) *ApplicationCreate {
+	ac.mutation.SetRedirectUris(s)
+	return ac
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (ac *ApplicationCreate) SetResponseTypes(s []string) *ApplicationCreate {
+	ac.mutation.SetResponseTypes(s)
+	return ac
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (ac *ApplicationCreate) SetGrantTypes(s []string) *ApplicationCreate {
+	ac.mutation.SetGrantTypes(s)
+	return ac
+}
+
+// SetScopes sets the "scopes" field.
+func (ac *ApplicationCreate) SetScopes(s []string) *ApplicationCreate {
+	ac.mutation.SetScopes(s)
+	return ac
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (ac *ApplicationCreate) SetPkceRequired(b bool) *ApplicationCreate {
+	ac.mutation.SetPkceRequired(b)
+	return ac
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (ac *ApplicationCreate) SetNillablePkceRequired(b *bool) *ApplicationCreate {
+	if b != nil {
+		ac.SetPkceRequired(*b)
+	}
+	return ac
+}
+
+// SetS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field.
+func (ac *ApplicationCreate) SetS256CodeChallengeMethodRequired(b bool) *ApplicationCreate {
+	ac.mutation.SetS256CodeChallengeMethodRequired(b)
+	return ac
+}
+
+// SetNillableS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field if the given value is not nil.
+func (ac *ApplicationCreate) SetNillableS256CodeChallengeMethodRequired(b *bool) *ApplicationCreate {
+	if b != nil {
+		ac.SetS256CodeChallengeMethodRequired(*b)
+	}
+	return ac
+}
+
+// SetAllowedAuthenticationMethods sets the "allowed_authentication_methods" field.
+func (ac *ApplicationCreate) SetAllowedAuthenticationMethods(s []string) *ApplicationCreate {
+	ac.mutation.SetAllowedAuthenticationMethods(s)
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *ApplicationCreate) SetID(s string) *ApplicationCreate {
 	ac.mutation.SetID(s)
 	return ac
-}
-
-// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID.
-func (ac *ApplicationCreate) SetM2mGrantID(id string) *ApplicationCreate {
-	ac.mutation.SetM2mGrantID(id)
-	return ac
-}
-
-// SetNillableM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by ID if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableM2mGrantID(id *string) *ApplicationCreate {
-	if id != nil {
-		ac = ac.SetM2mGrantID(*id)
-	}
-	return ac
-}
-
-// SetM2mGrant sets the "m2m_grant" edge to the M2MGrant entity.
-func (ac *ApplicationCreate) SetM2mGrant(m *M2MGrant) *ApplicationCreate {
-	return ac.SetM2mGrantID(m.ID)
-}
-
-// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID.
-func (ac *ApplicationCreate) SetCodeGrantID(id string) *ApplicationCreate {
-	ac.mutation.SetCodeGrantID(id)
-	return ac
-}
-
-// SetNillableCodeGrantID sets the "code_grant" edge to the CodeGrant entity by ID if the given value is not nil.
-func (ac *ApplicationCreate) SetNillableCodeGrantID(id *string) *ApplicationCreate {
-	if id != nil {
-		ac = ac.SetCodeGrantID(*id)
-	}
-	return ac
-}
-
-// SetCodeGrant sets the "code_grant" edge to the CodeGrant entity.
-func (ac *ApplicationCreate) SetCodeGrant(c *CodeGrant) *ApplicationCreate {
-	return ac.SetCodeGrantID(c.ID)
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by IDs.
@@ -160,6 +184,14 @@ func (ac *ApplicationCreate) defaults() {
 		v := application.DefaultPublic
 		ac.mutation.SetPublic(v)
 	}
+	if _, ok := ac.mutation.PkceRequired(); !ok {
+		v := application.DefaultPkceRequired
+		ac.mutation.SetPkceRequired(v)
+	}
+	if _, ok := ac.mutation.S256CodeChallengeMethodRequired(); !ok {
+		v := application.DefaultS256CodeChallengeMethodRequired
+		ac.mutation.SetS256CodeChallengeMethodRequired(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -174,6 +206,30 @@ func (ac *ApplicationCreate) check() error {
 	}
 	if _, ok := ac.mutation.Public(); !ok {
 		return &ValidationError{Name: "public", err: errors.New(`ent: missing required field "Application.public"`)}
+	}
+	if _, ok := ac.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Application.description"`)}
+	}
+	if _, ok := ac.mutation.RedirectUris(); !ok {
+		return &ValidationError{Name: "redirect_uris", err: errors.New(`ent: missing required field "Application.redirect_uris"`)}
+	}
+	if _, ok := ac.mutation.ResponseTypes(); !ok {
+		return &ValidationError{Name: "response_types", err: errors.New(`ent: missing required field "Application.response_types"`)}
+	}
+	if _, ok := ac.mutation.GrantTypes(); !ok {
+		return &ValidationError{Name: "grant_types", err: errors.New(`ent: missing required field "Application.grant_types"`)}
+	}
+	if _, ok := ac.mutation.Scopes(); !ok {
+		return &ValidationError{Name: "scopes", err: errors.New(`ent: missing required field "Application.scopes"`)}
+	}
+	if _, ok := ac.mutation.PkceRequired(); !ok {
+		return &ValidationError{Name: "pkce_required", err: errors.New(`ent: missing required field "Application.pkce_required"`)}
+	}
+	if _, ok := ac.mutation.S256CodeChallengeMethodRequired(); !ok {
+		return &ValidationError{Name: "s256_code_challenge_method_required", err: errors.New(`ent: missing required field "Application.s256_code_challenge_method_required"`)}
+	}
+	if _, ok := ac.mutation.AllowedAuthenticationMethods(); !ok {
+		return &ValidationError{Name: "allowed_authentication_methods", err: errors.New(`ent: missing required field "Application.allowed_authentication_methods"`)}
 	}
 	if v, ok := ac.mutation.ID(); ok {
 		if err := application.IDValidator(v); err != nil {
@@ -221,39 +277,39 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.Public(); ok {
 		_spec.SetField(application.FieldPublic, field.TypeBool, value)
-		_node.Public = &value
+		_node.Public = value
 	}
-	if nodes := ac.mutation.M2mGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.M2mGrantTable,
-			Columns: []string{application.M2mGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(m2mgrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := ac.mutation.Description(); ok {
+		_spec.SetField(application.FieldDescription, field.TypeString, value)
+		_node.Description = value
 	}
-	if nodes := ac.mutation.CodeGrantIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   application.CodeGrantTable,
-			Columns: []string{application.CodeGrantColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(codegrant.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := ac.mutation.RedirectUris(); ok {
+		_spec.SetField(application.FieldRedirectUris, field.TypeJSON, value)
+		_node.RedirectUris = value
+	}
+	if value, ok := ac.mutation.ResponseTypes(); ok {
+		_spec.SetField(application.FieldResponseTypes, field.TypeJSON, value)
+		_node.ResponseTypes = value
+	}
+	if value, ok := ac.mutation.GrantTypes(); ok {
+		_spec.SetField(application.FieldGrantTypes, field.TypeJSON, value)
+		_node.GrantTypes = value
+	}
+	if value, ok := ac.mutation.Scopes(); ok {
+		_spec.SetField(application.FieldScopes, field.TypeJSON, value)
+		_node.Scopes = value
+	}
+	if value, ok := ac.mutation.PkceRequired(); ok {
+		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
+		_node.PkceRequired = value
+	}
+	if value, ok := ac.mutation.S256CodeChallengeMethodRequired(); ok {
+		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)
+		_node.S256CodeChallengeMethodRequired = value
+	}
+	if value, ok := ac.mutation.AllowedAuthenticationMethods(); ok {
+		_spec.SetField(application.FieldAllowedAuthenticationMethods, field.TypeJSON, value)
+		_node.AllowedAuthenticationMethods = value
 	}
 	if nodes := ac.mutation.CredentialsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

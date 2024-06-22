@@ -14,15 +14,16 @@ import (
 	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
 	"go.authbricks.com/bricks/ent/signingkey"
 	"go.authbricks.com/bricks/ent/standardclaims"
@@ -39,45 +40,55 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeApplication          = "Application"
-	TypeAuthorizationCode    = "AuthorizationCode"
-	TypeAuthorizationPayload = "AuthorizationPayload"
-	TypeCodeGrant            = "CodeGrant"
-	TypeCookieStore          = "CookieStore"
-	TypeCredentials          = "Credentials"
-	TypeKeySet               = "KeySet"
-	TypeM2MGrant             = "M2MGrant"
-	TypeRefreshToken         = "RefreshToken"
-	TypeService              = "Service"
-	TypeServiceConfig        = "ServiceConfig"
-	TypeSession              = "Session"
-	TypeSigningKey           = "SigningKey"
-	TypeStandardClaims       = "StandardClaims"
-	TypeUser                 = "User"
-	TypeUserPool             = "UserPool"
+	TypeApplication                        = "Application"
+	TypeAuthorizationCode                  = "AuthorizationCode"
+	TypeAuthorizationPayload               = "AuthorizationPayload"
+	TypeCookieStore                        = "CookieStore"
+	TypeCredentials                        = "Credentials"
+	TypeKeySet                             = "KeySet"
+	TypeRefreshToken                       = "RefreshToken"
+	TypeService                            = "Service"
+	TypeServiceAuthorizationEndpointConfig = "ServiceAuthorizationEndpointConfig"
+	TypeServiceIntrospectionEndpointConfig = "ServiceIntrospectionEndpointConfig"
+	TypeServiceTokenEndpointConfig         = "ServiceTokenEndpointConfig"
+	TypeServiceUserInfoEndpointConfig      = "ServiceUserInfoEndpointConfig"
+	TypeSession                            = "Session"
+	TypeSigningKey                         = "SigningKey"
+	TypeStandardClaims                     = "StandardClaims"
+	TypeUser                               = "User"
+	TypeUserPool                           = "UserPool"
 )
 
 // ApplicationMutation represents an operation that mutates the Application nodes in the graph.
 type ApplicationMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *string
-	name               *string
-	public             *bool
-	clearedFields      map[string]struct{}
-	m2m_grant          *string
-	clearedm2m_grant   bool
-	code_grant         *string
-	clearedcode_grant  bool
-	credentials        map[string]struct{}
-	removedcredentials map[string]struct{}
-	clearedcredentials bool
-	service            *string
-	clearedservice     bool
-	done               bool
-	oldValue           func(context.Context) (*Application, error)
-	predicates         []predicate.Application
+	op                                   Op
+	typ                                  string
+	id                                   *string
+	name                                 *string
+	public                               *bool
+	description                          *string
+	redirect_uris                        *[]string
+	appendredirect_uris                  []string
+	response_types                       *[]string
+	appendresponse_types                 []string
+	grant_types                          *[]string
+	appendgrant_types                    []string
+	scopes                               *[]string
+	appendscopes                         []string
+	pkce_required                        *bool
+	s256_code_challenge_method_required  *bool
+	allowed_authentication_methods       *[]string
+	appendallowed_authentication_methods []string
+	clearedFields                        map[string]struct{}
+	credentials                          map[string]struct{}
+	removedcredentials                   map[string]struct{}
+	clearedcredentials                   bool
+	service                              *string
+	clearedservice                       bool
+	done                                 bool
+	oldValue                             func(context.Context) (*Application, error)
+	predicates                           []predicate.Application
 }
 
 var _ ent.Mutation = (*ApplicationMutation)(nil)
@@ -237,7 +248,7 @@ func (m *ApplicationMutation) Public() (r bool, exists bool) {
 // OldPublic returns the old "public" field's value of the Application entity.
 // If the Application object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ApplicationMutation) OldPublic(ctx context.Context) (v *bool, err error) {
+func (m *ApplicationMutation) OldPublic(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPublic is only allowed on UpdateOne operations")
 	}
@@ -256,82 +267,367 @@ func (m *ApplicationMutation) ResetPublic() {
 	m.public = nil
 }
 
-// SetM2mGrantID sets the "m2m_grant" edge to the M2MGrant entity by id.
-func (m *ApplicationMutation) SetM2mGrantID(id string) {
-	m.m2m_grant = &id
+// SetDescription sets the "description" field.
+func (m *ApplicationMutation) SetDescription(s string) {
+	m.description = &s
 }
 
-// ClearM2mGrant clears the "m2m_grant" edge to the M2MGrant entity.
-func (m *ApplicationMutation) ClearM2mGrant() {
-	m.clearedm2m_grant = true
-}
-
-// M2mGrantCleared reports if the "m2m_grant" edge to the M2MGrant entity was cleared.
-func (m *ApplicationMutation) M2mGrantCleared() bool {
-	return m.clearedm2m_grant
-}
-
-// M2mGrantID returns the "m2m_grant" edge ID in the mutation.
-func (m *ApplicationMutation) M2mGrantID() (id string, exists bool) {
-	if m.m2m_grant != nil {
-		return *m.m2m_grant, true
+// Description returns the value of the "description" field in the mutation.
+func (m *ApplicationMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// M2mGrantIDs returns the "m2m_grant" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// M2mGrantID instead. It exists only for internal usage by the builders.
-func (m *ApplicationMutation) M2mGrantIDs() (ids []string) {
-	if id := m.m2m_grant; id != nil {
-		ids = append(ids, *id)
+// OldDescription returns the old "description" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
-	return
-}
-
-// ResetM2mGrant resets all changes to the "m2m_grant" edge.
-func (m *ApplicationMutation) ResetM2mGrant() {
-	m.m2m_grant = nil
-	m.clearedm2m_grant = false
-}
-
-// SetCodeGrantID sets the "code_grant" edge to the CodeGrant entity by id.
-func (m *ApplicationMutation) SetCodeGrantID(id string) {
-	m.code_grant = &id
-}
-
-// ClearCodeGrant clears the "code_grant" edge to the CodeGrant entity.
-func (m *ApplicationMutation) ClearCodeGrant() {
-	m.clearedcode_grant = true
-}
-
-// CodeGrantCleared reports if the "code_grant" edge to the CodeGrant entity was cleared.
-func (m *ApplicationMutation) CodeGrantCleared() bool {
-	return m.clearedcode_grant
-}
-
-// CodeGrantID returns the "code_grant" edge ID in the mutation.
-func (m *ApplicationMutation) CodeGrantID() (id string, exists bool) {
-	if m.code_grant != nil {
-		return *m.code_grant, true
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
 	}
-	return
-}
-
-// CodeGrantIDs returns the "code_grant" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CodeGrantID instead. It exists only for internal usage by the builders.
-func (m *ApplicationMutation) CodeGrantIDs() (ids []string) {
-	if id := m.code_grant; id != nil {
-		ids = append(ids, *id)
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
 	}
-	return
+	return oldValue.Description, nil
 }
 
-// ResetCodeGrant resets all changes to the "code_grant" edge.
-func (m *ApplicationMutation) ResetCodeGrant() {
-	m.code_grant = nil
-	m.clearedcode_grant = false
+// ResetDescription resets all changes to the "description" field.
+func (m *ApplicationMutation) ResetDescription() {
+	m.description = nil
+}
+
+// SetRedirectUris sets the "redirect_uris" field.
+func (m *ApplicationMutation) SetRedirectUris(s []string) {
+	m.redirect_uris = &s
+	m.appendredirect_uris = nil
+}
+
+// RedirectUris returns the value of the "redirect_uris" field in the mutation.
+func (m *ApplicationMutation) RedirectUris() (r []string, exists bool) {
+	v := m.redirect_uris
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedirectUris returns the old "redirect_uris" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldRedirectUris(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedirectUris is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedirectUris requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedirectUris: %w", err)
+	}
+	return oldValue.RedirectUris, nil
+}
+
+// AppendRedirectUris adds s to the "redirect_uris" field.
+func (m *ApplicationMutation) AppendRedirectUris(s []string) {
+	m.appendredirect_uris = append(m.appendredirect_uris, s...)
+}
+
+// AppendedRedirectUris returns the list of values that were appended to the "redirect_uris" field in this mutation.
+func (m *ApplicationMutation) AppendedRedirectUris() ([]string, bool) {
+	if len(m.appendredirect_uris) == 0 {
+		return nil, false
+	}
+	return m.appendredirect_uris, true
+}
+
+// ResetRedirectUris resets all changes to the "redirect_uris" field.
+func (m *ApplicationMutation) ResetRedirectUris() {
+	m.redirect_uris = nil
+	m.appendredirect_uris = nil
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (m *ApplicationMutation) SetResponseTypes(s []string) {
+	m.response_types = &s
+	m.appendresponse_types = nil
+}
+
+// ResponseTypes returns the value of the "response_types" field in the mutation.
+func (m *ApplicationMutation) ResponseTypes() (r []string, exists bool) {
+	v := m.response_types
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResponseTypes returns the old "response_types" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldResponseTypes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResponseTypes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResponseTypes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResponseTypes: %w", err)
+	}
+	return oldValue.ResponseTypes, nil
+}
+
+// AppendResponseTypes adds s to the "response_types" field.
+func (m *ApplicationMutation) AppendResponseTypes(s []string) {
+	m.appendresponse_types = append(m.appendresponse_types, s...)
+}
+
+// AppendedResponseTypes returns the list of values that were appended to the "response_types" field in this mutation.
+func (m *ApplicationMutation) AppendedResponseTypes() ([]string, bool) {
+	if len(m.appendresponse_types) == 0 {
+		return nil, false
+	}
+	return m.appendresponse_types, true
+}
+
+// ResetResponseTypes resets all changes to the "response_types" field.
+func (m *ApplicationMutation) ResetResponseTypes() {
+	m.response_types = nil
+	m.appendresponse_types = nil
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (m *ApplicationMutation) SetGrantTypes(s []string) {
+	m.grant_types = &s
+	m.appendgrant_types = nil
+}
+
+// GrantTypes returns the value of the "grant_types" field in the mutation.
+func (m *ApplicationMutation) GrantTypes() (r []string, exists bool) {
+	v := m.grant_types
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGrantTypes returns the old "grant_types" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldGrantTypes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGrantTypes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGrantTypes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGrantTypes: %w", err)
+	}
+	return oldValue.GrantTypes, nil
+}
+
+// AppendGrantTypes adds s to the "grant_types" field.
+func (m *ApplicationMutation) AppendGrantTypes(s []string) {
+	m.appendgrant_types = append(m.appendgrant_types, s...)
+}
+
+// AppendedGrantTypes returns the list of values that were appended to the "grant_types" field in this mutation.
+func (m *ApplicationMutation) AppendedGrantTypes() ([]string, bool) {
+	if len(m.appendgrant_types) == 0 {
+		return nil, false
+	}
+	return m.appendgrant_types, true
+}
+
+// ResetGrantTypes resets all changes to the "grant_types" field.
+func (m *ApplicationMutation) ResetGrantTypes() {
+	m.grant_types = nil
+	m.appendgrant_types = nil
+}
+
+// SetScopes sets the "scopes" field.
+func (m *ApplicationMutation) SetScopes(s []string) {
+	m.scopes = &s
+	m.appendscopes = nil
+}
+
+// Scopes returns the value of the "scopes" field in the mutation.
+func (m *ApplicationMutation) Scopes() (r []string, exists bool) {
+	v := m.scopes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScopes returns the old "scopes" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldScopes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScopes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScopes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScopes: %w", err)
+	}
+	return oldValue.Scopes, nil
+}
+
+// AppendScopes adds s to the "scopes" field.
+func (m *ApplicationMutation) AppendScopes(s []string) {
+	m.appendscopes = append(m.appendscopes, s...)
+}
+
+// AppendedScopes returns the list of values that were appended to the "scopes" field in this mutation.
+func (m *ApplicationMutation) AppendedScopes() ([]string, bool) {
+	if len(m.appendscopes) == 0 {
+		return nil, false
+	}
+	return m.appendscopes, true
+}
+
+// ResetScopes resets all changes to the "scopes" field.
+func (m *ApplicationMutation) ResetScopes() {
+	m.scopes = nil
+	m.appendscopes = nil
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (m *ApplicationMutation) SetPkceRequired(b bool) {
+	m.pkce_required = &b
+}
+
+// PkceRequired returns the value of the "pkce_required" field in the mutation.
+func (m *ApplicationMutation) PkceRequired() (r bool, exists bool) {
+	v := m.pkce_required
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPkceRequired returns the old "pkce_required" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldPkceRequired(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPkceRequired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPkceRequired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPkceRequired: %w", err)
+	}
+	return oldValue.PkceRequired, nil
+}
+
+// ResetPkceRequired resets all changes to the "pkce_required" field.
+func (m *ApplicationMutation) ResetPkceRequired() {
+	m.pkce_required = nil
+}
+
+// SetS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field.
+func (m *ApplicationMutation) SetS256CodeChallengeMethodRequired(b bool) {
+	m.s256_code_challenge_method_required = &b
+}
+
+// S256CodeChallengeMethodRequired returns the value of the "s256_code_challenge_method_required" field in the mutation.
+func (m *ApplicationMutation) S256CodeChallengeMethodRequired() (r bool, exists bool) {
+	v := m.s256_code_challenge_method_required
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldS256CodeChallengeMethodRequired returns the old "s256_code_challenge_method_required" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldS256CodeChallengeMethodRequired(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldS256CodeChallengeMethodRequired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldS256CodeChallengeMethodRequired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldS256CodeChallengeMethodRequired: %w", err)
+	}
+	return oldValue.S256CodeChallengeMethodRequired, nil
+}
+
+// ResetS256CodeChallengeMethodRequired resets all changes to the "s256_code_challenge_method_required" field.
+func (m *ApplicationMutation) ResetS256CodeChallengeMethodRequired() {
+	m.s256_code_challenge_method_required = nil
+}
+
+// SetAllowedAuthenticationMethods sets the "allowed_authentication_methods" field.
+func (m *ApplicationMutation) SetAllowedAuthenticationMethods(s []string) {
+	m.allowed_authentication_methods = &s
+	m.appendallowed_authentication_methods = nil
+}
+
+// AllowedAuthenticationMethods returns the value of the "allowed_authentication_methods" field in the mutation.
+func (m *ApplicationMutation) AllowedAuthenticationMethods() (r []string, exists bool) {
+	v := m.allowed_authentication_methods
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowedAuthenticationMethods returns the old "allowed_authentication_methods" field's value of the Application entity.
+// If the Application object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ApplicationMutation) OldAllowedAuthenticationMethods(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowedAuthenticationMethods is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowedAuthenticationMethods requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowedAuthenticationMethods: %w", err)
+	}
+	return oldValue.AllowedAuthenticationMethods, nil
+}
+
+// AppendAllowedAuthenticationMethods adds s to the "allowed_authentication_methods" field.
+func (m *ApplicationMutation) AppendAllowedAuthenticationMethods(s []string) {
+	m.appendallowed_authentication_methods = append(m.appendallowed_authentication_methods, s...)
+}
+
+// AppendedAllowedAuthenticationMethods returns the list of values that were appended to the "allowed_authentication_methods" field in this mutation.
+func (m *ApplicationMutation) AppendedAllowedAuthenticationMethods() ([]string, bool) {
+	if len(m.appendallowed_authentication_methods) == 0 {
+		return nil, false
+	}
+	return m.appendallowed_authentication_methods, true
+}
+
+// ResetAllowedAuthenticationMethods resets all changes to the "allowed_authentication_methods" field.
+func (m *ApplicationMutation) ResetAllowedAuthenticationMethods() {
+	m.allowed_authentication_methods = nil
+	m.appendallowed_authentication_methods = nil
 }
 
 // AddCredentialIDs adds the "credentials" edge to the Credentials entity by ids.
@@ -461,12 +757,36 @@ func (m *ApplicationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ApplicationMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 10)
 	if m.name != nil {
 		fields = append(fields, application.FieldName)
 	}
 	if m.public != nil {
 		fields = append(fields, application.FieldPublic)
+	}
+	if m.description != nil {
+		fields = append(fields, application.FieldDescription)
+	}
+	if m.redirect_uris != nil {
+		fields = append(fields, application.FieldRedirectUris)
+	}
+	if m.response_types != nil {
+		fields = append(fields, application.FieldResponseTypes)
+	}
+	if m.grant_types != nil {
+		fields = append(fields, application.FieldGrantTypes)
+	}
+	if m.scopes != nil {
+		fields = append(fields, application.FieldScopes)
+	}
+	if m.pkce_required != nil {
+		fields = append(fields, application.FieldPkceRequired)
+	}
+	if m.s256_code_challenge_method_required != nil {
+		fields = append(fields, application.FieldS256CodeChallengeMethodRequired)
+	}
+	if m.allowed_authentication_methods != nil {
+		fields = append(fields, application.FieldAllowedAuthenticationMethods)
 	}
 	return fields
 }
@@ -480,6 +800,22 @@ func (m *ApplicationMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case application.FieldPublic:
 		return m.Public()
+	case application.FieldDescription:
+		return m.Description()
+	case application.FieldRedirectUris:
+		return m.RedirectUris()
+	case application.FieldResponseTypes:
+		return m.ResponseTypes()
+	case application.FieldGrantTypes:
+		return m.GrantTypes()
+	case application.FieldScopes:
+		return m.Scopes()
+	case application.FieldPkceRequired:
+		return m.PkceRequired()
+	case application.FieldS256CodeChallengeMethodRequired:
+		return m.S256CodeChallengeMethodRequired()
+	case application.FieldAllowedAuthenticationMethods:
+		return m.AllowedAuthenticationMethods()
 	}
 	return nil, false
 }
@@ -493,6 +829,22 @@ func (m *ApplicationMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldName(ctx)
 	case application.FieldPublic:
 		return m.OldPublic(ctx)
+	case application.FieldDescription:
+		return m.OldDescription(ctx)
+	case application.FieldRedirectUris:
+		return m.OldRedirectUris(ctx)
+	case application.FieldResponseTypes:
+		return m.OldResponseTypes(ctx)
+	case application.FieldGrantTypes:
+		return m.OldGrantTypes(ctx)
+	case application.FieldScopes:
+		return m.OldScopes(ctx)
+	case application.FieldPkceRequired:
+		return m.OldPkceRequired(ctx)
+	case application.FieldS256CodeChallengeMethodRequired:
+		return m.OldS256CodeChallengeMethodRequired(ctx)
+	case application.FieldAllowedAuthenticationMethods:
+		return m.OldAllowedAuthenticationMethods(ctx)
 	}
 	return nil, fmt.Errorf("unknown Application field %s", name)
 }
@@ -515,6 +867,62 @@ func (m *ApplicationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPublic(v)
+		return nil
+	case application.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case application.FieldRedirectUris:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedirectUris(v)
+		return nil
+	case application.FieldResponseTypes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResponseTypes(v)
+		return nil
+	case application.FieldGrantTypes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGrantTypes(v)
+		return nil
+	case application.FieldScopes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScopes(v)
+		return nil
+	case application.FieldPkceRequired:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPkceRequired(v)
+		return nil
+	case application.FieldS256CodeChallengeMethodRequired:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetS256CodeChallengeMethodRequired(v)
+		return nil
+	case application.FieldAllowedAuthenticationMethods:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowedAuthenticationMethods(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Application field %s", name)
@@ -571,19 +979,37 @@ func (m *ApplicationMutation) ResetField(name string) error {
 	case application.FieldPublic:
 		m.ResetPublic()
 		return nil
+	case application.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case application.FieldRedirectUris:
+		m.ResetRedirectUris()
+		return nil
+	case application.FieldResponseTypes:
+		m.ResetResponseTypes()
+		return nil
+	case application.FieldGrantTypes:
+		m.ResetGrantTypes()
+		return nil
+	case application.FieldScopes:
+		m.ResetScopes()
+		return nil
+	case application.FieldPkceRequired:
+		m.ResetPkceRequired()
+		return nil
+	case application.FieldS256CodeChallengeMethodRequired:
+		m.ResetS256CodeChallengeMethodRequired()
+		return nil
+	case application.FieldAllowedAuthenticationMethods:
+		m.ResetAllowedAuthenticationMethods()
+		return nil
 	}
 	return fmt.Errorf("unknown Application field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ApplicationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.m2m_grant != nil {
-		edges = append(edges, application.EdgeM2mGrant)
-	}
-	if m.code_grant != nil {
-		edges = append(edges, application.EdgeCodeGrant)
-	}
+	edges := make([]string, 0, 2)
 	if m.credentials != nil {
 		edges = append(edges, application.EdgeCredentials)
 	}
@@ -597,14 +1023,6 @@ func (m *ApplicationMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ApplicationMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case application.EdgeM2mGrant:
-		if id := m.m2m_grant; id != nil {
-			return []ent.Value{*id}
-		}
-	case application.EdgeCodeGrant:
-		if id := m.code_grant; id != nil {
-			return []ent.Value{*id}
-		}
 	case application.EdgeCredentials:
 		ids := make([]ent.Value, 0, len(m.credentials))
 		for id := range m.credentials {
@@ -621,7 +1039,7 @@ func (m *ApplicationMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ApplicationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 2)
 	if m.removedcredentials != nil {
 		edges = append(edges, application.EdgeCredentials)
 	}
@@ -644,13 +1062,7 @@ func (m *ApplicationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ApplicationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.clearedm2m_grant {
-		edges = append(edges, application.EdgeM2mGrant)
-	}
-	if m.clearedcode_grant {
-		edges = append(edges, application.EdgeCodeGrant)
-	}
+	edges := make([]string, 0, 2)
 	if m.clearedcredentials {
 		edges = append(edges, application.EdgeCredentials)
 	}
@@ -664,10 +1076,6 @@ func (m *ApplicationMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ApplicationMutation) EdgeCleared(name string) bool {
 	switch name {
-	case application.EdgeM2mGrant:
-		return m.clearedm2m_grant
-	case application.EdgeCodeGrant:
-		return m.clearedcode_grant
 	case application.EdgeCredentials:
 		return m.clearedcredentials
 	case application.EdgeService:
@@ -680,12 +1088,6 @@ func (m *ApplicationMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ApplicationMutation) ClearEdge(name string) error {
 	switch name {
-	case application.EdgeM2mGrant:
-		m.ClearM2mGrant()
-		return nil
-	case application.EdgeCodeGrant:
-		m.ClearCodeGrant()
-		return nil
 	case application.EdgeService:
 		m.ClearService()
 		return nil
@@ -697,12 +1099,6 @@ func (m *ApplicationMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ApplicationMutation) ResetEdge(name string) error {
 	switch name {
-	case application.EdgeM2mGrant:
-		m.ResetM2mGrant()
-		return nil
-	case application.EdgeCodeGrant:
-		m.ResetCodeGrant()
-		return nil
 	case application.EdgeCredentials:
 		m.ResetCredentials()
 		return nil
@@ -2470,491 +2866,6 @@ func (m *AuthorizationPayloadMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AuthorizationPayload edge %s", name)
 }
 
-// CodeGrantMutation represents an operation that mutates the CodeGrant nodes in the graph.
-type CodeGrantMutation struct {
-	config
-	op                 Op
-	typ                string
-	id                 *string
-	scopes             *[]string
-	appendscopes       []string
-	callbacks          *[]string
-	appendcallbacks    []string
-	clearedFields      map[string]struct{}
-	application        *string
-	clearedapplication bool
-	done               bool
-	oldValue           func(context.Context) (*CodeGrant, error)
-	predicates         []predicate.CodeGrant
-}
-
-var _ ent.Mutation = (*CodeGrantMutation)(nil)
-
-// codegrantOption allows management of the mutation configuration using functional options.
-type codegrantOption func(*CodeGrantMutation)
-
-// newCodeGrantMutation creates new mutation for the CodeGrant entity.
-func newCodeGrantMutation(c config, op Op, opts ...codegrantOption) *CodeGrantMutation {
-	m := &CodeGrantMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeCodeGrant,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withCodeGrantID sets the ID field of the mutation.
-func withCodeGrantID(id string) codegrantOption {
-	return func(m *CodeGrantMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *CodeGrant
-		)
-		m.oldValue = func(ctx context.Context) (*CodeGrant, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().CodeGrant.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withCodeGrant sets the old CodeGrant of the mutation.
-func withCodeGrant(node *CodeGrant) codegrantOption {
-	return func(m *CodeGrantMutation) {
-		m.oldValue = func(context.Context) (*CodeGrant, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m CodeGrantMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m CodeGrantMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of CodeGrant entities.
-func (m *CodeGrantMutation) SetID(id string) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *CodeGrantMutation) ID() (id string, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *CodeGrantMutation) IDs(ctx context.Context) ([]string, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []string{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().CodeGrant.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetScopes sets the "scopes" field.
-func (m *CodeGrantMutation) SetScopes(s []string) {
-	m.scopes = &s
-	m.appendscopes = nil
-}
-
-// Scopes returns the value of the "scopes" field in the mutation.
-func (m *CodeGrantMutation) Scopes() (r []string, exists bool) {
-	v := m.scopes
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldScopes returns the old "scopes" field's value of the CodeGrant entity.
-// If the CodeGrant object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CodeGrantMutation) OldScopes(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScopes is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScopes requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScopes: %w", err)
-	}
-	return oldValue.Scopes, nil
-}
-
-// AppendScopes adds s to the "scopes" field.
-func (m *CodeGrantMutation) AppendScopes(s []string) {
-	m.appendscopes = append(m.appendscopes, s...)
-}
-
-// AppendedScopes returns the list of values that were appended to the "scopes" field in this mutation.
-func (m *CodeGrantMutation) AppendedScopes() ([]string, bool) {
-	if len(m.appendscopes) == 0 {
-		return nil, false
-	}
-	return m.appendscopes, true
-}
-
-// ResetScopes resets all changes to the "scopes" field.
-func (m *CodeGrantMutation) ResetScopes() {
-	m.scopes = nil
-	m.appendscopes = nil
-}
-
-// SetCallbacks sets the "callbacks" field.
-func (m *CodeGrantMutation) SetCallbacks(s []string) {
-	m.callbacks = &s
-	m.appendcallbacks = nil
-}
-
-// Callbacks returns the value of the "callbacks" field in the mutation.
-func (m *CodeGrantMutation) Callbacks() (r []string, exists bool) {
-	v := m.callbacks
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCallbacks returns the old "callbacks" field's value of the CodeGrant entity.
-// If the CodeGrant object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CodeGrantMutation) OldCallbacks(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCallbacks is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCallbacks requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCallbacks: %w", err)
-	}
-	return oldValue.Callbacks, nil
-}
-
-// AppendCallbacks adds s to the "callbacks" field.
-func (m *CodeGrantMutation) AppendCallbacks(s []string) {
-	m.appendcallbacks = append(m.appendcallbacks, s...)
-}
-
-// AppendedCallbacks returns the list of values that were appended to the "callbacks" field in this mutation.
-func (m *CodeGrantMutation) AppendedCallbacks() ([]string, bool) {
-	if len(m.appendcallbacks) == 0 {
-		return nil, false
-	}
-	return m.appendcallbacks, true
-}
-
-// ResetCallbacks resets all changes to the "callbacks" field.
-func (m *CodeGrantMutation) ResetCallbacks() {
-	m.callbacks = nil
-	m.appendcallbacks = nil
-}
-
-// SetApplicationID sets the "application" edge to the Application entity by id.
-func (m *CodeGrantMutation) SetApplicationID(id string) {
-	m.application = &id
-}
-
-// ClearApplication clears the "application" edge to the Application entity.
-func (m *CodeGrantMutation) ClearApplication() {
-	m.clearedapplication = true
-}
-
-// ApplicationCleared reports if the "application" edge to the Application entity was cleared.
-func (m *CodeGrantMutation) ApplicationCleared() bool {
-	return m.clearedapplication
-}
-
-// ApplicationID returns the "application" edge ID in the mutation.
-func (m *CodeGrantMutation) ApplicationID() (id string, exists bool) {
-	if m.application != nil {
-		return *m.application, true
-	}
-	return
-}
-
-// ApplicationIDs returns the "application" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ApplicationID instead. It exists only for internal usage by the builders.
-func (m *CodeGrantMutation) ApplicationIDs() (ids []string) {
-	if id := m.application; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetApplication resets all changes to the "application" edge.
-func (m *CodeGrantMutation) ResetApplication() {
-	m.application = nil
-	m.clearedapplication = false
-}
-
-// Where appends a list predicates to the CodeGrantMutation builder.
-func (m *CodeGrantMutation) Where(ps ...predicate.CodeGrant) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the CodeGrantMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *CodeGrantMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.CodeGrant, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *CodeGrantMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *CodeGrantMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (CodeGrant).
-func (m *CodeGrantMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *CodeGrantMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.scopes != nil {
-		fields = append(fields, codegrant.FieldScopes)
-	}
-	if m.callbacks != nil {
-		fields = append(fields, codegrant.FieldCallbacks)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *CodeGrantMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case codegrant.FieldScopes:
-		return m.Scopes()
-	case codegrant.FieldCallbacks:
-		return m.Callbacks()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *CodeGrantMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case codegrant.FieldScopes:
-		return m.OldScopes(ctx)
-	case codegrant.FieldCallbacks:
-		return m.OldCallbacks(ctx)
-	}
-	return nil, fmt.Errorf("unknown CodeGrant field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *CodeGrantMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case codegrant.FieldScopes:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScopes(v)
-		return nil
-	case codegrant.FieldCallbacks:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCallbacks(v)
-		return nil
-	}
-	return fmt.Errorf("unknown CodeGrant field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *CodeGrantMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *CodeGrantMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *CodeGrantMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown CodeGrant numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *CodeGrantMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *CodeGrantMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *CodeGrantMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown CodeGrant nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *CodeGrantMutation) ResetField(name string) error {
-	switch name {
-	case codegrant.FieldScopes:
-		m.ResetScopes()
-		return nil
-	case codegrant.FieldCallbacks:
-		m.ResetCallbacks()
-		return nil
-	}
-	return fmt.Errorf("unknown CodeGrant field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *CodeGrantMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.application != nil {
-		edges = append(edges, codegrant.EdgeApplication)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *CodeGrantMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case codegrant.EdgeApplication:
-		if id := m.application; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *CodeGrantMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *CodeGrantMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *CodeGrantMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedapplication {
-		edges = append(edges, codegrant.EdgeApplication)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *CodeGrantMutation) EdgeCleared(name string) bool {
-	switch name {
-	case codegrant.EdgeApplication:
-		return m.clearedapplication
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *CodeGrantMutation) ClearEdge(name string) error {
-	switch name {
-	case codegrant.EdgeApplication:
-		m.ClearApplication()
-		return nil
-	}
-	return fmt.Errorf("unknown CodeGrant unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *CodeGrantMutation) ResetEdge(name string) error {
-	switch name {
-	case codegrant.EdgeApplication:
-		m.ResetApplication()
-		return nil
-	}
-	return fmt.Errorf("unknown CodeGrant edge %s", name)
-}
-
 // CookieStoreMutation represents an operation that mutates the CookieStore nodes in the graph.
 type CookieStoreMutation struct {
 	config
@@ -3797,18 +3708,18 @@ func (m *CredentialsMutation) ResetEdge(name string) error {
 // KeySetMutation represents an operation that mutates the KeySet nodes in the graph.
 type KeySetMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *string
-	clearedFields         map[string]struct{}
-	service_config        *string
-	clearedservice_config bool
-	signing_keys          map[string]struct{}
-	removedsigning_keys   map[string]struct{}
-	clearedsigning_keys   bool
-	done                  bool
-	oldValue              func(context.Context) (*KeySet, error)
-	predicates            []predicate.KeySet
+	op                  Op
+	typ                 string
+	id                  *string
+	clearedFields       map[string]struct{}
+	services            *string
+	clearedservices     bool
+	signing_keys        map[string]struct{}
+	removedsigning_keys map[string]struct{}
+	clearedsigning_keys bool
+	done                bool
+	oldValue            func(context.Context) (*KeySet, error)
+	predicates          []predicate.KeySet
 }
 
 var _ ent.Mutation = (*KeySetMutation)(nil)
@@ -3915,43 +3826,43 @@ func (m *KeySetMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by id.
-func (m *KeySetMutation) SetServiceConfigID(id string) {
-	m.service_config = &id
+// SetServicesID sets the "services" edge to the Service entity by id.
+func (m *KeySetMutation) SetServicesID(id string) {
+	m.services = &id
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (m *KeySetMutation) ClearServiceConfig() {
-	m.clearedservice_config = true
+// ClearServices clears the "services" edge to the Service entity.
+func (m *KeySetMutation) ClearServices() {
+	m.clearedservices = true
 }
 
-// ServiceConfigCleared reports if the "service_config" edge to the ServiceConfig entity was cleared.
-func (m *KeySetMutation) ServiceConfigCleared() bool {
-	return m.clearedservice_config
+// ServicesCleared reports if the "services" edge to the Service entity was cleared.
+func (m *KeySetMutation) ServicesCleared() bool {
+	return m.clearedservices
 }
 
-// ServiceConfigID returns the "service_config" edge ID in the mutation.
-func (m *KeySetMutation) ServiceConfigID() (id string, exists bool) {
-	if m.service_config != nil {
-		return *m.service_config, true
+// ServicesID returns the "services" edge ID in the mutation.
+func (m *KeySetMutation) ServicesID() (id string, exists bool) {
+	if m.services != nil {
+		return *m.services, true
 	}
 	return
 }
 
-// ServiceConfigIDs returns the "service_config" edge IDs in the mutation.
+// ServicesIDs returns the "services" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ServiceConfigID instead. It exists only for internal usage by the builders.
-func (m *KeySetMutation) ServiceConfigIDs() (ids []string) {
-	if id := m.service_config; id != nil {
+// ServicesID instead. It exists only for internal usage by the builders.
+func (m *KeySetMutation) ServicesIDs() (ids []string) {
+	if id := m.services; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetServiceConfig resets all changes to the "service_config" edge.
-func (m *KeySetMutation) ResetServiceConfig() {
-	m.service_config = nil
-	m.clearedservice_config = false
+// ResetServices resets all changes to the "services" edge.
+func (m *KeySetMutation) ResetServices() {
+	m.services = nil
+	m.clearedservices = false
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by ids.
@@ -4117,8 +4028,8 @@ func (m *KeySetMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *KeySetMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.service_config != nil {
-		edges = append(edges, keyset.EdgeServiceConfig)
+	if m.services != nil {
+		edges = append(edges, keyset.EdgeServices)
 	}
 	if m.signing_keys != nil {
 		edges = append(edges, keyset.EdgeSigningKeys)
@@ -4130,8 +4041,8 @@ func (m *KeySetMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *KeySetMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case keyset.EdgeServiceConfig:
-		if id := m.service_config; id != nil {
+	case keyset.EdgeServices:
+		if id := m.services; id != nil {
 			return []ent.Value{*id}
 		}
 	case keyset.EdgeSigningKeys:
@@ -4170,8 +4081,8 @@ func (m *KeySetMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *KeySetMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedservice_config {
-		edges = append(edges, keyset.EdgeServiceConfig)
+	if m.clearedservices {
+		edges = append(edges, keyset.EdgeServices)
 	}
 	if m.clearedsigning_keys {
 		edges = append(edges, keyset.EdgeSigningKeys)
@@ -4183,8 +4094,8 @@ func (m *KeySetMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *KeySetMutation) EdgeCleared(name string) bool {
 	switch name {
-	case keyset.EdgeServiceConfig:
-		return m.clearedservice_config
+	case keyset.EdgeServices:
+		return m.clearedservices
 	case keyset.EdgeSigningKeys:
 		return m.clearedsigning_keys
 	}
@@ -4195,8 +4106,8 @@ func (m *KeySetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *KeySetMutation) ClearEdge(name string) error {
 	switch name {
-	case keyset.EdgeServiceConfig:
-		m.ClearServiceConfig()
+	case keyset.EdgeServices:
+		m.ClearServices()
 		return nil
 	}
 	return fmt.Errorf("unknown KeySet unique edge %s", name)
@@ -4206,429 +4117,14 @@ func (m *KeySetMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *KeySetMutation) ResetEdge(name string) error {
 	switch name {
-	case keyset.EdgeServiceConfig:
-		m.ResetServiceConfig()
+	case keyset.EdgeServices:
+		m.ResetServices()
 		return nil
 	case keyset.EdgeSigningKeys:
 		m.ResetSigningKeys()
 		return nil
 	}
 	return fmt.Errorf("unknown KeySet edge %s", name)
-}
-
-// M2MGrantMutation represents an operation that mutates the M2MGrant nodes in the graph.
-type M2MGrantMutation struct {
-	config
-	op                 Op
-	typ                string
-	id                 *string
-	scopes             *[]string
-	appendscopes       []string
-	clearedFields      map[string]struct{}
-	application        *string
-	clearedapplication bool
-	done               bool
-	oldValue           func(context.Context) (*M2MGrant, error)
-	predicates         []predicate.M2MGrant
-}
-
-var _ ent.Mutation = (*M2MGrantMutation)(nil)
-
-// m2mgrantOption allows management of the mutation configuration using functional options.
-type m2mgrantOption func(*M2MGrantMutation)
-
-// newM2MGrantMutation creates new mutation for the M2MGrant entity.
-func newM2MGrantMutation(c config, op Op, opts ...m2mgrantOption) *M2MGrantMutation {
-	m := &M2MGrantMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeM2MGrant,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withM2MGrantID sets the ID field of the mutation.
-func withM2MGrantID(id string) m2mgrantOption {
-	return func(m *M2MGrantMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *M2MGrant
-		)
-		m.oldValue = func(ctx context.Context) (*M2MGrant, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().M2MGrant.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withM2MGrant sets the old M2MGrant of the mutation.
-func withM2MGrant(node *M2MGrant) m2mgrantOption {
-	return func(m *M2MGrantMutation) {
-		m.oldValue = func(context.Context) (*M2MGrant, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m M2MGrantMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m M2MGrantMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of M2MGrant entities.
-func (m *M2MGrantMutation) SetID(id string) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *M2MGrantMutation) ID() (id string, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *M2MGrantMutation) IDs(ctx context.Context) ([]string, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []string{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().M2MGrant.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetScopes sets the "scopes" field.
-func (m *M2MGrantMutation) SetScopes(s []string) {
-	m.scopes = &s
-	m.appendscopes = nil
-}
-
-// Scopes returns the value of the "scopes" field in the mutation.
-func (m *M2MGrantMutation) Scopes() (r []string, exists bool) {
-	v := m.scopes
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldScopes returns the old "scopes" field's value of the M2MGrant entity.
-// If the M2MGrant object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *M2MGrantMutation) OldScopes(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldScopes is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldScopes requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldScopes: %w", err)
-	}
-	return oldValue.Scopes, nil
-}
-
-// AppendScopes adds s to the "scopes" field.
-func (m *M2MGrantMutation) AppendScopes(s []string) {
-	m.appendscopes = append(m.appendscopes, s...)
-}
-
-// AppendedScopes returns the list of values that were appended to the "scopes" field in this mutation.
-func (m *M2MGrantMutation) AppendedScopes() ([]string, bool) {
-	if len(m.appendscopes) == 0 {
-		return nil, false
-	}
-	return m.appendscopes, true
-}
-
-// ResetScopes resets all changes to the "scopes" field.
-func (m *M2MGrantMutation) ResetScopes() {
-	m.scopes = nil
-	m.appendscopes = nil
-}
-
-// SetApplicationID sets the "application" edge to the Application entity by id.
-func (m *M2MGrantMutation) SetApplicationID(id string) {
-	m.application = &id
-}
-
-// ClearApplication clears the "application" edge to the Application entity.
-func (m *M2MGrantMutation) ClearApplication() {
-	m.clearedapplication = true
-}
-
-// ApplicationCleared reports if the "application" edge to the Application entity was cleared.
-func (m *M2MGrantMutation) ApplicationCleared() bool {
-	return m.clearedapplication
-}
-
-// ApplicationID returns the "application" edge ID in the mutation.
-func (m *M2MGrantMutation) ApplicationID() (id string, exists bool) {
-	if m.application != nil {
-		return *m.application, true
-	}
-	return
-}
-
-// ApplicationIDs returns the "application" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ApplicationID instead. It exists only for internal usage by the builders.
-func (m *M2MGrantMutation) ApplicationIDs() (ids []string) {
-	if id := m.application; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetApplication resets all changes to the "application" edge.
-func (m *M2MGrantMutation) ResetApplication() {
-	m.application = nil
-	m.clearedapplication = false
-}
-
-// Where appends a list predicates to the M2MGrantMutation builder.
-func (m *M2MGrantMutation) Where(ps ...predicate.M2MGrant) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the M2MGrantMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *M2MGrantMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.M2MGrant, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *M2MGrantMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *M2MGrantMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (M2MGrant).
-func (m *M2MGrantMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *M2MGrantMutation) Fields() []string {
-	fields := make([]string, 0, 1)
-	if m.scopes != nil {
-		fields = append(fields, m2mgrant.FieldScopes)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *M2MGrantMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case m2mgrant.FieldScopes:
-		return m.Scopes()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *M2MGrantMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case m2mgrant.FieldScopes:
-		return m.OldScopes(ctx)
-	}
-	return nil, fmt.Errorf("unknown M2MGrant field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *M2MGrantMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case m2mgrant.FieldScopes:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetScopes(v)
-		return nil
-	}
-	return fmt.Errorf("unknown M2MGrant field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *M2MGrantMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *M2MGrantMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *M2MGrantMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown M2MGrant numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *M2MGrantMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *M2MGrantMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *M2MGrantMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown M2MGrant nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *M2MGrantMutation) ResetField(name string) error {
-	switch name {
-	case m2mgrant.FieldScopes:
-		m.ResetScopes()
-		return nil
-	}
-	return fmt.Errorf("unknown M2MGrant field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *M2MGrantMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.application != nil {
-		edges = append(edges, m2mgrant.EdgeApplication)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *M2MGrantMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case m2mgrant.EdgeApplication:
-		if id := m.application; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *M2MGrantMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *M2MGrantMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *M2MGrantMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedapplication {
-		edges = append(edges, m2mgrant.EdgeApplication)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *M2MGrantMutation) EdgeCleared(name string) bool {
-	switch name {
-	case m2mgrant.EdgeApplication:
-		return m.clearedapplication
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *M2MGrantMutation) ClearEdge(name string) error {
-	switch name {
-	case m2mgrant.EdgeApplication:
-		m.ClearApplication()
-		return nil
-	}
-	return fmt.Errorf("unknown M2MGrant unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *M2MGrantMutation) ResetEdge(name string) error {
-	switch name {
-	case m2mgrant.EdgeApplication:
-		m.ResetApplication()
-		return nil
-	}
-	return fmt.Errorf("unknown M2MGrant edge %s", name)
 }
 
 // RefreshTokenMutation represents an operation that mutates the RefreshToken nodes in the graph.
@@ -5467,22 +4963,39 @@ func (m *RefreshTokenMutation) ResetEdge(name string) error {
 // ServiceMutation represents an operation that mutates the Service nodes in the graph.
 type ServiceMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *string
-	name                  *string
-	issuer                *string
-	scopes                *[]string
-	appendscopes          []string
-	clearedFields         map[string]struct{}
-	service_config        *string
-	clearedservice_config bool
-	applications          map[string]struct{}
-	removedapplications   map[string]struct{}
-	clearedapplications   bool
-	done                  bool
-	oldValue              func(context.Context) (*Service, error)
-	predicates            []predicate.Service
+	op                                           Op
+	typ                                          string
+	id                                           *string
+	name                                         *string
+	issuer                                       *string
+	description                                  *string
+	scopes                                       *[]string
+	appendscopes                                 []string
+	service_metadata                             *string
+	allowed_client_metadata                      *[]string
+	appendallowed_client_metadata                []string
+	grant_types                                  *[]string
+	appendgrant_types                            []string
+	response_types                               *[]string
+	appendresponse_types                         []string
+	clearedFields                                map[string]struct{}
+	key_sets                                     map[string]struct{}
+	removedkey_sets                              map[string]struct{}
+	clearedkey_sets                              bool
+	service_authorization_endpoint_config        *string
+	clearedservice_authorization_endpoint_config bool
+	service_introspection_endpoint_config        *string
+	clearedservice_introspection_endpoint_config bool
+	service_token_endpoint_config                *string
+	clearedservice_token_endpoint_config         bool
+	service_user_info_endpoint_config            *string
+	clearedservice_user_info_endpoint_config     bool
+	applications                                 map[string]struct{}
+	removedapplications                          map[string]struct{}
+	clearedapplications                          bool
+	done                                         bool
+	oldValue                                     func(context.Context) (*Service, error)
+	predicates                                   []predicate.Service
 }
 
 var _ ent.Mutation = (*ServiceMutation)(nil)
@@ -5661,6 +5174,42 @@ func (m *ServiceMutation) ResetIssuer() {
 	m.issuer = nil
 }
 
+// SetDescription sets the "description" field.
+func (m *ServiceMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ServiceMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Service entity.
+// If the Service object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ServiceMutation) ResetDescription() {
+	m.description = nil
+}
+
 // SetScopes sets the "scopes" field.
 func (m *ServiceMutation) SetScopes(s []string) {
 	m.scopes = &s
@@ -5712,43 +5261,403 @@ func (m *ServiceMutation) ResetScopes() {
 	m.appendscopes = nil
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by id.
-func (m *ServiceMutation) SetServiceConfigID(id string) {
-	m.service_config = &id
+// SetServiceMetadata sets the "service_metadata" field.
+func (m *ServiceMutation) SetServiceMetadata(s string) {
+	m.service_metadata = &s
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (m *ServiceMutation) ClearServiceConfig() {
-	m.clearedservice_config = true
+// ServiceMetadata returns the value of the "service_metadata" field in the mutation.
+func (m *ServiceMutation) ServiceMetadata() (r string, exists bool) {
+	v := m.service_metadata
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// ServiceConfigCleared reports if the "service_config" edge to the ServiceConfig entity was cleared.
-func (m *ServiceMutation) ServiceConfigCleared() bool {
-	return m.clearedservice_config
+// OldServiceMetadata returns the old "service_metadata" field's value of the Service entity.
+// If the Service object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceMutation) OldServiceMetadata(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldServiceMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldServiceMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldServiceMetadata: %w", err)
+	}
+	return oldValue.ServiceMetadata, nil
 }
 
-// ServiceConfigID returns the "service_config" edge ID in the mutation.
-func (m *ServiceMutation) ServiceConfigID() (id string, exists bool) {
-	if m.service_config != nil {
-		return *m.service_config, true
+// ResetServiceMetadata resets all changes to the "service_metadata" field.
+func (m *ServiceMutation) ResetServiceMetadata() {
+	m.service_metadata = nil
+}
+
+// SetAllowedClientMetadata sets the "allowed_client_metadata" field.
+func (m *ServiceMutation) SetAllowedClientMetadata(s []string) {
+	m.allowed_client_metadata = &s
+	m.appendallowed_client_metadata = nil
+}
+
+// AllowedClientMetadata returns the value of the "allowed_client_metadata" field in the mutation.
+func (m *ServiceMutation) AllowedClientMetadata() (r []string, exists bool) {
+	v := m.allowed_client_metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowedClientMetadata returns the old "allowed_client_metadata" field's value of the Service entity.
+// If the Service object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceMutation) OldAllowedClientMetadata(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowedClientMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowedClientMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowedClientMetadata: %w", err)
+	}
+	return oldValue.AllowedClientMetadata, nil
+}
+
+// AppendAllowedClientMetadata adds s to the "allowed_client_metadata" field.
+func (m *ServiceMutation) AppendAllowedClientMetadata(s []string) {
+	m.appendallowed_client_metadata = append(m.appendallowed_client_metadata, s...)
+}
+
+// AppendedAllowedClientMetadata returns the list of values that were appended to the "allowed_client_metadata" field in this mutation.
+func (m *ServiceMutation) AppendedAllowedClientMetadata() ([]string, bool) {
+	if len(m.appendallowed_client_metadata) == 0 {
+		return nil, false
+	}
+	return m.appendallowed_client_metadata, true
+}
+
+// ResetAllowedClientMetadata resets all changes to the "allowed_client_metadata" field.
+func (m *ServiceMutation) ResetAllowedClientMetadata() {
+	m.allowed_client_metadata = nil
+	m.appendallowed_client_metadata = nil
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (m *ServiceMutation) SetGrantTypes(s []string) {
+	m.grant_types = &s
+	m.appendgrant_types = nil
+}
+
+// GrantTypes returns the value of the "grant_types" field in the mutation.
+func (m *ServiceMutation) GrantTypes() (r []string, exists bool) {
+	v := m.grant_types
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGrantTypes returns the old "grant_types" field's value of the Service entity.
+// If the Service object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceMutation) OldGrantTypes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGrantTypes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGrantTypes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGrantTypes: %w", err)
+	}
+	return oldValue.GrantTypes, nil
+}
+
+// AppendGrantTypes adds s to the "grant_types" field.
+func (m *ServiceMutation) AppendGrantTypes(s []string) {
+	m.appendgrant_types = append(m.appendgrant_types, s...)
+}
+
+// AppendedGrantTypes returns the list of values that were appended to the "grant_types" field in this mutation.
+func (m *ServiceMutation) AppendedGrantTypes() ([]string, bool) {
+	if len(m.appendgrant_types) == 0 {
+		return nil, false
+	}
+	return m.appendgrant_types, true
+}
+
+// ResetGrantTypes resets all changes to the "grant_types" field.
+func (m *ServiceMutation) ResetGrantTypes() {
+	m.grant_types = nil
+	m.appendgrant_types = nil
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (m *ServiceMutation) SetResponseTypes(s []string) {
+	m.response_types = &s
+	m.appendresponse_types = nil
+}
+
+// ResponseTypes returns the value of the "response_types" field in the mutation.
+func (m *ServiceMutation) ResponseTypes() (r []string, exists bool) {
+	v := m.response_types
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResponseTypes returns the old "response_types" field's value of the Service entity.
+// If the Service object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceMutation) OldResponseTypes(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResponseTypes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResponseTypes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResponseTypes: %w", err)
+	}
+	return oldValue.ResponseTypes, nil
+}
+
+// AppendResponseTypes adds s to the "response_types" field.
+func (m *ServiceMutation) AppendResponseTypes(s []string) {
+	m.appendresponse_types = append(m.appendresponse_types, s...)
+}
+
+// AppendedResponseTypes returns the list of values that were appended to the "response_types" field in this mutation.
+func (m *ServiceMutation) AppendedResponseTypes() ([]string, bool) {
+	if len(m.appendresponse_types) == 0 {
+		return nil, false
+	}
+	return m.appendresponse_types, true
+}
+
+// ResetResponseTypes resets all changes to the "response_types" field.
+func (m *ServiceMutation) ResetResponseTypes() {
+	m.response_types = nil
+	m.appendresponse_types = nil
+}
+
+// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by ids.
+func (m *ServiceMutation) AddKeySetIDs(ids ...string) {
+	if m.key_sets == nil {
+		m.key_sets = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.key_sets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearKeySets clears the "key_sets" edge to the KeySet entity.
+func (m *ServiceMutation) ClearKeySets() {
+	m.clearedkey_sets = true
+}
+
+// KeySetsCleared reports if the "key_sets" edge to the KeySet entity was cleared.
+func (m *ServiceMutation) KeySetsCleared() bool {
+	return m.clearedkey_sets
+}
+
+// RemoveKeySetIDs removes the "key_sets" edge to the KeySet entity by IDs.
+func (m *ServiceMutation) RemoveKeySetIDs(ids ...string) {
+	if m.removedkey_sets == nil {
+		m.removedkey_sets = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.key_sets, ids[i])
+		m.removedkey_sets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedKeySets returns the removed IDs of the "key_sets" edge to the KeySet entity.
+func (m *ServiceMutation) RemovedKeySetsIDs() (ids []string) {
+	for id := range m.removedkey_sets {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// ServiceConfigIDs returns the "service_config" edge IDs in the mutation.
+// KeySetsIDs returns the "key_sets" edge IDs in the mutation.
+func (m *ServiceMutation) KeySetsIDs() (ids []string) {
+	for id := range m.key_sets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetKeySets resets all changes to the "key_sets" edge.
+func (m *ServiceMutation) ResetKeySets() {
+	m.key_sets = nil
+	m.clearedkey_sets = false
+	m.removedkey_sets = nil
+}
+
+// SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceAuthorizationEndpointConfigID(id string) {
+	m.service_authorization_endpoint_config = &id
+}
+
+// ClearServiceAuthorizationEndpointConfig clears the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceAuthorizationEndpointConfig() {
+	m.clearedservice_authorization_endpoint_config = true
+}
+
+// ServiceAuthorizationEndpointConfigCleared reports if the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceAuthorizationEndpointConfigCleared() bool {
+	return m.clearedservice_authorization_endpoint_config
+}
+
+// ServiceAuthorizationEndpointConfigID returns the "service_authorization_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceAuthorizationEndpointConfigID() (id string, exists bool) {
+	if m.service_authorization_endpoint_config != nil {
+		return *m.service_authorization_endpoint_config, true
+	}
+	return
+}
+
+// ServiceAuthorizationEndpointConfigIDs returns the "service_authorization_endpoint_config" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ServiceConfigID instead. It exists only for internal usage by the builders.
-func (m *ServiceMutation) ServiceConfigIDs() (ids []string) {
-	if id := m.service_config; id != nil {
+// ServiceAuthorizationEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceAuthorizationEndpointConfigIDs() (ids []string) {
+	if id := m.service_authorization_endpoint_config; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetServiceConfig resets all changes to the "service_config" edge.
-func (m *ServiceMutation) ResetServiceConfig() {
-	m.service_config = nil
-	m.clearedservice_config = false
+// ResetServiceAuthorizationEndpointConfig resets all changes to the "service_authorization_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceAuthorizationEndpointConfig() {
+	m.service_authorization_endpoint_config = nil
+	m.clearedservice_authorization_endpoint_config = false
+}
+
+// SetServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceIntrospectionEndpointConfigID(id string) {
+	m.service_introspection_endpoint_config = &id
+}
+
+// ClearServiceIntrospectionEndpointConfig clears the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceIntrospectionEndpointConfig() {
+	m.clearedservice_introspection_endpoint_config = true
+}
+
+// ServiceIntrospectionEndpointConfigCleared reports if the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceIntrospectionEndpointConfigCleared() bool {
+	return m.clearedservice_introspection_endpoint_config
+}
+
+// ServiceIntrospectionEndpointConfigID returns the "service_introspection_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceIntrospectionEndpointConfigID() (id string, exists bool) {
+	if m.service_introspection_endpoint_config != nil {
+		return *m.service_introspection_endpoint_config, true
+	}
+	return
+}
+
+// ServiceIntrospectionEndpointConfigIDs returns the "service_introspection_endpoint_config" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceIntrospectionEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceIntrospectionEndpointConfigIDs() (ids []string) {
+	if id := m.service_introspection_endpoint_config; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServiceIntrospectionEndpointConfig resets all changes to the "service_introspection_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceIntrospectionEndpointConfig() {
+	m.service_introspection_endpoint_config = nil
+	m.clearedservice_introspection_endpoint_config = false
+}
+
+// SetServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceTokenEndpointConfigID(id string) {
+	m.service_token_endpoint_config = &id
+}
+
+// ClearServiceTokenEndpointConfig clears the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceTokenEndpointConfig() {
+	m.clearedservice_token_endpoint_config = true
+}
+
+// ServiceTokenEndpointConfigCleared reports if the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceTokenEndpointConfigCleared() bool {
+	return m.clearedservice_token_endpoint_config
+}
+
+// ServiceTokenEndpointConfigID returns the "service_token_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceTokenEndpointConfigID() (id string, exists bool) {
+	if m.service_token_endpoint_config != nil {
+		return *m.service_token_endpoint_config, true
+	}
+	return
+}
+
+// ServiceTokenEndpointConfigIDs returns the "service_token_endpoint_config" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceTokenEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceTokenEndpointConfigIDs() (ids []string) {
+	if id := m.service_token_endpoint_config; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServiceTokenEndpointConfig resets all changes to the "service_token_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceTokenEndpointConfig() {
+	m.service_token_endpoint_config = nil
+	m.clearedservice_token_endpoint_config = false
+}
+
+// SetServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceUserInfoEndpointConfigID(id string) {
+	m.service_user_info_endpoint_config = &id
+}
+
+// ClearServiceUserInfoEndpointConfig clears the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceUserInfoEndpointConfig() {
+	m.clearedservice_user_info_endpoint_config = true
+}
+
+// ServiceUserInfoEndpointConfigCleared reports if the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceUserInfoEndpointConfigCleared() bool {
+	return m.clearedservice_user_info_endpoint_config
+}
+
+// ServiceUserInfoEndpointConfigID returns the "service_user_info_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceUserInfoEndpointConfigID() (id string, exists bool) {
+	if m.service_user_info_endpoint_config != nil {
+		return *m.service_user_info_endpoint_config, true
+	}
+	return
+}
+
+// ServiceUserInfoEndpointConfigIDs returns the "service_user_info_endpoint_config" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceUserInfoEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceUserInfoEndpointConfigIDs() (ids []string) {
+	if id := m.service_user_info_endpoint_config; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServiceUserInfoEndpointConfig resets all changes to the "service_user_info_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceUserInfoEndpointConfig() {
+	m.service_user_info_endpoint_config = nil
+	m.clearedservice_user_info_endpoint_config = false
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by ids.
@@ -5839,15 +5748,30 @@ func (m *ServiceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ServiceMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, service.FieldName)
 	}
 	if m.issuer != nil {
 		fields = append(fields, service.FieldIssuer)
 	}
+	if m.description != nil {
+		fields = append(fields, service.FieldDescription)
+	}
 	if m.scopes != nil {
 		fields = append(fields, service.FieldScopes)
+	}
+	if m.service_metadata != nil {
+		fields = append(fields, service.FieldServiceMetadata)
+	}
+	if m.allowed_client_metadata != nil {
+		fields = append(fields, service.FieldAllowedClientMetadata)
+	}
+	if m.grant_types != nil {
+		fields = append(fields, service.FieldGrantTypes)
+	}
+	if m.response_types != nil {
+		fields = append(fields, service.FieldResponseTypes)
 	}
 	return fields
 }
@@ -5861,8 +5785,18 @@ func (m *ServiceMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case service.FieldIssuer:
 		return m.Issuer()
+	case service.FieldDescription:
+		return m.Description()
 	case service.FieldScopes:
 		return m.Scopes()
+	case service.FieldServiceMetadata:
+		return m.ServiceMetadata()
+	case service.FieldAllowedClientMetadata:
+		return m.AllowedClientMetadata()
+	case service.FieldGrantTypes:
+		return m.GrantTypes()
+	case service.FieldResponseTypes:
+		return m.ResponseTypes()
 	}
 	return nil, false
 }
@@ -5876,8 +5810,18 @@ func (m *ServiceMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case service.FieldIssuer:
 		return m.OldIssuer(ctx)
+	case service.FieldDescription:
+		return m.OldDescription(ctx)
 	case service.FieldScopes:
 		return m.OldScopes(ctx)
+	case service.FieldServiceMetadata:
+		return m.OldServiceMetadata(ctx)
+	case service.FieldAllowedClientMetadata:
+		return m.OldAllowedClientMetadata(ctx)
+	case service.FieldGrantTypes:
+		return m.OldGrantTypes(ctx)
+	case service.FieldResponseTypes:
+		return m.OldResponseTypes(ctx)
 	}
 	return nil, fmt.Errorf("unknown Service field %s", name)
 }
@@ -5901,12 +5845,47 @@ func (m *ServiceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetIssuer(v)
 		return nil
+	case service.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
 	case service.FieldScopes:
 		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScopes(v)
+		return nil
+	case service.FieldServiceMetadata:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetServiceMetadata(v)
+		return nil
+	case service.FieldAllowedClientMetadata:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowedClientMetadata(v)
+		return nil
+	case service.FieldGrantTypes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGrantTypes(v)
+		return nil
+	case service.FieldResponseTypes:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResponseTypes(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Service field %s", name)
@@ -5963,8 +5942,23 @@ func (m *ServiceMutation) ResetField(name string) error {
 	case service.FieldIssuer:
 		m.ResetIssuer()
 		return nil
+	case service.FieldDescription:
+		m.ResetDescription()
+		return nil
 	case service.FieldScopes:
 		m.ResetScopes()
+		return nil
+	case service.FieldServiceMetadata:
+		m.ResetServiceMetadata()
+		return nil
+	case service.FieldAllowedClientMetadata:
+		m.ResetAllowedClientMetadata()
+		return nil
+	case service.FieldGrantTypes:
+		m.ResetGrantTypes()
+		return nil
+	case service.FieldResponseTypes:
+		m.ResetResponseTypes()
 		return nil
 	}
 	return fmt.Errorf("unknown Service field %s", name)
@@ -5972,9 +5966,21 @@ func (m *ServiceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ServiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.service_config != nil {
-		edges = append(edges, service.EdgeServiceConfig)
+	edges := make([]string, 0, 6)
+	if m.key_sets != nil {
+		edges = append(edges, service.EdgeKeySets)
+	}
+	if m.service_authorization_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceAuthorizationEndpointConfig)
+	}
+	if m.service_introspection_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceIntrospectionEndpointConfig)
+	}
+	if m.service_token_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceTokenEndpointConfig)
+	}
+	if m.service_user_info_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceUserInfoEndpointConfig)
 	}
 	if m.applications != nil {
 		edges = append(edges, service.EdgeApplications)
@@ -5986,8 +5992,26 @@ func (m *ServiceMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case service.EdgeServiceConfig:
-		if id := m.service_config; id != nil {
+	case service.EdgeKeySets:
+		ids := make([]ent.Value, 0, len(m.key_sets))
+		for id := range m.key_sets {
+			ids = append(ids, id)
+		}
+		return ids
+	case service.EdgeServiceAuthorizationEndpointConfig:
+		if id := m.service_authorization_endpoint_config; id != nil {
+			return []ent.Value{*id}
+		}
+	case service.EdgeServiceIntrospectionEndpointConfig:
+		if id := m.service_introspection_endpoint_config; id != nil {
+			return []ent.Value{*id}
+		}
+	case service.EdgeServiceTokenEndpointConfig:
+		if id := m.service_token_endpoint_config; id != nil {
+			return []ent.Value{*id}
+		}
+	case service.EdgeServiceUserInfoEndpointConfig:
+		if id := m.service_user_info_endpoint_config; id != nil {
 			return []ent.Value{*id}
 		}
 	case service.EdgeApplications:
@@ -6002,7 +6026,10 @@ func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ServiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 6)
+	if m.removedkey_sets != nil {
+		edges = append(edges, service.EdgeKeySets)
+	}
 	if m.removedapplications != nil {
 		edges = append(edges, service.EdgeApplications)
 	}
@@ -6013,6 +6040,12 @@ func (m *ServiceMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ServiceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case service.EdgeKeySets:
+		ids := make([]ent.Value, 0, len(m.removedkey_sets))
+		for id := range m.removedkey_sets {
+			ids = append(ids, id)
+		}
+		return ids
 	case service.EdgeApplications:
 		ids := make([]ent.Value, 0, len(m.removedapplications))
 		for id := range m.removedapplications {
@@ -6025,9 +6058,21 @@ func (m *ServiceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ServiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedservice_config {
-		edges = append(edges, service.EdgeServiceConfig)
+	edges := make([]string, 0, 6)
+	if m.clearedkey_sets {
+		edges = append(edges, service.EdgeKeySets)
+	}
+	if m.clearedservice_authorization_endpoint_config {
+		edges = append(edges, service.EdgeServiceAuthorizationEndpointConfig)
+	}
+	if m.clearedservice_introspection_endpoint_config {
+		edges = append(edges, service.EdgeServiceIntrospectionEndpointConfig)
+	}
+	if m.clearedservice_token_endpoint_config {
+		edges = append(edges, service.EdgeServiceTokenEndpointConfig)
+	}
+	if m.clearedservice_user_info_endpoint_config {
+		edges = append(edges, service.EdgeServiceUserInfoEndpointConfig)
 	}
 	if m.clearedapplications {
 		edges = append(edges, service.EdgeApplications)
@@ -6039,8 +6084,16 @@ func (m *ServiceMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ServiceMutation) EdgeCleared(name string) bool {
 	switch name {
-	case service.EdgeServiceConfig:
-		return m.clearedservice_config
+	case service.EdgeKeySets:
+		return m.clearedkey_sets
+	case service.EdgeServiceAuthorizationEndpointConfig:
+		return m.clearedservice_authorization_endpoint_config
+	case service.EdgeServiceIntrospectionEndpointConfig:
+		return m.clearedservice_introspection_endpoint_config
+	case service.EdgeServiceTokenEndpointConfig:
+		return m.clearedservice_token_endpoint_config
+	case service.EdgeServiceUserInfoEndpointConfig:
+		return m.clearedservice_user_info_endpoint_config
 	case service.EdgeApplications:
 		return m.clearedapplications
 	}
@@ -6051,8 +6104,17 @@ func (m *ServiceMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ServiceMutation) ClearEdge(name string) error {
 	switch name {
-	case service.EdgeServiceConfig:
-		m.ClearServiceConfig()
+	case service.EdgeServiceAuthorizationEndpointConfig:
+		m.ClearServiceAuthorizationEndpointConfig()
+		return nil
+	case service.EdgeServiceIntrospectionEndpointConfig:
+		m.ClearServiceIntrospectionEndpointConfig()
+		return nil
+	case service.EdgeServiceTokenEndpointConfig:
+		m.ClearServiceTokenEndpointConfig()
+		return nil
+	case service.EdgeServiceUserInfoEndpointConfig:
+		m.ClearServiceUserInfoEndpointConfig()
 		return nil
 	}
 	return fmt.Errorf("unknown Service unique edge %s", name)
@@ -6062,8 +6124,20 @@ func (m *ServiceMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ServiceMutation) ResetEdge(name string) error {
 	switch name {
-	case service.EdgeServiceConfig:
-		m.ResetServiceConfig()
+	case service.EdgeKeySets:
+		m.ResetKeySets()
+		return nil
+	case service.EdgeServiceAuthorizationEndpointConfig:
+		m.ResetServiceAuthorizationEndpointConfig()
+		return nil
+	case service.EdgeServiceIntrospectionEndpointConfig:
+		m.ResetServiceIntrospectionEndpointConfig()
+		return nil
+	case service.EdgeServiceTokenEndpointConfig:
+		m.ResetServiceTokenEndpointConfig()
+		return nil
+	case service.EdgeServiceUserInfoEndpointConfig:
+		m.ResetServiceUserInfoEndpointConfig()
 		return nil
 	case service.EdgeApplications:
 		m.ResetApplications()
@@ -6072,34 +6146,34 @@ func (m *ServiceMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Service edge %s", name)
 }
 
-// ServiceConfigMutation represents an operation that mutates the ServiceConfig nodes in the graph.
-type ServiceConfigMutation struct {
+// ServiceAuthorizationEndpointConfigMutation represents an operation that mutates the ServiceAuthorizationEndpointConfig nodes in the graph.
+type ServiceAuthorizationEndpointConfigMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *string
-	clearedFields   map[string]struct{}
-	service         *string
-	clearedservice  bool
-	key_sets        map[string]struct{}
-	removedkey_sets map[string]struct{}
-	clearedkey_sets bool
-	done            bool
-	oldValue        func(context.Context) (*ServiceConfig, error)
-	predicates      []predicate.ServiceConfig
+	op                                       Op
+	typ                                      string
+	id                                       *string
+	endpoint                                 *string
+	pkce_required                            *bool
+	pkce_s256_code_challenge_method_required *bool
+	clearedFields                            map[string]struct{}
+	service                                  *string
+	clearedservice                           bool
+	done                                     bool
+	oldValue                                 func(context.Context) (*ServiceAuthorizationEndpointConfig, error)
+	predicates                               []predicate.ServiceAuthorizationEndpointConfig
 }
 
-var _ ent.Mutation = (*ServiceConfigMutation)(nil)
+var _ ent.Mutation = (*ServiceAuthorizationEndpointConfigMutation)(nil)
 
-// serviceconfigOption allows management of the mutation configuration using functional options.
-type serviceconfigOption func(*ServiceConfigMutation)
+// serviceauthorizationendpointconfigOption allows management of the mutation configuration using functional options.
+type serviceauthorizationendpointconfigOption func(*ServiceAuthorizationEndpointConfigMutation)
 
-// newServiceConfigMutation creates new mutation for the ServiceConfig entity.
-func newServiceConfigMutation(c config, op Op, opts ...serviceconfigOption) *ServiceConfigMutation {
-	m := &ServiceConfigMutation{
+// newServiceAuthorizationEndpointConfigMutation creates new mutation for the ServiceAuthorizationEndpointConfig entity.
+func newServiceAuthorizationEndpointConfigMutation(c config, op Op, opts ...serviceauthorizationendpointconfigOption) *ServiceAuthorizationEndpointConfigMutation {
+	m := &ServiceAuthorizationEndpointConfigMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeServiceConfig,
+		typ:           TypeServiceAuthorizationEndpointConfig,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -6108,20 +6182,20 @@ func newServiceConfigMutation(c config, op Op, opts ...serviceconfigOption) *Ser
 	return m
 }
 
-// withServiceConfigID sets the ID field of the mutation.
-func withServiceConfigID(id string) serviceconfigOption {
-	return func(m *ServiceConfigMutation) {
+// withServiceAuthorizationEndpointConfigID sets the ID field of the mutation.
+func withServiceAuthorizationEndpointConfigID(id string) serviceauthorizationendpointconfigOption {
+	return func(m *ServiceAuthorizationEndpointConfigMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *ServiceConfig
+			value *ServiceAuthorizationEndpointConfig
 		)
-		m.oldValue = func(ctx context.Context) (*ServiceConfig, error) {
+		m.oldValue = func(ctx context.Context) (*ServiceAuthorizationEndpointConfig, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().ServiceConfig.Get(ctx, id)
+					value, err = m.Client().ServiceAuthorizationEndpointConfig.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -6130,10 +6204,10 @@ func withServiceConfigID(id string) serviceconfigOption {
 	}
 }
 
-// withServiceConfig sets the old ServiceConfig of the mutation.
-func withServiceConfig(node *ServiceConfig) serviceconfigOption {
-	return func(m *ServiceConfigMutation) {
-		m.oldValue = func(context.Context) (*ServiceConfig, error) {
+// withServiceAuthorizationEndpointConfig sets the old ServiceAuthorizationEndpointConfig of the mutation.
+func withServiceAuthorizationEndpointConfig(node *ServiceAuthorizationEndpointConfig) serviceauthorizationendpointconfigOption {
+	return func(m *ServiceAuthorizationEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*ServiceAuthorizationEndpointConfig, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -6142,7 +6216,7 @@ func withServiceConfig(node *ServiceConfig) serviceconfigOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ServiceConfigMutation) Client() *Client {
+func (m ServiceAuthorizationEndpointConfigMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -6150,7 +6224,7 @@ func (m ServiceConfigMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m ServiceConfigMutation) Tx() (*Tx, error) {
+func (m ServiceAuthorizationEndpointConfigMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -6160,14 +6234,14 @@ func (m ServiceConfigMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of ServiceConfig entities.
-func (m *ServiceConfigMutation) SetID(id string) {
+// operation is only accepted on creation of ServiceAuthorizationEndpointConfig entities.
+func (m *ServiceAuthorizationEndpointConfigMutation) SetID(id string) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ServiceConfigMutation) ID() (id string, exists bool) {
+func (m *ServiceAuthorizationEndpointConfigMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -6178,7 +6252,7 @@ func (m *ServiceConfigMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ServiceConfigMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *ServiceAuthorizationEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -6187,29 +6261,137 @@ func (m *ServiceConfigMutation) IDs(ctx context.Context) ([]string, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ServiceConfig.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().ServiceAuthorizationEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
+// SetEndpoint sets the "endpoint" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ServiceAuthorizationEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ServiceAuthorizationEndpointConfig entity.
+// If the ServiceAuthorizationEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceAuthorizationEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) SetPkceRequired(b bool) {
+	m.pkce_required = &b
+}
+
+// PkceRequired returns the value of the "pkce_required" field in the mutation.
+func (m *ServiceAuthorizationEndpointConfigMutation) PkceRequired() (r bool, exists bool) {
+	v := m.pkce_required
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPkceRequired returns the old "pkce_required" field's value of the ServiceAuthorizationEndpointConfig entity.
+// If the ServiceAuthorizationEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceAuthorizationEndpointConfigMutation) OldPkceRequired(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPkceRequired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPkceRequired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPkceRequired: %w", err)
+	}
+	return oldValue.PkceRequired, nil
+}
+
+// ResetPkceRequired resets all changes to the "pkce_required" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetPkceRequired() {
+	m.pkce_required = nil
+}
+
+// SetPkceS256CodeChallengeMethodRequired sets the "pkce_s256_code_challenge_method_required" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) SetPkceS256CodeChallengeMethodRequired(b bool) {
+	m.pkce_s256_code_challenge_method_required = &b
+}
+
+// PkceS256CodeChallengeMethodRequired returns the value of the "pkce_s256_code_challenge_method_required" field in the mutation.
+func (m *ServiceAuthorizationEndpointConfigMutation) PkceS256CodeChallengeMethodRequired() (r bool, exists bool) {
+	v := m.pkce_s256_code_challenge_method_required
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPkceS256CodeChallengeMethodRequired returns the old "pkce_s256_code_challenge_method_required" field's value of the ServiceAuthorizationEndpointConfig entity.
+// If the ServiceAuthorizationEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceAuthorizationEndpointConfigMutation) OldPkceS256CodeChallengeMethodRequired(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPkceS256CodeChallengeMethodRequired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPkceS256CodeChallengeMethodRequired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPkceS256CodeChallengeMethodRequired: %w", err)
+	}
+	return oldValue.PkceS256CodeChallengeMethodRequired, nil
+}
+
+// ResetPkceS256CodeChallengeMethodRequired resets all changes to the "pkce_s256_code_challenge_method_required" field.
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetPkceS256CodeChallengeMethodRequired() {
+	m.pkce_s256_code_challenge_method_required = nil
+}
+
 // SetServiceID sets the "service" edge to the Service entity by id.
-func (m *ServiceConfigMutation) SetServiceID(id string) {
+func (m *ServiceAuthorizationEndpointConfigMutation) SetServiceID(id string) {
 	m.service = &id
 }
 
 // ClearService clears the "service" edge to the Service entity.
-func (m *ServiceConfigMutation) ClearService() {
+func (m *ServiceAuthorizationEndpointConfigMutation) ClearService() {
 	m.clearedservice = true
 }
 
 // ServiceCleared reports if the "service" edge to the Service entity was cleared.
-func (m *ServiceConfigMutation) ServiceCleared() bool {
+func (m *ServiceAuthorizationEndpointConfigMutation) ServiceCleared() bool {
 	return m.clearedservice
 }
 
 // ServiceID returns the "service" edge ID in the mutation.
-func (m *ServiceConfigMutation) ServiceID() (id string, exists bool) {
+func (m *ServiceAuthorizationEndpointConfigMutation) ServiceID() (id string, exists bool) {
 	if m.service != nil {
 		return *m.service, true
 	}
@@ -6219,7 +6401,7 @@ func (m *ServiceConfigMutation) ServiceID() (id string, exists bool) {
 // ServiceIDs returns the "service" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // ServiceID instead. It exists only for internal usage by the builders.
-func (m *ServiceConfigMutation) ServiceIDs() (ids []string) {
+func (m *ServiceAuthorizationEndpointConfigMutation) ServiceIDs() (ids []string) {
 	if id := m.service; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6227,74 +6409,20 @@ func (m *ServiceConfigMutation) ServiceIDs() (ids []string) {
 }
 
 // ResetService resets all changes to the "service" edge.
-func (m *ServiceConfigMutation) ResetService() {
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetService() {
 	m.service = nil
 	m.clearedservice = false
 }
 
-// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by ids.
-func (m *ServiceConfigMutation) AddKeySetIDs(ids ...string) {
-	if m.key_sets == nil {
-		m.key_sets = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.key_sets[ids[i]] = struct{}{}
-	}
-}
-
-// ClearKeySets clears the "key_sets" edge to the KeySet entity.
-func (m *ServiceConfigMutation) ClearKeySets() {
-	m.clearedkey_sets = true
-}
-
-// KeySetsCleared reports if the "key_sets" edge to the KeySet entity was cleared.
-func (m *ServiceConfigMutation) KeySetsCleared() bool {
-	return m.clearedkey_sets
-}
-
-// RemoveKeySetIDs removes the "key_sets" edge to the KeySet entity by IDs.
-func (m *ServiceConfigMutation) RemoveKeySetIDs(ids ...string) {
-	if m.removedkey_sets == nil {
-		m.removedkey_sets = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.key_sets, ids[i])
-		m.removedkey_sets[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedKeySets returns the removed IDs of the "key_sets" edge to the KeySet entity.
-func (m *ServiceConfigMutation) RemovedKeySetsIDs() (ids []string) {
-	for id := range m.removedkey_sets {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// KeySetsIDs returns the "key_sets" edge IDs in the mutation.
-func (m *ServiceConfigMutation) KeySetsIDs() (ids []string) {
-	for id := range m.key_sets {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetKeySets resets all changes to the "key_sets" edge.
-func (m *ServiceConfigMutation) ResetKeySets() {
-	m.key_sets = nil
-	m.clearedkey_sets = false
-	m.removedkey_sets = nil
-}
-
-// Where appends a list predicates to the ServiceConfigMutation builder.
-func (m *ServiceConfigMutation) Where(ps ...predicate.ServiceConfig) {
+// Where appends a list predicates to the ServiceAuthorizationEndpointConfigMutation builder.
+func (m *ServiceAuthorizationEndpointConfigMutation) Where(ps ...predicate.ServiceAuthorizationEndpointConfig) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the ServiceConfigMutation builder. Using this method,
+// WhereP appends storage-level predicates to the ServiceAuthorizationEndpointConfigMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ServiceConfigMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ServiceConfig, len(ps))
+func (m *ServiceAuthorizationEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ServiceAuthorizationEndpointConfig, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -6302,196 +6430,1494 @@ func (m *ServiceConfigMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *ServiceConfigMutation) Op() Op {
+func (m *ServiceAuthorizationEndpointConfigMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *ServiceConfigMutation) SetOp(op Op) {
+func (m *ServiceAuthorizationEndpointConfigMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (ServiceConfig).
-func (m *ServiceConfigMutation) Type() string {
+// Type returns the node type of this mutation (ServiceAuthorizationEndpointConfig).
+func (m *ServiceAuthorizationEndpointConfigMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *ServiceConfigMutation) Fields() []string {
-	fields := make([]string, 0, 0)
+func (m *ServiceAuthorizationEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.endpoint != nil {
+		fields = append(fields, serviceauthorizationendpointconfig.FieldEndpoint)
+	}
+	if m.pkce_required != nil {
+		fields = append(fields, serviceauthorizationendpointconfig.FieldPkceRequired)
+	}
+	if m.pkce_s256_code_challenge_method_required != nil {
+		fields = append(fields, serviceauthorizationendpointconfig.FieldPkceS256CodeChallengeMethodRequired)
+	}
 	return fields
 }
 
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *ServiceConfigMutation) Field(name string) (ent.Value, bool) {
+func (m *ServiceAuthorizationEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case serviceauthorizationendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	case serviceauthorizationendpointconfig.FieldPkceRequired:
+		return m.PkceRequired()
+	case serviceauthorizationendpointconfig.FieldPkceS256CodeChallengeMethodRequired:
+		return m.PkceS256CodeChallengeMethodRequired()
+	}
 	return nil, false
 }
 
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *ServiceConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, fmt.Errorf("unknown ServiceConfig field %s", name)
+func (m *ServiceAuthorizationEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case serviceauthorizationendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	case serviceauthorizationendpointconfig.FieldPkceRequired:
+		return m.OldPkceRequired(ctx)
+	case serviceauthorizationendpointconfig.FieldPkceS256CodeChallengeMethodRequired:
+		return m.OldPkceS256CodeChallengeMethodRequired(ctx)
+	}
+	return nil, fmt.Errorf("unknown ServiceAuthorizationEndpointConfig field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ServiceConfigMutation) SetField(name string, value ent.Value) error {
+func (m *ServiceAuthorizationEndpointConfigMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case serviceauthorizationendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	case serviceauthorizationendpointconfig.FieldPkceRequired:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPkceRequired(v)
+		return nil
+	case serviceauthorizationendpointconfig.FieldPkceS256CodeChallengeMethodRequired:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPkceS256CodeChallengeMethodRequired(v)
+		return nil
 	}
-	return fmt.Errorf("unknown ServiceConfig field %s", name)
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *ServiceConfigMutation) AddedFields() []string {
+func (m *ServiceAuthorizationEndpointConfigMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *ServiceConfigMutation) AddedField(name string) (ent.Value, bool) {
+func (m *ServiceAuthorizationEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *ServiceConfigMutation) AddField(name string, value ent.Value) error {
-	return fmt.Errorf("unknown ServiceConfig numeric field %s", name)
+func (m *ServiceAuthorizationEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *ServiceConfigMutation) ClearedFields() []string {
+func (m *ServiceAuthorizationEndpointConfigMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *ServiceConfigMutation) FieldCleared(name string) bool {
+func (m *ServiceAuthorizationEndpointConfigMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *ServiceConfigMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown ServiceConfig nullable field %s", name)
+func (m *ServiceAuthorizationEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *ServiceConfigMutation) ResetField(name string) error {
-	return fmt.Errorf("unknown ServiceConfig field %s", name)
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case serviceauthorizationendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	case serviceauthorizationendpointconfig.FieldPkceRequired:
+		m.ResetPkceRequired()
+		return nil
+	case serviceauthorizationendpointconfig.FieldPkceS256CodeChallengeMethodRequired:
+		m.ResetPkceS256CodeChallengeMethodRequired()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ServiceConfigMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+func (m *ServiceAuthorizationEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
 	if m.service != nil {
-		edges = append(edges, serviceconfig.EdgeService)
-	}
-	if m.key_sets != nil {
-		edges = append(edges, serviceconfig.EdgeKeySets)
+		edges = append(edges, serviceauthorizationendpointconfig.EdgeService)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *ServiceConfigMutation) AddedIDs(name string) []ent.Value {
+func (m *ServiceAuthorizationEndpointConfigMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case serviceconfig.EdgeService:
+	case serviceauthorizationendpointconfig.EdgeService:
 		if id := m.service; id != nil {
 			return []ent.Value{*id}
 		}
-	case serviceconfig.EdgeKeySets:
-		ids := make([]ent.Value, 0, len(m.key_sets))
-		for id := range m.key_sets {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ServiceConfigMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedkey_sets != nil {
-		edges = append(edges, serviceconfig.EdgeKeySets)
-	}
+func (m *ServiceAuthorizationEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *ServiceConfigMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case serviceconfig.EdgeKeySets:
-		ids := make([]ent.Value, 0, len(m.removedkey_sets))
-		for id := range m.removedkey_sets {
-			ids = append(ids, id)
-		}
-		return ids
-	}
+func (m *ServiceAuthorizationEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ServiceConfigMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+func (m *ServiceAuthorizationEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
 	if m.clearedservice {
-		edges = append(edges, serviceconfig.EdgeService)
-	}
-	if m.clearedkey_sets {
-		edges = append(edges, serviceconfig.EdgeKeySets)
+		edges = append(edges, serviceauthorizationendpointconfig.EdgeService)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *ServiceConfigMutation) EdgeCleared(name string) bool {
+func (m *ServiceAuthorizationEndpointConfigMutation) EdgeCleared(name string) bool {
 	switch name {
-	case serviceconfig.EdgeService:
+	case serviceauthorizationendpointconfig.EdgeService:
 		return m.clearedservice
-	case serviceconfig.EdgeKeySets:
-		return m.clearedkey_sets
 	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *ServiceConfigMutation) ClearEdge(name string) error {
+func (m *ServiceAuthorizationEndpointConfigMutation) ClearEdge(name string) error {
 	switch name {
-	case serviceconfig.EdgeService:
+	case serviceauthorizationendpointconfig.EdgeService:
 		m.ClearService()
 		return nil
 	}
-	return fmt.Errorf("unknown ServiceConfig unique edge %s", name)
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *ServiceConfigMutation) ResetEdge(name string) error {
+func (m *ServiceAuthorizationEndpointConfigMutation) ResetEdge(name string) error {
 	switch name {
-	case serviceconfig.EdgeService:
+	case serviceauthorizationendpointconfig.EdgeService:
 		m.ResetService()
 		return nil
-	case serviceconfig.EdgeKeySets:
-		m.ResetKeySets()
+	}
+	return fmt.Errorf("unknown ServiceAuthorizationEndpointConfig edge %s", name)
+}
+
+// ServiceIntrospectionEndpointConfigMutation represents an operation that mutates the ServiceIntrospectionEndpointConfig nodes in the graph.
+type ServiceIntrospectionEndpointConfigMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *string
+	endpoint       *string
+	clearedFields  map[string]struct{}
+	service        *string
+	clearedservice bool
+	done           bool
+	oldValue       func(context.Context) (*ServiceIntrospectionEndpointConfig, error)
+	predicates     []predicate.ServiceIntrospectionEndpointConfig
+}
+
+var _ ent.Mutation = (*ServiceIntrospectionEndpointConfigMutation)(nil)
+
+// serviceintrospectionendpointconfigOption allows management of the mutation configuration using functional options.
+type serviceintrospectionendpointconfigOption func(*ServiceIntrospectionEndpointConfigMutation)
+
+// newServiceIntrospectionEndpointConfigMutation creates new mutation for the ServiceIntrospectionEndpointConfig entity.
+func newServiceIntrospectionEndpointConfigMutation(c config, op Op, opts ...serviceintrospectionendpointconfigOption) *ServiceIntrospectionEndpointConfigMutation {
+	m := &ServiceIntrospectionEndpointConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeServiceIntrospectionEndpointConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withServiceIntrospectionEndpointConfigID sets the ID field of the mutation.
+func withServiceIntrospectionEndpointConfigID(id string) serviceintrospectionendpointconfigOption {
+	return func(m *ServiceIntrospectionEndpointConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ServiceIntrospectionEndpointConfig
+		)
+		m.oldValue = func(ctx context.Context) (*ServiceIntrospectionEndpointConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ServiceIntrospectionEndpointConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withServiceIntrospectionEndpointConfig sets the old ServiceIntrospectionEndpointConfig of the mutation.
+func withServiceIntrospectionEndpointConfig(node *ServiceIntrospectionEndpointConfig) serviceintrospectionendpointconfigOption {
+	return func(m *ServiceIntrospectionEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*ServiceIntrospectionEndpointConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ServiceIntrospectionEndpointConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ServiceIntrospectionEndpointConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ServiceIntrospectionEndpointConfig entities.
+func (m *ServiceIntrospectionEndpointConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ServiceIntrospectionEndpointConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ServiceIntrospectionEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *ServiceIntrospectionEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ServiceIntrospectionEndpointConfig entity.
+// If the ServiceIntrospectionEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceIntrospectionEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ServiceIntrospectionEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *ServiceIntrospectionEndpointConfigMutation) SetServiceID(id string) {
+	m.service = &id
+}
+
+// ClearService clears the "service" edge to the Service entity.
+func (m *ServiceIntrospectionEndpointConfigMutation) ClearService() {
+	m.clearedservice = true
+}
+
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *ServiceIntrospectionEndpointConfigMutation) ServiceCleared() bool {
+	return m.clearedservice
+}
+
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
+	}
+	return
+}
+
+// ServiceIDs returns the "service" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *ServiceIntrospectionEndpointConfigMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetService resets all changes to the "service" edge.
+func (m *ServiceIntrospectionEndpointConfigMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
+}
+
+// Where appends a list predicates to the ServiceIntrospectionEndpointConfigMutation builder.
+func (m *ServiceIntrospectionEndpointConfigMutation) Where(ps ...predicate.ServiceIntrospectionEndpointConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ServiceIntrospectionEndpointConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ServiceIntrospectionEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ServiceIntrospectionEndpointConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ServiceIntrospectionEndpointConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ServiceIntrospectionEndpointConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ServiceIntrospectionEndpointConfig).
+func (m *ServiceIntrospectionEndpointConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ServiceIntrospectionEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.endpoint != nil {
+		fields = append(fields, serviceintrospectionendpointconfig.FieldEndpoint)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case serviceintrospectionendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ServiceIntrospectionEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case serviceintrospectionendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	}
+	return nil, fmt.Errorf("unknown ServiceIntrospectionEndpointConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceIntrospectionEndpointConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case serviceintrospectionendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
 		return nil
 	}
-	return fmt.Errorf("unknown ServiceConfig edge %s", name)
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceIntrospectionEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case serviceintrospectionendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.service != nil {
+		edges = append(edges, serviceintrospectionendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case serviceintrospectionendpointconfig.EdgeService:
+		if id := m.service; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedservice {
+		edges = append(edges, serviceintrospectionendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ServiceIntrospectionEndpointConfigMutation) EdgeCleared(name string) bool {
+	switch name {
+	case serviceintrospectionendpointconfig.EdgeService:
+		return m.clearedservice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) ClearEdge(name string) error {
+	switch name {
+	case serviceintrospectionendpointconfig.EdgeService:
+		m.ClearService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ServiceIntrospectionEndpointConfigMutation) ResetEdge(name string) error {
+	switch name {
+	case serviceintrospectionendpointconfig.EdgeService:
+		m.ResetService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig edge %s", name)
+}
+
+// ServiceTokenEndpointConfigMutation represents an operation that mutates the ServiceTokenEndpointConfig nodes in the graph.
+type ServiceTokenEndpointConfigMutation struct {
+	config
+	op                                   Op
+	typ                                  string
+	id                                   *string
+	endpoint                             *string
+	allowed_authentication_methods       *[]string
+	appendallowed_authentication_methods []string
+	clearedFields                        map[string]struct{}
+	service                              *string
+	clearedservice                       bool
+	done                                 bool
+	oldValue                             func(context.Context) (*ServiceTokenEndpointConfig, error)
+	predicates                           []predicate.ServiceTokenEndpointConfig
+}
+
+var _ ent.Mutation = (*ServiceTokenEndpointConfigMutation)(nil)
+
+// servicetokenendpointconfigOption allows management of the mutation configuration using functional options.
+type servicetokenendpointconfigOption func(*ServiceTokenEndpointConfigMutation)
+
+// newServiceTokenEndpointConfigMutation creates new mutation for the ServiceTokenEndpointConfig entity.
+func newServiceTokenEndpointConfigMutation(c config, op Op, opts ...servicetokenendpointconfigOption) *ServiceTokenEndpointConfigMutation {
+	m := &ServiceTokenEndpointConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeServiceTokenEndpointConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withServiceTokenEndpointConfigID sets the ID field of the mutation.
+func withServiceTokenEndpointConfigID(id string) servicetokenendpointconfigOption {
+	return func(m *ServiceTokenEndpointConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ServiceTokenEndpointConfig
+		)
+		m.oldValue = func(ctx context.Context) (*ServiceTokenEndpointConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ServiceTokenEndpointConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withServiceTokenEndpointConfig sets the old ServiceTokenEndpointConfig of the mutation.
+func withServiceTokenEndpointConfig(node *ServiceTokenEndpointConfig) servicetokenendpointconfigOption {
+	return func(m *ServiceTokenEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*ServiceTokenEndpointConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ServiceTokenEndpointConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ServiceTokenEndpointConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ServiceTokenEndpointConfig entities.
+func (m *ServiceTokenEndpointConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ServiceTokenEndpointConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ServiceTokenEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ServiceTokenEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *ServiceTokenEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ServiceTokenEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ServiceTokenEndpointConfig entity.
+// If the ServiceTokenEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceTokenEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ServiceTokenEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetAllowedAuthenticationMethods sets the "allowed_authentication_methods" field.
+func (m *ServiceTokenEndpointConfigMutation) SetAllowedAuthenticationMethods(s []string) {
+	m.allowed_authentication_methods = &s
+	m.appendallowed_authentication_methods = nil
+}
+
+// AllowedAuthenticationMethods returns the value of the "allowed_authentication_methods" field in the mutation.
+func (m *ServiceTokenEndpointConfigMutation) AllowedAuthenticationMethods() (r []string, exists bool) {
+	v := m.allowed_authentication_methods
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowedAuthenticationMethods returns the old "allowed_authentication_methods" field's value of the ServiceTokenEndpointConfig entity.
+// If the ServiceTokenEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceTokenEndpointConfigMutation) OldAllowedAuthenticationMethods(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowedAuthenticationMethods is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowedAuthenticationMethods requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowedAuthenticationMethods: %w", err)
+	}
+	return oldValue.AllowedAuthenticationMethods, nil
+}
+
+// AppendAllowedAuthenticationMethods adds s to the "allowed_authentication_methods" field.
+func (m *ServiceTokenEndpointConfigMutation) AppendAllowedAuthenticationMethods(s []string) {
+	m.appendallowed_authentication_methods = append(m.appendallowed_authentication_methods, s...)
+}
+
+// AppendedAllowedAuthenticationMethods returns the list of values that were appended to the "allowed_authentication_methods" field in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) AppendedAllowedAuthenticationMethods() ([]string, bool) {
+	if len(m.appendallowed_authentication_methods) == 0 {
+		return nil, false
+	}
+	return m.appendallowed_authentication_methods, true
+}
+
+// ResetAllowedAuthenticationMethods resets all changes to the "allowed_authentication_methods" field.
+func (m *ServiceTokenEndpointConfigMutation) ResetAllowedAuthenticationMethods() {
+	m.allowed_authentication_methods = nil
+	m.appendallowed_authentication_methods = nil
+}
+
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *ServiceTokenEndpointConfigMutation) SetServiceID(id string) {
+	m.service = &id
+}
+
+// ClearService clears the "service" edge to the Service entity.
+func (m *ServiceTokenEndpointConfigMutation) ClearService() {
+	m.clearedservice = true
+}
+
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *ServiceTokenEndpointConfigMutation) ServiceCleared() bool {
+	return m.clearedservice
+}
+
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *ServiceTokenEndpointConfigMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
+	}
+	return
+}
+
+// ServiceIDs returns the "service" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *ServiceTokenEndpointConfigMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetService resets all changes to the "service" edge.
+func (m *ServiceTokenEndpointConfigMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
+}
+
+// Where appends a list predicates to the ServiceTokenEndpointConfigMutation builder.
+func (m *ServiceTokenEndpointConfigMutation) Where(ps ...predicate.ServiceTokenEndpointConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ServiceTokenEndpointConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ServiceTokenEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ServiceTokenEndpointConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ServiceTokenEndpointConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ServiceTokenEndpointConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ServiceTokenEndpointConfig).
+func (m *ServiceTokenEndpointConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ServiceTokenEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.endpoint != nil {
+		fields = append(fields, servicetokenendpointconfig.FieldEndpoint)
+	}
+	if m.allowed_authentication_methods != nil {
+		fields = append(fields, servicetokenendpointconfig.FieldAllowedAuthenticationMethods)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ServiceTokenEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case servicetokenendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	case servicetokenendpointconfig.FieldAllowedAuthenticationMethods:
+		return m.AllowedAuthenticationMethods()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ServiceTokenEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case servicetokenendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	case servicetokenendpointconfig.FieldAllowedAuthenticationMethods:
+		return m.OldAllowedAuthenticationMethods(ctx)
+	}
+	return nil, fmt.Errorf("unknown ServiceTokenEndpointConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceTokenEndpointConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case servicetokenendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	case servicetokenendpointconfig.FieldAllowedAuthenticationMethods:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowedAuthenticationMethods(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ServiceTokenEndpointConfigMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ServiceTokenEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceTokenEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ServiceTokenEndpointConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ServiceTokenEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ServiceTokenEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case servicetokenendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	case servicetokenendpointconfig.FieldAllowedAuthenticationMethods:
+		m.ResetAllowedAuthenticationMethods()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.service != nil {
+		edges = append(edges, servicetokenendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case servicetokenendpointconfig.EdgeService:
+		if id := m.service; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedservice {
+		edges = append(edges, servicetokenendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ServiceTokenEndpointConfigMutation) EdgeCleared(name string) bool {
+	switch name {
+	case servicetokenendpointconfig.EdgeService:
+		return m.clearedservice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ServiceTokenEndpointConfigMutation) ClearEdge(name string) error {
+	switch name {
+	case servicetokenendpointconfig.EdgeService:
+		m.ClearService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ServiceTokenEndpointConfigMutation) ResetEdge(name string) error {
+	switch name {
+	case servicetokenendpointconfig.EdgeService:
+		m.ResetService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceTokenEndpointConfig edge %s", name)
+}
+
+// ServiceUserInfoEndpointConfigMutation represents an operation that mutates the ServiceUserInfoEndpointConfig nodes in the graph.
+type ServiceUserInfoEndpointConfigMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *string
+	endpoint       *string
+	clearedFields  map[string]struct{}
+	service        *string
+	clearedservice bool
+	done           bool
+	oldValue       func(context.Context) (*ServiceUserInfoEndpointConfig, error)
+	predicates     []predicate.ServiceUserInfoEndpointConfig
+}
+
+var _ ent.Mutation = (*ServiceUserInfoEndpointConfigMutation)(nil)
+
+// serviceuserinfoendpointconfigOption allows management of the mutation configuration using functional options.
+type serviceuserinfoendpointconfigOption func(*ServiceUserInfoEndpointConfigMutation)
+
+// newServiceUserInfoEndpointConfigMutation creates new mutation for the ServiceUserInfoEndpointConfig entity.
+func newServiceUserInfoEndpointConfigMutation(c config, op Op, opts ...serviceuserinfoendpointconfigOption) *ServiceUserInfoEndpointConfigMutation {
+	m := &ServiceUserInfoEndpointConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeServiceUserInfoEndpointConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withServiceUserInfoEndpointConfigID sets the ID field of the mutation.
+func withServiceUserInfoEndpointConfigID(id string) serviceuserinfoendpointconfigOption {
+	return func(m *ServiceUserInfoEndpointConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ServiceUserInfoEndpointConfig
+		)
+		m.oldValue = func(ctx context.Context) (*ServiceUserInfoEndpointConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ServiceUserInfoEndpointConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withServiceUserInfoEndpointConfig sets the old ServiceUserInfoEndpointConfig of the mutation.
+func withServiceUserInfoEndpointConfig(node *ServiceUserInfoEndpointConfig) serviceuserinfoendpointconfigOption {
+	return func(m *ServiceUserInfoEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*ServiceUserInfoEndpointConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ServiceUserInfoEndpointConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ServiceUserInfoEndpointConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ServiceUserInfoEndpointConfig entities.
+func (m *ServiceUserInfoEndpointConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ServiceUserInfoEndpointConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ServiceUserInfoEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *ServiceUserInfoEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ServiceUserInfoEndpointConfig entity.
+// If the ServiceUserInfoEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceUserInfoEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ServiceUserInfoEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *ServiceUserInfoEndpointConfigMutation) SetServiceID(id string) {
+	m.service = &id
+}
+
+// ClearService clears the "service" edge to the Service entity.
+func (m *ServiceUserInfoEndpointConfigMutation) ClearService() {
+	m.clearedservice = true
+}
+
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *ServiceUserInfoEndpointConfigMutation) ServiceCleared() bool {
+	return m.clearedservice
+}
+
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
+	}
+	return
+}
+
+// ServiceIDs returns the "service" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *ServiceUserInfoEndpointConfigMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetService resets all changes to the "service" edge.
+func (m *ServiceUserInfoEndpointConfigMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
+}
+
+// Where appends a list predicates to the ServiceUserInfoEndpointConfigMutation builder.
+func (m *ServiceUserInfoEndpointConfigMutation) Where(ps ...predicate.ServiceUserInfoEndpointConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ServiceUserInfoEndpointConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ServiceUserInfoEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ServiceUserInfoEndpointConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ServiceUserInfoEndpointConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ServiceUserInfoEndpointConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ServiceUserInfoEndpointConfig).
+func (m *ServiceUserInfoEndpointConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ServiceUserInfoEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.endpoint != nil {
+		fields = append(fields, serviceuserinfoendpointconfig.FieldEndpoint)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ServiceUserInfoEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case serviceuserinfoendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ServiceUserInfoEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case serviceuserinfoendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	}
+	return nil, fmt.Errorf("unknown ServiceUserInfoEndpointConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceUserInfoEndpointConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case serviceuserinfoendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ServiceUserInfoEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceUserInfoEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ServiceUserInfoEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ServiceUserInfoEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case serviceuserinfoendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.service != nil {
+		edges = append(edges, serviceuserinfoendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case serviceuserinfoendpointconfig.EdgeService:
+		if id := m.service; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedservice {
+		edges = append(edges, serviceuserinfoendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ServiceUserInfoEndpointConfigMutation) EdgeCleared(name string) bool {
+	switch name {
+	case serviceuserinfoendpointconfig.EdgeService:
+		return m.clearedservice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ServiceUserInfoEndpointConfigMutation) ClearEdge(name string) error {
+	switch name {
+	case serviceuserinfoendpointconfig.EdgeService:
+		m.ClearService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ServiceUserInfoEndpointConfigMutation) ResetEdge(name string) error {
+	switch name {
+	case serviceuserinfoendpointconfig.EdgeService:
+		m.ResetService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceUserInfoEndpointConfig edge %s", name)
 }
 
 // SessionMutation represents an operation that mutates the Session nodes in the graph.

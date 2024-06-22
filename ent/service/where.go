@@ -73,6 +73,16 @@ func Issuer(v string) predicate.Service {
 	return predicate.Service(sql.FieldEQ(FieldIssuer, v))
 }
 
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldDescription, v))
+}
+
+// ServiceMetadata applies equality check predicate on the "service_metadata" field. It's identical to ServiceMetadataEQ.
+func ServiceMetadata(v string) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldServiceMetadata, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Service {
 	return predicate.Service(sql.FieldEQ(FieldName, v))
@@ -203,21 +213,243 @@ func IssuerContainsFold(v string) predicate.Service {
 	return predicate.Service(sql.FieldContainsFold(FieldIssuer, v))
 }
 
-// HasServiceConfig applies the HasEdge predicate on the "service_config" edge.
-func HasServiceConfig() predicate.Service {
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldDescription, v))
+}
+
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.Service {
+	return predicate.Service(sql.FieldNEQ(FieldDescription, v))
+}
+
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.Service {
+	return predicate.Service(sql.FieldIn(FieldDescription, vs...))
+}
+
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.Service {
+	return predicate.Service(sql.FieldNotIn(FieldDescription, vs...))
+}
+
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.Service {
+	return predicate.Service(sql.FieldGT(FieldDescription, v))
+}
+
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.Service {
+	return predicate.Service(sql.FieldGTE(FieldDescription, v))
+}
+
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.Service {
+	return predicate.Service(sql.FieldLT(FieldDescription, v))
+}
+
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.Service {
+	return predicate.Service(sql.FieldLTE(FieldDescription, v))
+}
+
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.Service {
+	return predicate.Service(sql.FieldContains(FieldDescription, v))
+}
+
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.Service {
+	return predicate.Service(sql.FieldHasPrefix(FieldDescription, v))
+}
+
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.Service {
+	return predicate.Service(sql.FieldHasSuffix(FieldDescription, v))
+}
+
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.Service {
+	return predicate.Service(sql.FieldEqualFold(FieldDescription, v))
+}
+
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.Service {
+	return predicate.Service(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// ServiceMetadataEQ applies the EQ predicate on the "service_metadata" field.
+func ServiceMetadataEQ(v string) predicate.Service {
+	return predicate.Service(sql.FieldEQ(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataNEQ applies the NEQ predicate on the "service_metadata" field.
+func ServiceMetadataNEQ(v string) predicate.Service {
+	return predicate.Service(sql.FieldNEQ(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataIn applies the In predicate on the "service_metadata" field.
+func ServiceMetadataIn(vs ...string) predicate.Service {
+	return predicate.Service(sql.FieldIn(FieldServiceMetadata, vs...))
+}
+
+// ServiceMetadataNotIn applies the NotIn predicate on the "service_metadata" field.
+func ServiceMetadataNotIn(vs ...string) predicate.Service {
+	return predicate.Service(sql.FieldNotIn(FieldServiceMetadata, vs...))
+}
+
+// ServiceMetadataGT applies the GT predicate on the "service_metadata" field.
+func ServiceMetadataGT(v string) predicate.Service {
+	return predicate.Service(sql.FieldGT(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataGTE applies the GTE predicate on the "service_metadata" field.
+func ServiceMetadataGTE(v string) predicate.Service {
+	return predicate.Service(sql.FieldGTE(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataLT applies the LT predicate on the "service_metadata" field.
+func ServiceMetadataLT(v string) predicate.Service {
+	return predicate.Service(sql.FieldLT(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataLTE applies the LTE predicate on the "service_metadata" field.
+func ServiceMetadataLTE(v string) predicate.Service {
+	return predicate.Service(sql.FieldLTE(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataContains applies the Contains predicate on the "service_metadata" field.
+func ServiceMetadataContains(v string) predicate.Service {
+	return predicate.Service(sql.FieldContains(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataHasPrefix applies the HasPrefix predicate on the "service_metadata" field.
+func ServiceMetadataHasPrefix(v string) predicate.Service {
+	return predicate.Service(sql.FieldHasPrefix(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataHasSuffix applies the HasSuffix predicate on the "service_metadata" field.
+func ServiceMetadataHasSuffix(v string) predicate.Service {
+	return predicate.Service(sql.FieldHasSuffix(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataEqualFold applies the EqualFold predicate on the "service_metadata" field.
+func ServiceMetadataEqualFold(v string) predicate.Service {
+	return predicate.Service(sql.FieldEqualFold(FieldServiceMetadata, v))
+}
+
+// ServiceMetadataContainsFold applies the ContainsFold predicate on the "service_metadata" field.
+func ServiceMetadataContainsFold(v string) predicate.Service {
+	return predicate.Service(sql.FieldContainsFold(FieldServiceMetadata, v))
+}
+
+// HasKeySets applies the HasEdge predicate on the "key_sets" edge.
+func HasKeySets() predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ServiceConfigTable, ServiceConfigColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, KeySetsTable, KeySetsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasServiceConfigWith applies the HasEdge predicate on the "service_config" edge with a given conditions (other predicates).
-func HasServiceConfigWith(preds ...predicate.ServiceConfig) predicate.Service {
+// HasKeySetsWith applies the HasEdge predicate on the "key_sets" edge with a given conditions (other predicates).
+func HasKeySetsWith(preds ...predicate.KeySet) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
-		step := newServiceConfigStep()
+		step := newKeySetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceAuthorizationEndpointConfig applies the HasEdge predicate on the "service_authorization_endpoint_config" edge.
+func HasServiceAuthorizationEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceAuthorizationEndpointConfigTable, ServiceAuthorizationEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceAuthorizationEndpointConfigWith applies the HasEdge predicate on the "service_authorization_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceAuthorizationEndpointConfigWith(preds ...predicate.ServiceAuthorizationEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceAuthorizationEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceIntrospectionEndpointConfig applies the HasEdge predicate on the "service_introspection_endpoint_config" edge.
+func HasServiceIntrospectionEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceIntrospectionEndpointConfigTable, ServiceIntrospectionEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceIntrospectionEndpointConfigWith applies the HasEdge predicate on the "service_introspection_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceIntrospectionEndpointConfigWith(preds ...predicate.ServiceIntrospectionEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceIntrospectionEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceTokenEndpointConfig applies the HasEdge predicate on the "service_token_endpoint_config" edge.
+func HasServiceTokenEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceTokenEndpointConfigTable, ServiceTokenEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceTokenEndpointConfigWith applies the HasEdge predicate on the "service_token_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceTokenEndpointConfigWith(preds ...predicate.ServiceTokenEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceTokenEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceUserInfoEndpointConfig applies the HasEdge predicate on the "service_user_info_endpoint_config" edge.
+func HasServiceUserInfoEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceUserInfoEndpointConfigTable, ServiceUserInfoEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceUserInfoEndpointConfigWith applies the HasEdge predicate on the "service_user_info_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceUserInfoEndpointConfigWith(preds ...predicate.ServiceUserInfoEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceUserInfoEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

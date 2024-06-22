@@ -13,20 +13,20 @@ import (
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/predicate"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
 // KeySetQuery is the builder for querying KeySet entities.
 type KeySetQuery struct {
 	config
-	ctx               *QueryContext
-	order             []keyset.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.KeySet
-	withServiceConfig *ServiceConfigQuery
-	withSigningKeys   *SigningKeyQuery
-	withFKs           bool
+	ctx             *QueryContext
+	order           []keyset.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.KeySet
+	withServices    *ServiceQuery
+	withSigningKeys *SigningKeyQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,9 +63,9 @@ func (ksq *KeySetQuery) Order(o ...keyset.OrderOption) *KeySetQuery {
 	return ksq
 }
 
-// QueryServiceConfig chains the current query on the "service_config" edge.
-func (ksq *KeySetQuery) QueryServiceConfig() *ServiceConfigQuery {
-	query := (&ServiceConfigClient{config: ksq.config}).Query()
+// QueryServices chains the current query on the "services" edge.
+func (ksq *KeySetQuery) QueryServices() *ServiceQuery {
+	query := (&ServiceClient{config: ksq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ksq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,8 +76,8 @@ func (ksq *KeySetQuery) QueryServiceConfig() *ServiceConfigQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(keyset.Table, keyset.FieldID, selector),
-			sqlgraph.To(serviceconfig.Table, serviceconfig.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServiceConfigTable, keyset.ServiceConfigColumn),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServicesTable, keyset.ServicesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ksq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,27 +294,27 @@ func (ksq *KeySetQuery) Clone() *KeySetQuery {
 		return nil
 	}
 	return &KeySetQuery{
-		config:            ksq.config,
-		ctx:               ksq.ctx.Clone(),
-		order:             append([]keyset.OrderOption{}, ksq.order...),
-		inters:            append([]Interceptor{}, ksq.inters...),
-		predicates:        append([]predicate.KeySet{}, ksq.predicates...),
-		withServiceConfig: ksq.withServiceConfig.Clone(),
-		withSigningKeys:   ksq.withSigningKeys.Clone(),
+		config:          ksq.config,
+		ctx:             ksq.ctx.Clone(),
+		order:           append([]keyset.OrderOption{}, ksq.order...),
+		inters:          append([]Interceptor{}, ksq.inters...),
+		predicates:      append([]predicate.KeySet{}, ksq.predicates...),
+		withServices:    ksq.withServices.Clone(),
+		withSigningKeys: ksq.withSigningKeys.Clone(),
 		// clone intermediate query.
 		sql:  ksq.sql.Clone(),
 		path: ksq.path,
 	}
 }
 
-// WithServiceConfig tells the query-builder to eager-load the nodes that are connected to
-// the "service_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (ksq *KeySetQuery) WithServiceConfig(opts ...func(*ServiceConfigQuery)) *KeySetQuery {
-	query := (&ServiceConfigClient{config: ksq.config}).Query()
+// WithServices tells the query-builder to eager-load the nodes that are connected to
+// the "services" edge. The optional arguments are used to configure the query builder of the edge.
+func (ksq *KeySetQuery) WithServices(opts ...func(*ServiceQuery)) *KeySetQuery {
+	query := (&ServiceClient{config: ksq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ksq.withServiceConfig = query
+	ksq.withServices = query
 	return ksq
 }
 
@@ -387,11 +387,11 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 		withFKs     = ksq.withFKs
 		_spec       = ksq.querySpec()
 		loadedTypes = [2]bool{
-			ksq.withServiceConfig != nil,
+			ksq.withServices != nil,
 			ksq.withSigningKeys != nil,
 		}
 	)
-	if ksq.withServiceConfig != nil {
+	if ksq.withServices != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -415,9 +415,9 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := ksq.withServiceConfig; query != nil {
-		if err := ksq.loadServiceConfig(ctx, query, nodes, nil,
-			func(n *KeySet, e *ServiceConfig) { n.Edges.ServiceConfig = e }); err != nil {
+	if query := ksq.withServices; query != nil {
+		if err := ksq.loadServices(ctx, query, nodes, nil,
+			func(n *KeySet, e *Service) { n.Edges.Services = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -431,14 +431,14 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	return nodes, nil
 }
 
-func (ksq *KeySetQuery) loadServiceConfig(ctx context.Context, query *ServiceConfigQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *ServiceConfig)) error {
+func (ksq *KeySetQuery) loadServices(ctx context.Context, query *ServiceQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *Service)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*KeySet)
 	for i := range nodes {
-		if nodes[i].service_config_key_sets == nil {
+		if nodes[i].service_key_sets == nil {
 			continue
 		}
-		fk := *nodes[i].service_config_key_sets
+		fk := *nodes[i].service_key_sets
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -447,7 +447,7 @@ func (ksq *KeySetQuery) loadServiceConfig(ctx context.Context, query *ServiceCon
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(serviceconfig.IDIn(ids...))
+	query.Where(service.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -455,7 +455,7 @@ func (ksq *KeySetQuery) loadServiceConfig(ctx context.Context, query *ServiceCon
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "service_config_key_sets" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "service_key_sets" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

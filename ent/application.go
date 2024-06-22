@@ -3,26 +3,41 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"go.authbricks.com/bricks/ent/application"
-	"go.authbricks.com/bricks/ent/codegrant"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/service"
 )
 
 // Application is the model entity for the Application schema.
 type Application struct {
-	config `json:"-"`
+	config `hcl:"-" json:"-"`
 	// ID of the ent.
-	ID string `json:"id"`
+	ID string `json:"id" hcl:"id"`
 	// Name holds the value of the "name" field.
-	Name string `json:"name"`
+	Name string `json:"name" hcl:"name"`
 	// Public holds the value of the "public" field.
-	Public *bool `json:"public"`
+	Public bool `json:"public" hcl:"public"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description" hcl:"description"`
+	// RedirectUris holds the value of the "redirect_uris" field.
+	RedirectUris []string `json:"redirect_uris" hcl:"redirect_uris"`
+	// ResponseTypes holds the value of the "response_types" field.
+	ResponseTypes []string `json:"response_types" hcl:"response_types"`
+	// GrantTypes holds the value of the "grant_types" field.
+	GrantTypes []string `json:"grant_types" hcl:"grant_types"`
+	// Scopes holds the value of the "scopes" field.
+	Scopes []string `json:"scopes" hcl:"scopes"`
+	// PkceRequired holds the value of the "pkce_required" field.
+	PkceRequired bool `json:"pkce_required" hcl:"pkce_required"`
+	// S256CodeChallengeMethodRequired holds the value of the "s256_code_challenge_method_required" field.
+	S256CodeChallengeMethodRequired bool `json:"s256_code_challenge_method_required" hcl:"s256_code_challenge_method_required"`
+	// AllowedAuthenticationMethods holds the value of the "allowed_authentication_methods" field.
+	AllowedAuthenticationMethods []string `json:"allowed_authentication_methods" hcl:"allowed_authentication_methods"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ApplicationQuery when eager-loading is set.
 	Edges                ApplicationEdges `json:"edges"`
@@ -32,45 +47,19 @@ type Application struct {
 
 // ApplicationEdges holds the relations/edges for other nodes in the graph.
 type ApplicationEdges struct {
-	// M2mGrant holds the value of the m2m_grant edge.
-	M2mGrant *M2MGrant `json:"m2m_grant,omitempty"`
-	// CodeGrant holds the value of the code_grant edge.
-	CodeGrant *CodeGrant `json:"code_grant,omitempty"`
 	// Credentials holds the value of the credentials edge.
 	Credentials []*Credentials `json:"credentials,omitempty"`
 	// Service holds the value of the service edge.
 	Service *Service `json:"service,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
-}
-
-// M2mGrantOrErr returns the M2mGrant value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ApplicationEdges) M2mGrantOrErr() (*M2MGrant, error) {
-	if e.M2mGrant != nil {
-		return e.M2mGrant, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: m2mgrant.Label}
-	}
-	return nil, &NotLoadedError{edge: "m2m_grant"}
-}
-
-// CodeGrantOrErr returns the CodeGrant value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ApplicationEdges) CodeGrantOrErr() (*CodeGrant, error) {
-	if e.CodeGrant != nil {
-		return e.CodeGrant, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: codegrant.Label}
-	}
-	return nil, &NotLoadedError{edge: "code_grant"}
+	loadedTypes [2]bool
 }
 
 // CredentialsOrErr returns the Credentials value or an error if the edge
 // was not loaded in eager-loading.
 func (e ApplicationEdges) CredentialsOrErr() ([]*Credentials, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[0] {
 		return e.Credentials, nil
 	}
 	return nil, &NotLoadedError{edge: "credentials"}
@@ -81,7 +70,7 @@ func (e ApplicationEdges) CredentialsOrErr() ([]*Credentials, error) {
 func (e ApplicationEdges) ServiceOrErr() (*Service, error) {
 	if e.Service != nil {
 		return e.Service, nil
-	} else if e.loadedTypes[3] {
+	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: service.Label}
 	}
 	return nil, &NotLoadedError{edge: "service"}
@@ -92,9 +81,11 @@ func (*Application) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case application.FieldPublic:
+		case application.FieldRedirectUris, application.FieldResponseTypes, application.FieldGrantTypes, application.FieldScopes, application.FieldAllowedAuthenticationMethods:
+			values[i] = new([]byte)
+		case application.FieldPublic, application.FieldPkceRequired, application.FieldS256CodeChallengeMethodRequired:
 			values[i] = new(sql.NullBool)
-		case application.FieldID, application.FieldName:
+		case application.FieldID, application.FieldName, application.FieldDescription:
 			values[i] = new(sql.NullString)
 		case application.ForeignKeys[0]: // service_applications
 			values[i] = new(sql.NullString)
@@ -129,8 +120,65 @@ func (a *Application) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field public", values[i])
 			} else if value.Valid {
-				a.Public = new(bool)
-				*a.Public = value.Bool
+				a.Public = value.Bool
+			}
+		case application.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				a.Description = value.String
+			}
+		case application.FieldRedirectUris:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field redirect_uris", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.RedirectUris); err != nil {
+					return fmt.Errorf("unmarshal field redirect_uris: %w", err)
+				}
+			}
+		case application.FieldResponseTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field response_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.ResponseTypes); err != nil {
+					return fmt.Errorf("unmarshal field response_types: %w", err)
+				}
+			}
+		case application.FieldGrantTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field grant_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.GrantTypes); err != nil {
+					return fmt.Errorf("unmarshal field grant_types: %w", err)
+				}
+			}
+		case application.FieldScopes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field scopes", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Scopes); err != nil {
+					return fmt.Errorf("unmarshal field scopes: %w", err)
+				}
+			}
+		case application.FieldPkceRequired:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field pkce_required", values[i])
+			} else if value.Valid {
+				a.PkceRequired = value.Bool
+			}
+		case application.FieldS256CodeChallengeMethodRequired:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field s256_code_challenge_method_required", values[i])
+			} else if value.Valid {
+				a.S256CodeChallengeMethodRequired = value.Bool
+			}
+		case application.FieldAllowedAuthenticationMethods:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field allowed_authentication_methods", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.AllowedAuthenticationMethods); err != nil {
+					return fmt.Errorf("unmarshal field allowed_authentication_methods: %w", err)
+				}
 			}
 		case application.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -150,16 +198,6 @@ func (a *Application) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (a *Application) Value(name string) (ent.Value, error) {
 	return a.selectValues.Get(name)
-}
-
-// QueryM2mGrant queries the "m2m_grant" edge of the Application entity.
-func (a *Application) QueryM2mGrant() *M2MGrantQuery {
-	return NewApplicationClient(a.config).QueryM2mGrant(a)
-}
-
-// QueryCodeGrant queries the "code_grant" edge of the Application entity.
-func (a *Application) QueryCodeGrant() *CodeGrantQuery {
-	return NewApplicationClient(a.config).QueryCodeGrant(a)
 }
 
 // QueryCredentials queries the "credentials" edge of the Application entity.
@@ -198,10 +236,32 @@ func (a *Application) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(a.Name)
 	builder.WriteString(", ")
-	if v := a.Public; v != nil {
-		builder.WriteString("public=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("public=")
+	builder.WriteString(fmt.Sprintf("%v", a.Public))
+	builder.WriteString(", ")
+	builder.WriteString("description=")
+	builder.WriteString(a.Description)
+	builder.WriteString(", ")
+	builder.WriteString("redirect_uris=")
+	builder.WriteString(fmt.Sprintf("%v", a.RedirectUris))
+	builder.WriteString(", ")
+	builder.WriteString("response_types=")
+	builder.WriteString(fmt.Sprintf("%v", a.ResponseTypes))
+	builder.WriteString(", ")
+	builder.WriteString("grant_types=")
+	builder.WriteString(fmt.Sprintf("%v", a.GrantTypes))
+	builder.WriteString(", ")
+	builder.WriteString("scopes=")
+	builder.WriteString(fmt.Sprintf("%v", a.Scopes))
+	builder.WriteString(", ")
+	builder.WriteString("pkce_required=")
+	builder.WriteString(fmt.Sprintf("%v", a.PkceRequired))
+	builder.WriteString(", ")
+	builder.WriteString("s256_code_challenge_method_required=")
+	builder.WriteString(fmt.Sprintf("%v", a.S256CodeChallengeMethodRequired))
+	builder.WriteString(", ")
+	builder.WriteString("allowed_authentication_methods=")
+	builder.WriteString(fmt.Sprintf("%v", a.AllowedAuthenticationMethods))
 	builder.WriteByte(')')
 	return builder.String()
 }

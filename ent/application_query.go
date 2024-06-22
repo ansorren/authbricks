@@ -12,9 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/credentials"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/service"
 )
@@ -26,8 +24,6 @@ type ApplicationQuery struct {
 	order           []application.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Application
-	withM2mGrant    *M2MGrantQuery
-	withCodeGrant   *CodeGrantQuery
 	withCredentials *CredentialsQuery
 	withService     *ServiceQuery
 	withFKs         bool
@@ -65,50 +61,6 @@ func (aq *ApplicationQuery) Unique(unique bool) *ApplicationQuery {
 func (aq *ApplicationQuery) Order(o ...application.OrderOption) *ApplicationQuery {
 	aq.order = append(aq.order, o...)
 	return aq
-}
-
-// QueryM2mGrant chains the current query on the "m2m_grant" edge.
-func (aq *ApplicationQuery) QueryM2mGrant() *M2MGrantQuery {
-	query := (&M2MGrantClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(application.Table, application.FieldID, selector),
-			sqlgraph.To(m2mgrant.Table, m2mgrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.M2mGrantTable, application.M2mGrantColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryCodeGrant chains the current query on the "code_grant" edge.
-func (aq *ApplicationQuery) QueryCodeGrant() *CodeGrantQuery {
-	query := (&CodeGrantClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(application.Table, application.FieldID, selector),
-			sqlgraph.To(codegrant.Table, codegrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.CodeGrantTable, application.CodeGrantColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // QueryCredentials chains the current query on the "credentials" edge.
@@ -347,36 +299,12 @@ func (aq *ApplicationQuery) Clone() *ApplicationQuery {
 		order:           append([]application.OrderOption{}, aq.order...),
 		inters:          append([]Interceptor{}, aq.inters...),
 		predicates:      append([]predicate.Application{}, aq.predicates...),
-		withM2mGrant:    aq.withM2mGrant.Clone(),
-		withCodeGrant:   aq.withCodeGrant.Clone(),
 		withCredentials: aq.withCredentials.Clone(),
 		withService:     aq.withService.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
-}
-
-// WithM2mGrant tells the query-builder to eager-load the nodes that are connected to
-// the "m2m_grant" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *ApplicationQuery) WithM2mGrant(opts ...func(*M2MGrantQuery)) *ApplicationQuery {
-	query := (&M2MGrantClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withM2mGrant = query
-	return aq
-}
-
-// WithCodeGrant tells the query-builder to eager-load the nodes that are connected to
-// the "code_grant" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *ApplicationQuery) WithCodeGrant(opts ...func(*CodeGrantQuery)) *ApplicationQuery {
-	query := (&CodeGrantClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withCodeGrant = query
-	return aq
 }
 
 // WithCredentials tells the query-builder to eager-load the nodes that are connected to
@@ -407,7 +335,7 @@ func (aq *ApplicationQuery) WithService(opts ...func(*ServiceQuery)) *Applicatio
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name"`
+//		Name string `json:"name" hcl:"name"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -430,7 +358,7 @@ func (aq *ApplicationQuery) GroupBy(field string, fields ...string) *Application
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name"`
+//		Name string `json:"name" hcl:"name"`
 //	}
 //
 //	client.Application.Query().
@@ -480,9 +408,7 @@ func (aq *ApplicationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		nodes       = []*Application{}
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
-		loadedTypes = [4]bool{
-			aq.withM2mGrant != nil,
-			aq.withCodeGrant != nil,
+		loadedTypes = [2]bool{
 			aq.withCredentials != nil,
 			aq.withService != nil,
 		}
@@ -511,18 +437,6 @@ func (aq *ApplicationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := aq.withM2mGrant; query != nil {
-		if err := aq.loadM2mGrant(ctx, query, nodes, nil,
-			func(n *Application, e *M2MGrant) { n.Edges.M2mGrant = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := aq.withCodeGrant; query != nil {
-		if err := aq.loadCodeGrant(ctx, query, nodes, nil,
-			func(n *Application, e *CodeGrant) { n.Edges.CodeGrant = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := aq.withCredentials; query != nil {
 		if err := aq.loadCredentials(ctx, query, nodes,
 			func(n *Application) { n.Edges.Credentials = []*Credentials{} },
@@ -539,62 +453,6 @@ func (aq *ApplicationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	return nodes, nil
 }
 
-func (aq *ApplicationQuery) loadM2mGrant(ctx context.Context, query *M2MGrantQuery, nodes []*Application, init func(*Application), assign func(*Application, *M2MGrant)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Application)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.M2MGrant(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(application.M2mGrantColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.application_m2m_grant
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "application_m2m_grant" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "application_m2m_grant" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (aq *ApplicationQuery) loadCodeGrant(ctx context.Context, query *CodeGrantQuery, nodes []*Application, init func(*Application), assign func(*Application, *CodeGrant)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*Application)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.CodeGrant(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(application.CodeGrantColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.application_code_grant
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "application_code_grant" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "application_code_grant" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (aq *ApplicationQuery) loadCredentials(ctx context.Context, query *CredentialsQuery, nodes []*Application, init func(*Application), assign func(*Application, *Credentials)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Application)

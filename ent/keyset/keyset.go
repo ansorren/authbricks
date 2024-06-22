@@ -12,19 +12,19 @@ const (
 	Label = "key_set"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// EdgeServiceConfig holds the string denoting the service_config edge name in mutations.
-	EdgeServiceConfig = "service_config"
+	// EdgeServices holds the string denoting the services edge name in mutations.
+	EdgeServices = "services"
 	// EdgeSigningKeys holds the string denoting the signing_keys edge name in mutations.
 	EdgeSigningKeys = "signing_keys"
 	// Table holds the table name of the keyset in the database.
 	Table = "key_sets"
-	// ServiceConfigTable is the table that holds the service_config relation/edge.
-	ServiceConfigTable = "key_sets"
-	// ServiceConfigInverseTable is the table name for the ServiceConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "serviceconfig" package.
-	ServiceConfigInverseTable = "service_configs"
-	// ServiceConfigColumn is the table column denoting the service_config relation/edge.
-	ServiceConfigColumn = "service_config_key_sets"
+	// ServicesTable is the table that holds the services relation/edge.
+	ServicesTable = "key_sets"
+	// ServicesInverseTable is the table name for the Service entity.
+	// It exists in this package in order to avoid circular dependency with the "service" package.
+	ServicesInverseTable = "services"
+	// ServicesColumn is the table column denoting the services relation/edge.
+	ServicesColumn = "service_key_sets"
 	// SigningKeysTable is the table that holds the signing_keys relation/edge.
 	SigningKeysTable = "signing_keys"
 	// SigningKeysInverseTable is the table name for the SigningKey entity.
@@ -42,7 +42,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "key_sets"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"service_config_key_sets",
+	"service_key_sets",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -73,10 +73,10 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByServiceConfigField orders the results by service_config field.
-func ByServiceConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByServicesField orders the results by services field.
+func ByServicesField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newServiceConfigStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newServicesStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -93,11 +93,11 @@ func BySigningKeys(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSigningKeysStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newServiceConfigStep() *sqlgraph.Step {
+func newServicesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ServiceConfigInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ServiceConfigTable, ServiceConfigColumn),
+		sqlgraph.To(ServicesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ServicesTable, ServicesColumn),
 	)
 }
 func newSigningKeysStep() *sqlgraph.Step {

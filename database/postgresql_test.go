@@ -13,7 +13,7 @@ import (
 func TestNewPostgres(t *testing.T) {
 	db, err := NewPostgres(context.Background(), "postgres://user:pass@localhost:5432/postgres?sslmode=disable")
 	require.Nil(t, err)
-	client := db.Client()
+	client := db.EntClient
 
 	creds, err := client.Credentials.Create().
 		SetID(uuid.New().String()).

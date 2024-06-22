@@ -10,8 +10,12 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
+	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
 
 // ServiceCreate is the builder for creating a Service entity.
@@ -33,9 +37,39 @@ func (sc *ServiceCreate) SetIssuer(s string) *ServiceCreate {
 	return sc
 }
 
+// SetDescription sets the "description" field.
+func (sc *ServiceCreate) SetDescription(s string) *ServiceCreate {
+	sc.mutation.SetDescription(s)
+	return sc
+}
+
 // SetScopes sets the "scopes" field.
 func (sc *ServiceCreate) SetScopes(s []string) *ServiceCreate {
 	sc.mutation.SetScopes(s)
+	return sc
+}
+
+// SetServiceMetadata sets the "service_metadata" field.
+func (sc *ServiceCreate) SetServiceMetadata(s string) *ServiceCreate {
+	sc.mutation.SetServiceMetadata(s)
+	return sc
+}
+
+// SetAllowedClientMetadata sets the "allowed_client_metadata" field.
+func (sc *ServiceCreate) SetAllowedClientMetadata(s []string) *ServiceCreate {
+	sc.mutation.SetAllowedClientMetadata(s)
+	return sc
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (sc *ServiceCreate) SetGrantTypes(s []string) *ServiceCreate {
+	sc.mutation.SetGrantTypes(s)
+	return sc
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (sc *ServiceCreate) SetResponseTypes(s []string) *ServiceCreate {
+	sc.mutation.SetResponseTypes(s)
 	return sc
 }
 
@@ -45,23 +79,95 @@ func (sc *ServiceCreate) SetID(s string) *ServiceCreate {
 	return sc
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (sc *ServiceCreate) SetServiceConfigID(id string) *ServiceCreate {
-	sc.mutation.SetServiceConfigID(id)
+// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
+func (sc *ServiceCreate) AddKeySetIDs(ids ...string) *ServiceCreate {
+	sc.mutation.AddKeySetIDs(ids...)
 	return sc
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (sc *ServiceCreate) SetNillableServiceConfigID(id *string) *ServiceCreate {
+// AddKeySets adds the "key_sets" edges to the KeySet entity.
+func (sc *ServiceCreate) AddKeySets(k ...*KeySet) *ServiceCreate {
+	ids := make([]string, len(k))
+	for i := range k {
+		ids[i] = k[i].ID
+	}
+	return sc.AddKeySetIDs(ids...)
+}
+
+// SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceAuthorizationEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceAuthorizationEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceAuthorizationEndpointConfigID(id *string) *ServiceCreate {
 	if id != nil {
-		sc = sc.SetServiceConfigID(*id)
+		sc = sc.SetServiceAuthorizationEndpointConfigID(*id)
 	}
 	return sc
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (sc *ServiceCreate) SetServiceConfig(s *ServiceConfig) *ServiceCreate {
-	return sc.SetServiceConfigID(s.ID)
+// SetServiceAuthorizationEndpointConfig sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceAuthorizationEndpointConfig(s *ServiceAuthorizationEndpointConfig) *ServiceCreate {
+	return sc.SetServiceAuthorizationEndpointConfigID(s.ID)
+}
+
+// SetServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceIntrospectionEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceIntrospectionEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceIntrospectionEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceIntrospectionEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceIntrospectionEndpointConfig sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceIntrospectionEndpointConfig(s *ServiceIntrospectionEndpointConfig) *ServiceCreate {
+	return sc.SetServiceIntrospectionEndpointConfigID(s.ID)
+}
+
+// SetServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceTokenEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceTokenEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceTokenEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceTokenEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceTokenEndpointConfig sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceTokenEndpointConfig(s *ServiceTokenEndpointConfig) *ServiceCreate {
+	return sc.SetServiceTokenEndpointConfigID(s.ID)
+}
+
+// SetServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceUserInfoEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceUserInfoEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceUserInfoEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceUserInfoEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceUserInfoEndpointConfig sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceUserInfoEndpointConfig(s *ServiceUserInfoEndpointConfig) *ServiceCreate {
+	return sc.SetServiceUserInfoEndpointConfigID(s.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -129,8 +235,23 @@ func (sc *ServiceCreate) check() error {
 			return &ValidationError{Name: "issuer", err: fmt.Errorf(`ent: validator failed for field "Service.issuer": %w`, err)}
 		}
 	}
+	if _, ok := sc.mutation.Description(); !ok {
+		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Service.description"`)}
+	}
 	if _, ok := sc.mutation.Scopes(); !ok {
 		return &ValidationError{Name: "scopes", err: errors.New(`ent: missing required field "Service.scopes"`)}
+	}
+	if _, ok := sc.mutation.ServiceMetadata(); !ok {
+		return &ValidationError{Name: "service_metadata", err: errors.New(`ent: missing required field "Service.service_metadata"`)}
+	}
+	if _, ok := sc.mutation.AllowedClientMetadata(); !ok {
+		return &ValidationError{Name: "allowed_client_metadata", err: errors.New(`ent: missing required field "Service.allowed_client_metadata"`)}
+	}
+	if _, ok := sc.mutation.GrantTypes(); !ok {
+		return &ValidationError{Name: "grant_types", err: errors.New(`ent: missing required field "Service.grant_types"`)}
+	}
+	if _, ok := sc.mutation.ResponseTypes(); !ok {
+		return &ValidationError{Name: "response_types", err: errors.New(`ent: missing required field "Service.response_types"`)}
 	}
 	if v, ok := sc.mutation.ID(); ok {
 		if err := service.IDValidator(v); err != nil {
@@ -180,19 +301,103 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 		_spec.SetField(service.FieldIssuer, field.TypeString, value)
 		_node.Issuer = value
 	}
+	if value, ok := sc.mutation.Description(); ok {
+		_spec.SetField(service.FieldDescription, field.TypeString, value)
+		_node.Description = value
+	}
 	if value, ok := sc.mutation.Scopes(); ok {
 		_spec.SetField(service.FieldScopes, field.TypeJSON, value)
 		_node.Scopes = value
 	}
-	if nodes := sc.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if value, ok := sc.mutation.ServiceMetadata(); ok {
+		_spec.SetField(service.FieldServiceMetadata, field.TypeString, value)
+		_node.ServiceMetadata = value
+	}
+	if value, ok := sc.mutation.AllowedClientMetadata(); ok {
+		_spec.SetField(service.FieldAllowedClientMetadata, field.TypeJSON, value)
+		_node.AllowedClientMetadata = value
+	}
+	if value, ok := sc.mutation.GrantTypes(); ok {
+		_spec.SetField(service.FieldGrantTypes, field.TypeJSON, value)
+		_node.GrantTypes = value
+	}
+	if value, ok := sc.mutation.ResponseTypes(); ok {
+		_spec.SetField(service.FieldResponseTypes, field.TypeJSON, value)
+		_node.ResponseTypes = value
+	}
+	if nodes := sc.mutation.KeySetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceAuthorizationEndpointConfigIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.ServiceConfigTable,
-			Columns: []string{service.ServiceConfigColumn},
+			Table:   service.ServiceAuthorizationEndpointConfigTable,
+			Columns: []string{service.ServiceAuthorizationEndpointConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(serviceauthorizationendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceIntrospectionEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceIntrospectionEndpointConfigTable,
+			Columns: []string{service.ServiceIntrospectionEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceintrospectionendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceTokenEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceTokenEndpointConfigTable,
+			Columns: []string{service.ServiceTokenEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicetokenendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceUserInfoEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceUserInfoEndpointConfigTable,
+			Columns: []string{service.ServiceUserInfoEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

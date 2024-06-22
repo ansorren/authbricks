@@ -18,14 +18,15 @@ import (
 	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
-	"go.authbricks.com/bricks/ent/codegrant"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/m2mgrant"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
 	"go.authbricks.com/bricks/ent/signingkey"
 	"go.authbricks.com/bricks/ent/standardclaims"
@@ -44,22 +45,24 @@ type Client struct {
 	AuthorizationCode *AuthorizationCodeClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
 	AuthorizationPayload *AuthorizationPayloadClient
-	// CodeGrant is the client for interacting with the CodeGrant builders.
-	CodeGrant *CodeGrantClient
 	// CookieStore is the client for interacting with the CookieStore builders.
 	CookieStore *CookieStoreClient
 	// Credentials is the client for interacting with the Credentials builders.
 	Credentials *CredentialsClient
 	// KeySet is the client for interacting with the KeySet builders.
 	KeySet *KeySetClient
-	// M2MGrant is the client for interacting with the M2MGrant builders.
-	M2MGrant *M2MGrantClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
 	// Service is the client for interacting with the Service builders.
 	Service *ServiceClient
-	// ServiceConfig is the client for interacting with the ServiceConfig builders.
-	ServiceConfig *ServiceConfigClient
+	// ServiceAuthorizationEndpointConfig is the client for interacting with the ServiceAuthorizationEndpointConfig builders.
+	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigClient
+	// ServiceIntrospectionEndpointConfig is the client for interacting with the ServiceIntrospectionEndpointConfig builders.
+	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigClient
+	// ServiceTokenEndpointConfig is the client for interacting with the ServiceTokenEndpointConfig builders.
+	ServiceTokenEndpointConfig *ServiceTokenEndpointConfigClient
+	// ServiceUserInfoEndpointConfig is the client for interacting with the ServiceUserInfoEndpointConfig builders.
+	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfigClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// SigningKey is the client for interacting with the SigningKey builders.
@@ -84,14 +87,15 @@ func (c *Client) init() {
 	c.Application = NewApplicationClient(c.config)
 	c.AuthorizationCode = NewAuthorizationCodeClient(c.config)
 	c.AuthorizationPayload = NewAuthorizationPayloadClient(c.config)
-	c.CodeGrant = NewCodeGrantClient(c.config)
 	c.CookieStore = NewCookieStoreClient(c.config)
 	c.Credentials = NewCredentialsClient(c.config)
 	c.KeySet = NewKeySetClient(c.config)
-	c.M2MGrant = NewM2MGrantClient(c.config)
 	c.RefreshToken = NewRefreshTokenClient(c.config)
 	c.Service = NewServiceClient(c.config)
-	c.ServiceConfig = NewServiceConfigClient(c.config)
+	c.ServiceAuthorizationEndpointConfig = NewServiceAuthorizationEndpointConfigClient(c.config)
+	c.ServiceIntrospectionEndpointConfig = NewServiceIntrospectionEndpointConfigClient(c.config)
+	c.ServiceTokenEndpointConfig = NewServiceTokenEndpointConfigClient(c.config)
+	c.ServiceUserInfoEndpointConfig = NewServiceUserInfoEndpointConfigClient(c.config)
 	c.Session = NewSessionClient(c.config)
 	c.SigningKey = NewSigningKeyClient(c.config)
 	c.StandardClaims = NewStandardClaimsClient(c.config)
@@ -187,24 +191,25 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                  ctx,
-		config:               cfg,
-		Application:          NewApplicationClient(cfg),
-		AuthorizationCode:    NewAuthorizationCodeClient(cfg),
-		AuthorizationPayload: NewAuthorizationPayloadClient(cfg),
-		CodeGrant:            NewCodeGrantClient(cfg),
-		CookieStore:          NewCookieStoreClient(cfg),
-		Credentials:          NewCredentialsClient(cfg),
-		KeySet:               NewKeySetClient(cfg),
-		M2MGrant:             NewM2MGrantClient(cfg),
-		RefreshToken:         NewRefreshTokenClient(cfg),
-		Service:              NewServiceClient(cfg),
-		ServiceConfig:        NewServiceConfigClient(cfg),
-		Session:              NewSessionClient(cfg),
-		SigningKey:           NewSigningKeyClient(cfg),
-		StandardClaims:       NewStandardClaimsClient(cfg),
-		User:                 NewUserClient(cfg),
-		UserPool:             NewUserPoolClient(cfg),
+		ctx:                                ctx,
+		config:                             cfg,
+		Application:                        NewApplicationClient(cfg),
+		AuthorizationCode:                  NewAuthorizationCodeClient(cfg),
+		AuthorizationPayload:               NewAuthorizationPayloadClient(cfg),
+		CookieStore:                        NewCookieStoreClient(cfg),
+		Credentials:                        NewCredentialsClient(cfg),
+		KeySet:                             NewKeySetClient(cfg),
+		RefreshToken:                       NewRefreshTokenClient(cfg),
+		Service:                            NewServiceClient(cfg),
+		ServiceAuthorizationEndpointConfig: NewServiceAuthorizationEndpointConfigClient(cfg),
+		ServiceIntrospectionEndpointConfig: NewServiceIntrospectionEndpointConfigClient(cfg),
+		ServiceTokenEndpointConfig:         NewServiceTokenEndpointConfigClient(cfg),
+		ServiceUserInfoEndpointConfig:      NewServiceUserInfoEndpointConfigClient(cfg),
+		Session:                            NewSessionClient(cfg),
+		SigningKey:                         NewSigningKeyClient(cfg),
+		StandardClaims:                     NewStandardClaimsClient(cfg),
+		User:                               NewUserClient(cfg),
+		UserPool:                           NewUserPoolClient(cfg),
 	}, nil
 }
 
@@ -222,24 +227,25 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:                  ctx,
-		config:               cfg,
-		Application:          NewApplicationClient(cfg),
-		AuthorizationCode:    NewAuthorizationCodeClient(cfg),
-		AuthorizationPayload: NewAuthorizationPayloadClient(cfg),
-		CodeGrant:            NewCodeGrantClient(cfg),
-		CookieStore:          NewCookieStoreClient(cfg),
-		Credentials:          NewCredentialsClient(cfg),
-		KeySet:               NewKeySetClient(cfg),
-		M2MGrant:             NewM2MGrantClient(cfg),
-		RefreshToken:         NewRefreshTokenClient(cfg),
-		Service:              NewServiceClient(cfg),
-		ServiceConfig:        NewServiceConfigClient(cfg),
-		Session:              NewSessionClient(cfg),
-		SigningKey:           NewSigningKeyClient(cfg),
-		StandardClaims:       NewStandardClaimsClient(cfg),
-		User:                 NewUserClient(cfg),
-		UserPool:             NewUserPoolClient(cfg),
+		ctx:                                ctx,
+		config:                             cfg,
+		Application:                        NewApplicationClient(cfg),
+		AuthorizationCode:                  NewAuthorizationCodeClient(cfg),
+		AuthorizationPayload:               NewAuthorizationPayloadClient(cfg),
+		CookieStore:                        NewCookieStoreClient(cfg),
+		Credentials:                        NewCredentialsClient(cfg),
+		KeySet:                             NewKeySetClient(cfg),
+		RefreshToken:                       NewRefreshTokenClient(cfg),
+		Service:                            NewServiceClient(cfg),
+		ServiceAuthorizationEndpointConfig: NewServiceAuthorizationEndpointConfigClient(cfg),
+		ServiceIntrospectionEndpointConfig: NewServiceIntrospectionEndpointConfigClient(cfg),
+		ServiceTokenEndpointConfig:         NewServiceTokenEndpointConfigClient(cfg),
+		ServiceUserInfoEndpointConfig:      NewServiceUserInfoEndpointConfigClient(cfg),
+		Session:                            NewSessionClient(cfg),
+		SigningKey:                         NewSigningKeyClient(cfg),
+		StandardClaims:                     NewStandardClaimsClient(cfg),
+		User:                               NewUserClient(cfg),
+		UserPool:                           NewUserPoolClient(cfg),
 	}, nil
 }
 
@@ -269,9 +275,11 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Application, c.AuthorizationCode, c.AuthorizationPayload, c.CodeGrant,
-		c.CookieStore, c.Credentials, c.KeySet, c.M2MGrant, c.RefreshToken, c.Service,
-		c.ServiceConfig, c.Session, c.SigningKey, c.StandardClaims, c.User, c.UserPool,
+		c.Application, c.AuthorizationCode, c.AuthorizationPayload, c.CookieStore,
+		c.Credentials, c.KeySet, c.RefreshToken, c.Service,
+		c.ServiceAuthorizationEndpointConfig, c.ServiceIntrospectionEndpointConfig,
+		c.ServiceTokenEndpointConfig, c.ServiceUserInfoEndpointConfig, c.Session,
+		c.SigningKey, c.StandardClaims, c.User, c.UserPool,
 	} {
 		n.Use(hooks...)
 	}
@@ -281,9 +289,11 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Application, c.AuthorizationCode, c.AuthorizationPayload, c.CodeGrant,
-		c.CookieStore, c.Credentials, c.KeySet, c.M2MGrant, c.RefreshToken, c.Service,
-		c.ServiceConfig, c.Session, c.SigningKey, c.StandardClaims, c.User, c.UserPool,
+		c.Application, c.AuthorizationCode, c.AuthorizationPayload, c.CookieStore,
+		c.Credentials, c.KeySet, c.RefreshToken, c.Service,
+		c.ServiceAuthorizationEndpointConfig, c.ServiceIntrospectionEndpointConfig,
+		c.ServiceTokenEndpointConfig, c.ServiceUserInfoEndpointConfig, c.Session,
+		c.SigningKey, c.StandardClaims, c.User, c.UserPool,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -298,22 +308,24 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AuthorizationCode.mutate(ctx, m)
 	case *AuthorizationPayloadMutation:
 		return c.AuthorizationPayload.mutate(ctx, m)
-	case *CodeGrantMutation:
-		return c.CodeGrant.mutate(ctx, m)
 	case *CookieStoreMutation:
 		return c.CookieStore.mutate(ctx, m)
 	case *CredentialsMutation:
 		return c.Credentials.mutate(ctx, m)
 	case *KeySetMutation:
 		return c.KeySet.mutate(ctx, m)
-	case *M2MGrantMutation:
-		return c.M2MGrant.mutate(ctx, m)
 	case *RefreshTokenMutation:
 		return c.RefreshToken.mutate(ctx, m)
 	case *ServiceMutation:
 		return c.Service.mutate(ctx, m)
-	case *ServiceConfigMutation:
-		return c.ServiceConfig.mutate(ctx, m)
+	case *ServiceAuthorizationEndpointConfigMutation:
+		return c.ServiceAuthorizationEndpointConfig.mutate(ctx, m)
+	case *ServiceIntrospectionEndpointConfigMutation:
+		return c.ServiceIntrospectionEndpointConfig.mutate(ctx, m)
+	case *ServiceTokenEndpointConfigMutation:
+		return c.ServiceTokenEndpointConfig.mutate(ctx, m)
+	case *ServiceUserInfoEndpointConfigMutation:
+		return c.ServiceUserInfoEndpointConfig.mutate(ctx, m)
 	case *SessionMutation:
 		return c.Session.mutate(ctx, m)
 	case *SigningKeyMutation:
@@ -435,38 +447,6 @@ func (c *ApplicationClient) GetX(ctx context.Context, id string) *Application {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryM2mGrant queries the m2m_grant edge of a Application.
-func (c *ApplicationClient) QueryM2mGrant(a *Application) *M2MGrantQuery {
-	query := (&M2MGrantClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(application.Table, application.FieldID, id),
-			sqlgraph.To(m2mgrant.Table, m2mgrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.M2mGrantTable, application.M2mGrantColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCodeGrant queries the code_grant edge of a Application.
-func (c *ApplicationClient) QueryCodeGrant(a *Application) *CodeGrantQuery {
-	query := (&CodeGrantClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(application.Table, application.FieldID, id),
-			sqlgraph.To(codegrant.Table, codegrant.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, application.CodeGrantTable, application.CodeGrantColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // QueryCredentials queries the credentials edge of a Application.
@@ -805,155 +785,6 @@ func (c *AuthorizationPayloadClient) mutate(ctx context.Context, m *Authorizatio
 		return (&AuthorizationPayloadDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AuthorizationPayload mutation op: %q", m.Op())
-	}
-}
-
-// CodeGrantClient is a client for the CodeGrant schema.
-type CodeGrantClient struct {
-	config
-}
-
-// NewCodeGrantClient returns a client for the CodeGrant from the given config.
-func NewCodeGrantClient(c config) *CodeGrantClient {
-	return &CodeGrantClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `codegrant.Hooks(f(g(h())))`.
-func (c *CodeGrantClient) Use(hooks ...Hook) {
-	c.hooks.CodeGrant = append(c.hooks.CodeGrant, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `codegrant.Intercept(f(g(h())))`.
-func (c *CodeGrantClient) Intercept(interceptors ...Interceptor) {
-	c.inters.CodeGrant = append(c.inters.CodeGrant, interceptors...)
-}
-
-// Create returns a builder for creating a CodeGrant entity.
-func (c *CodeGrantClient) Create() *CodeGrantCreate {
-	mutation := newCodeGrantMutation(c.config, OpCreate)
-	return &CodeGrantCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of CodeGrant entities.
-func (c *CodeGrantClient) CreateBulk(builders ...*CodeGrantCreate) *CodeGrantCreateBulk {
-	return &CodeGrantCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *CodeGrantClient) MapCreateBulk(slice any, setFunc func(*CodeGrantCreate, int)) *CodeGrantCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &CodeGrantCreateBulk{err: fmt.Errorf("calling to CodeGrantClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*CodeGrantCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &CodeGrantCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for CodeGrant.
-func (c *CodeGrantClient) Update() *CodeGrantUpdate {
-	mutation := newCodeGrantMutation(c.config, OpUpdate)
-	return &CodeGrantUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *CodeGrantClient) UpdateOne(cg *CodeGrant) *CodeGrantUpdateOne {
-	mutation := newCodeGrantMutation(c.config, OpUpdateOne, withCodeGrant(cg))
-	return &CodeGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *CodeGrantClient) UpdateOneID(id string) *CodeGrantUpdateOne {
-	mutation := newCodeGrantMutation(c.config, OpUpdateOne, withCodeGrantID(id))
-	return &CodeGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for CodeGrant.
-func (c *CodeGrantClient) Delete() *CodeGrantDelete {
-	mutation := newCodeGrantMutation(c.config, OpDelete)
-	return &CodeGrantDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *CodeGrantClient) DeleteOne(cg *CodeGrant) *CodeGrantDeleteOne {
-	return c.DeleteOneID(cg.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CodeGrantClient) DeleteOneID(id string) *CodeGrantDeleteOne {
-	builder := c.Delete().Where(codegrant.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &CodeGrantDeleteOne{builder}
-}
-
-// Query returns a query builder for CodeGrant.
-func (c *CodeGrantClient) Query() *CodeGrantQuery {
-	return &CodeGrantQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeCodeGrant},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a CodeGrant entity by its id.
-func (c *CodeGrantClient) Get(ctx context.Context, id string) (*CodeGrant, error) {
-	return c.Query().Where(codegrant.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *CodeGrantClient) GetX(ctx context.Context, id string) *CodeGrant {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryApplication queries the application edge of a CodeGrant.
-func (c *CodeGrantClient) QueryApplication(cg *CodeGrant) *ApplicationQuery {
-	query := (&ApplicationClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cg.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(codegrant.Table, codegrant.FieldID, id),
-			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, codegrant.ApplicationTable, codegrant.ApplicationColumn),
-		)
-		fromV = sqlgraph.Neighbors(cg.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *CodeGrantClient) Hooks() []Hook {
-	return c.hooks.CodeGrant
-}
-
-// Interceptors returns the client interceptors.
-func (c *CodeGrantClient) Interceptors() []Interceptor {
-	return c.inters.CodeGrant
-}
-
-func (c *CodeGrantClient) mutate(ctx context.Context, m *CodeGrantMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&CodeGrantCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&CodeGrantUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&CodeGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&CodeGrantDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown CodeGrant mutation op: %q", m.Op())
 	}
 }
 
@@ -1347,15 +1178,15 @@ func (c *KeySetClient) GetX(ctx context.Context, id string) *KeySet {
 	return obj
 }
 
-// QueryServiceConfig queries the service_config edge of a KeySet.
-func (c *KeySetClient) QueryServiceConfig(ks *KeySet) *ServiceConfigQuery {
-	query := (&ServiceConfigClient{config: c.config}).Query()
+// QueryServices queries the services edge of a KeySet.
+func (c *KeySetClient) QueryServices(ks *KeySet) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ks.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(keyset.Table, keyset.FieldID, id),
-			sqlgraph.To(serviceconfig.Table, serviceconfig.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServiceConfigTable, keyset.ServiceConfigColumn),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServicesTable, keyset.ServicesColumn),
 		)
 		fromV = sqlgraph.Neighbors(ks.driver.Dialect(), step)
 		return fromV, nil
@@ -1401,155 +1232,6 @@ func (c *KeySetClient) mutate(ctx context.Context, m *KeySetMutation) (Value, er
 		return (&KeySetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown KeySet mutation op: %q", m.Op())
-	}
-}
-
-// M2MGrantClient is a client for the M2MGrant schema.
-type M2MGrantClient struct {
-	config
-}
-
-// NewM2MGrantClient returns a client for the M2MGrant from the given config.
-func NewM2MGrantClient(c config) *M2MGrantClient {
-	return &M2MGrantClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `m2mgrant.Hooks(f(g(h())))`.
-func (c *M2MGrantClient) Use(hooks ...Hook) {
-	c.hooks.M2MGrant = append(c.hooks.M2MGrant, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `m2mgrant.Intercept(f(g(h())))`.
-func (c *M2MGrantClient) Intercept(interceptors ...Interceptor) {
-	c.inters.M2MGrant = append(c.inters.M2MGrant, interceptors...)
-}
-
-// Create returns a builder for creating a M2MGrant entity.
-func (c *M2MGrantClient) Create() *M2MGrantCreate {
-	mutation := newM2MGrantMutation(c.config, OpCreate)
-	return &M2MGrantCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of M2MGrant entities.
-func (c *M2MGrantClient) CreateBulk(builders ...*M2MGrantCreate) *M2MGrantCreateBulk {
-	return &M2MGrantCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *M2MGrantClient) MapCreateBulk(slice any, setFunc func(*M2MGrantCreate, int)) *M2MGrantCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &M2MGrantCreateBulk{err: fmt.Errorf("calling to M2MGrantClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*M2MGrantCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &M2MGrantCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for M2MGrant.
-func (c *M2MGrantClient) Update() *M2MGrantUpdate {
-	mutation := newM2MGrantMutation(c.config, OpUpdate)
-	return &M2MGrantUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *M2MGrantClient) UpdateOne(mg *M2MGrant) *M2MGrantUpdateOne {
-	mutation := newM2MGrantMutation(c.config, OpUpdateOne, withM2MGrant(mg))
-	return &M2MGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *M2MGrantClient) UpdateOneID(id string) *M2MGrantUpdateOne {
-	mutation := newM2MGrantMutation(c.config, OpUpdateOne, withM2MGrantID(id))
-	return &M2MGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for M2MGrant.
-func (c *M2MGrantClient) Delete() *M2MGrantDelete {
-	mutation := newM2MGrantMutation(c.config, OpDelete)
-	return &M2MGrantDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *M2MGrantClient) DeleteOne(mg *M2MGrant) *M2MGrantDeleteOne {
-	return c.DeleteOneID(mg.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *M2MGrantClient) DeleteOneID(id string) *M2MGrantDeleteOne {
-	builder := c.Delete().Where(m2mgrant.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &M2MGrantDeleteOne{builder}
-}
-
-// Query returns a query builder for M2MGrant.
-func (c *M2MGrantClient) Query() *M2MGrantQuery {
-	return &M2MGrantQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeM2MGrant},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a M2MGrant entity by its id.
-func (c *M2MGrantClient) Get(ctx context.Context, id string) (*M2MGrant, error) {
-	return c.Query().Where(m2mgrant.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *M2MGrantClient) GetX(ctx context.Context, id string) *M2MGrant {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryApplication queries the application edge of a M2MGrant.
-func (c *M2MGrantClient) QueryApplication(mg *M2MGrant) *ApplicationQuery {
-	query := (&ApplicationClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mg.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(m2mgrant.Table, m2mgrant.FieldID, id),
-			sqlgraph.To(application.Table, application.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, m2mgrant.ApplicationTable, m2mgrant.ApplicationColumn),
-		)
-		fromV = sqlgraph.Neighbors(mg.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *M2MGrantClient) Hooks() []Hook {
-	return c.hooks.M2MGrant
-}
-
-// Interceptors returns the client interceptors.
-func (c *M2MGrantClient) Interceptors() []Interceptor {
-	return c.inters.M2MGrant
-}
-
-func (c *M2MGrantClient) mutate(ctx context.Context, m *M2MGrantMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&M2MGrantCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&M2MGrantUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&M2MGrantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&M2MGrantDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown M2MGrant mutation op: %q", m.Op())
 	}
 }
 
@@ -1794,15 +1476,79 @@ func (c *ServiceClient) GetX(ctx context.Context, id string) *Service {
 	return obj
 }
 
-// QueryServiceConfig queries the service_config edge of a Service.
-func (c *ServiceClient) QueryServiceConfig(s *Service) *ServiceConfigQuery {
-	query := (&ServiceConfigClient{config: c.config}).Query()
+// QueryKeySets queries the key_sets edge of a Service.
+func (c *ServiceClient) QueryKeySets(s *Service) *KeySetQuery {
+	query := (&KeySetClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, id),
-			sqlgraph.To(serviceconfig.Table, serviceconfig.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceConfigTable, service.ServiceConfigColumn),
+			sqlgraph.To(keyset.Table, keyset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, service.KeySetsTable, service.KeySetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceAuthorizationEndpointConfig queries the service_authorization_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceAuthorizationEndpointConfig(s *Service) *ServiceAuthorizationEndpointConfigQuery {
+	query := (&ServiceAuthorizationEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(serviceauthorizationendpointconfig.Table, serviceauthorizationendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceAuthorizationEndpointConfigTable, service.ServiceAuthorizationEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceIntrospectionEndpointConfig queries the service_introspection_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceIntrospectionEndpointConfig(s *Service) *ServiceIntrospectionEndpointConfigQuery {
+	query := (&ServiceIntrospectionEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(serviceintrospectionendpointconfig.Table, serviceintrospectionendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceIntrospectionEndpointConfigTable, service.ServiceIntrospectionEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceTokenEndpointConfig queries the service_token_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceTokenEndpointConfig(s *Service) *ServiceTokenEndpointConfigQuery {
+	query := (&ServiceTokenEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(servicetokenendpointconfig.Table, servicetokenendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceTokenEndpointConfigTable, service.ServiceTokenEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceUserInfoEndpointConfig queries the service_user_info_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceUserInfoEndpointConfig(s *Service) *ServiceUserInfoEndpointConfigQuery {
+	query := (&ServiceUserInfoEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(serviceuserinfoendpointconfig.Table, serviceuserinfoendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceUserInfoEndpointConfigTable, service.ServiceUserInfoEndpointConfigColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1851,107 +1597,107 @@ func (c *ServiceClient) mutate(ctx context.Context, m *ServiceMutation) (Value, 
 	}
 }
 
-// ServiceConfigClient is a client for the ServiceConfig schema.
-type ServiceConfigClient struct {
+// ServiceAuthorizationEndpointConfigClient is a client for the ServiceAuthorizationEndpointConfig schema.
+type ServiceAuthorizationEndpointConfigClient struct {
 	config
 }
 
-// NewServiceConfigClient returns a client for the ServiceConfig from the given config.
-func NewServiceConfigClient(c config) *ServiceConfigClient {
-	return &ServiceConfigClient{config: c}
+// NewServiceAuthorizationEndpointConfigClient returns a client for the ServiceAuthorizationEndpointConfig from the given config.
+func NewServiceAuthorizationEndpointConfigClient(c config) *ServiceAuthorizationEndpointConfigClient {
+	return &ServiceAuthorizationEndpointConfigClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `serviceconfig.Hooks(f(g(h())))`.
-func (c *ServiceConfigClient) Use(hooks ...Hook) {
-	c.hooks.ServiceConfig = append(c.hooks.ServiceConfig, hooks...)
+// A call to `Use(f, g, h)` equals to `serviceauthorizationendpointconfig.Hooks(f(g(h())))`.
+func (c *ServiceAuthorizationEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.ServiceAuthorizationEndpointConfig = append(c.hooks.ServiceAuthorizationEndpointConfig, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `serviceconfig.Intercept(f(g(h())))`.
-func (c *ServiceConfigClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ServiceConfig = append(c.inters.ServiceConfig, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `serviceauthorizationendpointconfig.Intercept(f(g(h())))`.
+func (c *ServiceAuthorizationEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ServiceAuthorizationEndpointConfig = append(c.inters.ServiceAuthorizationEndpointConfig, interceptors...)
 }
 
-// Create returns a builder for creating a ServiceConfig entity.
-func (c *ServiceConfigClient) Create() *ServiceConfigCreate {
-	mutation := newServiceConfigMutation(c.config, OpCreate)
-	return &ServiceConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a ServiceAuthorizationEndpointConfig entity.
+func (c *ServiceAuthorizationEndpointConfigClient) Create() *ServiceAuthorizationEndpointConfigCreate {
+	mutation := newServiceAuthorizationEndpointConfigMutation(c.config, OpCreate)
+	return &ServiceAuthorizationEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ServiceConfig entities.
-func (c *ServiceConfigClient) CreateBulk(builders ...*ServiceConfigCreate) *ServiceConfigCreateBulk {
-	return &ServiceConfigCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of ServiceAuthorizationEndpointConfig entities.
+func (c *ServiceAuthorizationEndpointConfigClient) CreateBulk(builders ...*ServiceAuthorizationEndpointConfigCreate) *ServiceAuthorizationEndpointConfigCreateBulk {
+	return &ServiceAuthorizationEndpointConfigCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *ServiceConfigClient) MapCreateBulk(slice any, setFunc func(*ServiceConfigCreate, int)) *ServiceConfigCreateBulk {
+func (c *ServiceAuthorizationEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*ServiceAuthorizationEndpointConfigCreate, int)) *ServiceAuthorizationEndpointConfigCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &ServiceConfigCreateBulk{err: fmt.Errorf("calling to ServiceConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &ServiceAuthorizationEndpointConfigCreateBulk{err: fmt.Errorf("calling to ServiceAuthorizationEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*ServiceConfigCreate, rv.Len())
+	builders := make([]*ServiceAuthorizationEndpointConfigCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &ServiceConfigCreateBulk{config: c.config, builders: builders}
+	return &ServiceAuthorizationEndpointConfigCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ServiceConfig.
-func (c *ServiceConfigClient) Update() *ServiceConfigUpdate {
-	mutation := newServiceConfigMutation(c.config, OpUpdate)
-	return &ServiceConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for ServiceAuthorizationEndpointConfig.
+func (c *ServiceAuthorizationEndpointConfigClient) Update() *ServiceAuthorizationEndpointConfigUpdate {
+	mutation := newServiceAuthorizationEndpointConfigMutation(c.config, OpUpdate)
+	return &ServiceAuthorizationEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ServiceConfigClient) UpdateOne(sc *ServiceConfig) *ServiceConfigUpdateOne {
-	mutation := newServiceConfigMutation(c.config, OpUpdateOne, withServiceConfig(sc))
-	return &ServiceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ServiceAuthorizationEndpointConfigClient) UpdateOne(saec *ServiceAuthorizationEndpointConfig) *ServiceAuthorizationEndpointConfigUpdateOne {
+	mutation := newServiceAuthorizationEndpointConfigMutation(c.config, OpUpdateOne, withServiceAuthorizationEndpointConfig(saec))
+	return &ServiceAuthorizationEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ServiceConfigClient) UpdateOneID(id string) *ServiceConfigUpdateOne {
-	mutation := newServiceConfigMutation(c.config, OpUpdateOne, withServiceConfigID(id))
-	return &ServiceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ServiceAuthorizationEndpointConfigClient) UpdateOneID(id string) *ServiceAuthorizationEndpointConfigUpdateOne {
+	mutation := newServiceAuthorizationEndpointConfigMutation(c.config, OpUpdateOne, withServiceAuthorizationEndpointConfigID(id))
+	return &ServiceAuthorizationEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ServiceConfig.
-func (c *ServiceConfigClient) Delete() *ServiceConfigDelete {
-	mutation := newServiceConfigMutation(c.config, OpDelete)
-	return &ServiceConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for ServiceAuthorizationEndpointConfig.
+func (c *ServiceAuthorizationEndpointConfigClient) Delete() *ServiceAuthorizationEndpointConfigDelete {
+	mutation := newServiceAuthorizationEndpointConfigMutation(c.config, OpDelete)
+	return &ServiceAuthorizationEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ServiceConfigClient) DeleteOne(sc *ServiceConfig) *ServiceConfigDeleteOne {
-	return c.DeleteOneID(sc.ID)
+func (c *ServiceAuthorizationEndpointConfigClient) DeleteOne(saec *ServiceAuthorizationEndpointConfig) *ServiceAuthorizationEndpointConfigDeleteOne {
+	return c.DeleteOneID(saec.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ServiceConfigClient) DeleteOneID(id string) *ServiceConfigDeleteOne {
-	builder := c.Delete().Where(serviceconfig.ID(id))
+func (c *ServiceAuthorizationEndpointConfigClient) DeleteOneID(id string) *ServiceAuthorizationEndpointConfigDeleteOne {
+	builder := c.Delete().Where(serviceauthorizationendpointconfig.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ServiceConfigDeleteOne{builder}
+	return &ServiceAuthorizationEndpointConfigDeleteOne{builder}
 }
 
-// Query returns a query builder for ServiceConfig.
-func (c *ServiceConfigClient) Query() *ServiceConfigQuery {
-	return &ServiceConfigQuery{
+// Query returns a query builder for ServiceAuthorizationEndpointConfig.
+func (c *ServiceAuthorizationEndpointConfigClient) Query() *ServiceAuthorizationEndpointConfigQuery {
+	return &ServiceAuthorizationEndpointConfigQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeServiceConfig},
+		ctx:    &QueryContext{Type: TypeServiceAuthorizationEndpointConfig},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ServiceConfig entity by its id.
-func (c *ServiceConfigClient) Get(ctx context.Context, id string) (*ServiceConfig, error) {
-	return c.Query().Where(serviceconfig.ID(id)).Only(ctx)
+// Get returns a ServiceAuthorizationEndpointConfig entity by its id.
+func (c *ServiceAuthorizationEndpointConfigClient) Get(ctx context.Context, id string) (*ServiceAuthorizationEndpointConfig, error) {
+	return c.Query().Where(serviceauthorizationendpointconfig.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ServiceConfigClient) GetX(ctx context.Context, id string) *ServiceConfig {
+func (c *ServiceAuthorizationEndpointConfigClient) GetX(ctx context.Context, id string) *ServiceAuthorizationEndpointConfig {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1959,60 +1705,491 @@ func (c *ServiceConfigClient) GetX(ctx context.Context, id string) *ServiceConfi
 	return obj
 }
 
-// QueryService queries the service edge of a ServiceConfig.
-func (c *ServiceConfigClient) QueryService(sc *ServiceConfig) *ServiceQuery {
+// QueryService queries the service edge of a ServiceAuthorizationEndpointConfig.
+func (c *ServiceAuthorizationEndpointConfigClient) QueryService(saec *ServiceAuthorizationEndpointConfig) *ServiceQuery {
 	query := (&ServiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := sc.ID
+		id := saec.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(serviceconfig.Table, serviceconfig.FieldID, id),
+			sqlgraph.From(serviceauthorizationendpointconfig.Table, serviceauthorizationendpointconfig.FieldID, id),
 			sqlgraph.To(service.Table, service.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, serviceconfig.ServiceTable, serviceconfig.ServiceColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, serviceauthorizationendpointconfig.ServiceTable, serviceauthorizationendpointconfig.ServiceColumn),
 		)
-		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryKeySets queries the key_sets edge of a ServiceConfig.
-func (c *ServiceConfigClient) QueryKeySets(sc *ServiceConfig) *KeySetQuery {
-	query := (&KeySetClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := sc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(serviceconfig.Table, serviceconfig.FieldID, id),
-			sqlgraph.To(keyset.Table, keyset.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, serviceconfig.KeySetsTable, serviceconfig.KeySetsColumn),
-		)
-		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(saec.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *ServiceConfigClient) Hooks() []Hook {
-	return c.hooks.ServiceConfig
+func (c *ServiceAuthorizationEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.ServiceAuthorizationEndpointConfig
 }
 
 // Interceptors returns the client interceptors.
-func (c *ServiceConfigClient) Interceptors() []Interceptor {
-	return c.inters.ServiceConfig
+func (c *ServiceAuthorizationEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.ServiceAuthorizationEndpointConfig
 }
 
-func (c *ServiceConfigClient) mutate(ctx context.Context, m *ServiceConfigMutation) (Value, error) {
+func (c *ServiceAuthorizationEndpointConfigClient) mutate(ctx context.Context, m *ServiceAuthorizationEndpointConfigMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ServiceConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ServiceAuthorizationEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ServiceConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ServiceAuthorizationEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ServiceConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ServiceAuthorizationEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ServiceConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ServiceAuthorizationEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown ServiceConfig mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown ServiceAuthorizationEndpointConfig mutation op: %q", m.Op())
+	}
+}
+
+// ServiceIntrospectionEndpointConfigClient is a client for the ServiceIntrospectionEndpointConfig schema.
+type ServiceIntrospectionEndpointConfigClient struct {
+	config
+}
+
+// NewServiceIntrospectionEndpointConfigClient returns a client for the ServiceIntrospectionEndpointConfig from the given config.
+func NewServiceIntrospectionEndpointConfigClient(c config) *ServiceIntrospectionEndpointConfigClient {
+	return &ServiceIntrospectionEndpointConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `serviceintrospectionendpointconfig.Hooks(f(g(h())))`.
+func (c *ServiceIntrospectionEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.ServiceIntrospectionEndpointConfig = append(c.hooks.ServiceIntrospectionEndpointConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `serviceintrospectionendpointconfig.Intercept(f(g(h())))`.
+func (c *ServiceIntrospectionEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ServiceIntrospectionEndpointConfig = append(c.inters.ServiceIntrospectionEndpointConfig, interceptors...)
+}
+
+// Create returns a builder for creating a ServiceIntrospectionEndpointConfig entity.
+func (c *ServiceIntrospectionEndpointConfigClient) Create() *ServiceIntrospectionEndpointConfigCreate {
+	mutation := newServiceIntrospectionEndpointConfigMutation(c.config, OpCreate)
+	return &ServiceIntrospectionEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ServiceIntrospectionEndpointConfig entities.
+func (c *ServiceIntrospectionEndpointConfigClient) CreateBulk(builders ...*ServiceIntrospectionEndpointConfigCreate) *ServiceIntrospectionEndpointConfigCreateBulk {
+	return &ServiceIntrospectionEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ServiceIntrospectionEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*ServiceIntrospectionEndpointConfigCreate, int)) *ServiceIntrospectionEndpointConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ServiceIntrospectionEndpointConfigCreateBulk{err: fmt.Errorf("calling to ServiceIntrospectionEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ServiceIntrospectionEndpointConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ServiceIntrospectionEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ServiceIntrospectionEndpointConfig.
+func (c *ServiceIntrospectionEndpointConfigClient) Update() *ServiceIntrospectionEndpointConfigUpdate {
+	mutation := newServiceIntrospectionEndpointConfigMutation(c.config, OpUpdate)
+	return &ServiceIntrospectionEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ServiceIntrospectionEndpointConfigClient) UpdateOne(siec *ServiceIntrospectionEndpointConfig) *ServiceIntrospectionEndpointConfigUpdateOne {
+	mutation := newServiceIntrospectionEndpointConfigMutation(c.config, OpUpdateOne, withServiceIntrospectionEndpointConfig(siec))
+	return &ServiceIntrospectionEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ServiceIntrospectionEndpointConfigClient) UpdateOneID(id string) *ServiceIntrospectionEndpointConfigUpdateOne {
+	mutation := newServiceIntrospectionEndpointConfigMutation(c.config, OpUpdateOne, withServiceIntrospectionEndpointConfigID(id))
+	return &ServiceIntrospectionEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ServiceIntrospectionEndpointConfig.
+func (c *ServiceIntrospectionEndpointConfigClient) Delete() *ServiceIntrospectionEndpointConfigDelete {
+	mutation := newServiceIntrospectionEndpointConfigMutation(c.config, OpDelete)
+	return &ServiceIntrospectionEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ServiceIntrospectionEndpointConfigClient) DeleteOne(siec *ServiceIntrospectionEndpointConfig) *ServiceIntrospectionEndpointConfigDeleteOne {
+	return c.DeleteOneID(siec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ServiceIntrospectionEndpointConfigClient) DeleteOneID(id string) *ServiceIntrospectionEndpointConfigDeleteOne {
+	builder := c.Delete().Where(serviceintrospectionendpointconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ServiceIntrospectionEndpointConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for ServiceIntrospectionEndpointConfig.
+func (c *ServiceIntrospectionEndpointConfigClient) Query() *ServiceIntrospectionEndpointConfigQuery {
+	return &ServiceIntrospectionEndpointConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeServiceIntrospectionEndpointConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ServiceIntrospectionEndpointConfig entity by its id.
+func (c *ServiceIntrospectionEndpointConfigClient) Get(ctx context.Context, id string) (*ServiceIntrospectionEndpointConfig, error) {
+	return c.Query().Where(serviceintrospectionendpointconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ServiceIntrospectionEndpointConfigClient) GetX(ctx context.Context, id string) *ServiceIntrospectionEndpointConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a ServiceIntrospectionEndpointConfig.
+func (c *ServiceIntrospectionEndpointConfigClient) QueryService(siec *ServiceIntrospectionEndpointConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := siec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(serviceintrospectionendpointconfig.Table, serviceintrospectionendpointconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, serviceintrospectionendpointconfig.ServiceTable, serviceintrospectionendpointconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(siec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ServiceIntrospectionEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.ServiceIntrospectionEndpointConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *ServiceIntrospectionEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.ServiceIntrospectionEndpointConfig
+}
+
+func (c *ServiceIntrospectionEndpointConfigClient) mutate(ctx context.Context, m *ServiceIntrospectionEndpointConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ServiceIntrospectionEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ServiceIntrospectionEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ServiceIntrospectionEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ServiceIntrospectionEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ServiceIntrospectionEndpointConfig mutation op: %q", m.Op())
+	}
+}
+
+// ServiceTokenEndpointConfigClient is a client for the ServiceTokenEndpointConfig schema.
+type ServiceTokenEndpointConfigClient struct {
+	config
+}
+
+// NewServiceTokenEndpointConfigClient returns a client for the ServiceTokenEndpointConfig from the given config.
+func NewServiceTokenEndpointConfigClient(c config) *ServiceTokenEndpointConfigClient {
+	return &ServiceTokenEndpointConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `servicetokenendpointconfig.Hooks(f(g(h())))`.
+func (c *ServiceTokenEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.ServiceTokenEndpointConfig = append(c.hooks.ServiceTokenEndpointConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `servicetokenendpointconfig.Intercept(f(g(h())))`.
+func (c *ServiceTokenEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ServiceTokenEndpointConfig = append(c.inters.ServiceTokenEndpointConfig, interceptors...)
+}
+
+// Create returns a builder for creating a ServiceTokenEndpointConfig entity.
+func (c *ServiceTokenEndpointConfigClient) Create() *ServiceTokenEndpointConfigCreate {
+	mutation := newServiceTokenEndpointConfigMutation(c.config, OpCreate)
+	return &ServiceTokenEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ServiceTokenEndpointConfig entities.
+func (c *ServiceTokenEndpointConfigClient) CreateBulk(builders ...*ServiceTokenEndpointConfigCreate) *ServiceTokenEndpointConfigCreateBulk {
+	return &ServiceTokenEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ServiceTokenEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*ServiceTokenEndpointConfigCreate, int)) *ServiceTokenEndpointConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ServiceTokenEndpointConfigCreateBulk{err: fmt.Errorf("calling to ServiceTokenEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ServiceTokenEndpointConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ServiceTokenEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ServiceTokenEndpointConfig.
+func (c *ServiceTokenEndpointConfigClient) Update() *ServiceTokenEndpointConfigUpdate {
+	mutation := newServiceTokenEndpointConfigMutation(c.config, OpUpdate)
+	return &ServiceTokenEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ServiceTokenEndpointConfigClient) UpdateOne(stec *ServiceTokenEndpointConfig) *ServiceTokenEndpointConfigUpdateOne {
+	mutation := newServiceTokenEndpointConfigMutation(c.config, OpUpdateOne, withServiceTokenEndpointConfig(stec))
+	return &ServiceTokenEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ServiceTokenEndpointConfigClient) UpdateOneID(id string) *ServiceTokenEndpointConfigUpdateOne {
+	mutation := newServiceTokenEndpointConfigMutation(c.config, OpUpdateOne, withServiceTokenEndpointConfigID(id))
+	return &ServiceTokenEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ServiceTokenEndpointConfig.
+func (c *ServiceTokenEndpointConfigClient) Delete() *ServiceTokenEndpointConfigDelete {
+	mutation := newServiceTokenEndpointConfigMutation(c.config, OpDelete)
+	return &ServiceTokenEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ServiceTokenEndpointConfigClient) DeleteOne(stec *ServiceTokenEndpointConfig) *ServiceTokenEndpointConfigDeleteOne {
+	return c.DeleteOneID(stec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ServiceTokenEndpointConfigClient) DeleteOneID(id string) *ServiceTokenEndpointConfigDeleteOne {
+	builder := c.Delete().Where(servicetokenendpointconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ServiceTokenEndpointConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for ServiceTokenEndpointConfig.
+func (c *ServiceTokenEndpointConfigClient) Query() *ServiceTokenEndpointConfigQuery {
+	return &ServiceTokenEndpointConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeServiceTokenEndpointConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ServiceTokenEndpointConfig entity by its id.
+func (c *ServiceTokenEndpointConfigClient) Get(ctx context.Context, id string) (*ServiceTokenEndpointConfig, error) {
+	return c.Query().Where(servicetokenendpointconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ServiceTokenEndpointConfigClient) GetX(ctx context.Context, id string) *ServiceTokenEndpointConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a ServiceTokenEndpointConfig.
+func (c *ServiceTokenEndpointConfigClient) QueryService(stec *ServiceTokenEndpointConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := stec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(servicetokenendpointconfig.Table, servicetokenendpointconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, servicetokenendpointconfig.ServiceTable, servicetokenendpointconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(stec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ServiceTokenEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.ServiceTokenEndpointConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *ServiceTokenEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.ServiceTokenEndpointConfig
+}
+
+func (c *ServiceTokenEndpointConfigClient) mutate(ctx context.Context, m *ServiceTokenEndpointConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ServiceTokenEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ServiceTokenEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ServiceTokenEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ServiceTokenEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ServiceTokenEndpointConfig mutation op: %q", m.Op())
+	}
+}
+
+// ServiceUserInfoEndpointConfigClient is a client for the ServiceUserInfoEndpointConfig schema.
+type ServiceUserInfoEndpointConfigClient struct {
+	config
+}
+
+// NewServiceUserInfoEndpointConfigClient returns a client for the ServiceUserInfoEndpointConfig from the given config.
+func NewServiceUserInfoEndpointConfigClient(c config) *ServiceUserInfoEndpointConfigClient {
+	return &ServiceUserInfoEndpointConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `serviceuserinfoendpointconfig.Hooks(f(g(h())))`.
+func (c *ServiceUserInfoEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.ServiceUserInfoEndpointConfig = append(c.hooks.ServiceUserInfoEndpointConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `serviceuserinfoendpointconfig.Intercept(f(g(h())))`.
+func (c *ServiceUserInfoEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ServiceUserInfoEndpointConfig = append(c.inters.ServiceUserInfoEndpointConfig, interceptors...)
+}
+
+// Create returns a builder for creating a ServiceUserInfoEndpointConfig entity.
+func (c *ServiceUserInfoEndpointConfigClient) Create() *ServiceUserInfoEndpointConfigCreate {
+	mutation := newServiceUserInfoEndpointConfigMutation(c.config, OpCreate)
+	return &ServiceUserInfoEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ServiceUserInfoEndpointConfig entities.
+func (c *ServiceUserInfoEndpointConfigClient) CreateBulk(builders ...*ServiceUserInfoEndpointConfigCreate) *ServiceUserInfoEndpointConfigCreateBulk {
+	return &ServiceUserInfoEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ServiceUserInfoEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*ServiceUserInfoEndpointConfigCreate, int)) *ServiceUserInfoEndpointConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ServiceUserInfoEndpointConfigCreateBulk{err: fmt.Errorf("calling to ServiceUserInfoEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ServiceUserInfoEndpointConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ServiceUserInfoEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ServiceUserInfoEndpointConfig.
+func (c *ServiceUserInfoEndpointConfigClient) Update() *ServiceUserInfoEndpointConfigUpdate {
+	mutation := newServiceUserInfoEndpointConfigMutation(c.config, OpUpdate)
+	return &ServiceUserInfoEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ServiceUserInfoEndpointConfigClient) UpdateOne(suiec *ServiceUserInfoEndpointConfig) *ServiceUserInfoEndpointConfigUpdateOne {
+	mutation := newServiceUserInfoEndpointConfigMutation(c.config, OpUpdateOne, withServiceUserInfoEndpointConfig(suiec))
+	return &ServiceUserInfoEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ServiceUserInfoEndpointConfigClient) UpdateOneID(id string) *ServiceUserInfoEndpointConfigUpdateOne {
+	mutation := newServiceUserInfoEndpointConfigMutation(c.config, OpUpdateOne, withServiceUserInfoEndpointConfigID(id))
+	return &ServiceUserInfoEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ServiceUserInfoEndpointConfig.
+func (c *ServiceUserInfoEndpointConfigClient) Delete() *ServiceUserInfoEndpointConfigDelete {
+	mutation := newServiceUserInfoEndpointConfigMutation(c.config, OpDelete)
+	return &ServiceUserInfoEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ServiceUserInfoEndpointConfigClient) DeleteOne(suiec *ServiceUserInfoEndpointConfig) *ServiceUserInfoEndpointConfigDeleteOne {
+	return c.DeleteOneID(suiec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ServiceUserInfoEndpointConfigClient) DeleteOneID(id string) *ServiceUserInfoEndpointConfigDeleteOne {
+	builder := c.Delete().Where(serviceuserinfoendpointconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ServiceUserInfoEndpointConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for ServiceUserInfoEndpointConfig.
+func (c *ServiceUserInfoEndpointConfigClient) Query() *ServiceUserInfoEndpointConfigQuery {
+	return &ServiceUserInfoEndpointConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeServiceUserInfoEndpointConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ServiceUserInfoEndpointConfig entity by its id.
+func (c *ServiceUserInfoEndpointConfigClient) Get(ctx context.Context, id string) (*ServiceUserInfoEndpointConfig, error) {
+	return c.Query().Where(serviceuserinfoendpointconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ServiceUserInfoEndpointConfigClient) GetX(ctx context.Context, id string) *ServiceUserInfoEndpointConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a ServiceUserInfoEndpointConfig.
+func (c *ServiceUserInfoEndpointConfigClient) QueryService(suiec *ServiceUserInfoEndpointConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := suiec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(serviceuserinfoendpointconfig.Table, serviceuserinfoendpointconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, serviceuserinfoendpointconfig.ServiceTable, serviceuserinfoendpointconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(suiec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ServiceUserInfoEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.ServiceUserInfoEndpointConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *ServiceUserInfoEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.ServiceUserInfoEndpointConfig
+}
+
+func (c *ServiceUserInfoEndpointConfigClient) mutate(ctx context.Context, m *ServiceUserInfoEndpointConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ServiceUserInfoEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ServiceUserInfoEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ServiceUserInfoEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ServiceUserInfoEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ServiceUserInfoEndpointConfig mutation op: %q", m.Op())
 	}
 }
 
@@ -2780,13 +2957,17 @@ func (c *UserPoolClient) mutate(ctx context.Context, m *UserPoolMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Application, AuthorizationCode, AuthorizationPayload, CodeGrant, CookieStore,
-		Credentials, KeySet, M2MGrant, RefreshToken, Service, ServiceConfig, Session,
-		SigningKey, StandardClaims, User, UserPool []ent.Hook
+		Application, AuthorizationCode, AuthorizationPayload, CookieStore, Credentials,
+		KeySet, RefreshToken, Service, ServiceAuthorizationEndpointConfig,
+		ServiceIntrospectionEndpointConfig, ServiceTokenEndpointConfig,
+		ServiceUserInfoEndpointConfig, Session, SigningKey, StandardClaims, User,
+		UserPool []ent.Hook
 	}
 	inters struct {
-		Application, AuthorizationCode, AuthorizationPayload, CodeGrant, CookieStore,
-		Credentials, KeySet, M2MGrant, RefreshToken, Service, ServiceConfig, Session,
-		SigningKey, StandardClaims, User, UserPool []ent.Interceptor
+		Application, AuthorizationCode, AuthorizationPayload, CookieStore, Credentials,
+		KeySet, RefreshToken, Service, ServiceAuthorizationEndpointConfig,
+		ServiceIntrospectionEndpointConfig, ServiceTokenEndpointConfig,
+		ServiceUserInfoEndpointConfig, Session, SigningKey, StandardClaims, User,
+		UserPool []ent.Interceptor
 	}
 )

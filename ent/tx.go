@@ -18,22 +18,24 @@ type Tx struct {
 	AuthorizationCode *AuthorizationCodeClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
 	AuthorizationPayload *AuthorizationPayloadClient
-	// CodeGrant is the client for interacting with the CodeGrant builders.
-	CodeGrant *CodeGrantClient
 	// CookieStore is the client for interacting with the CookieStore builders.
 	CookieStore *CookieStoreClient
 	// Credentials is the client for interacting with the Credentials builders.
 	Credentials *CredentialsClient
 	// KeySet is the client for interacting with the KeySet builders.
 	KeySet *KeySetClient
-	// M2MGrant is the client for interacting with the M2MGrant builders.
-	M2MGrant *M2MGrantClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
 	// Service is the client for interacting with the Service builders.
 	Service *ServiceClient
-	// ServiceConfig is the client for interacting with the ServiceConfig builders.
-	ServiceConfig *ServiceConfigClient
+	// ServiceAuthorizationEndpointConfig is the client for interacting with the ServiceAuthorizationEndpointConfig builders.
+	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigClient
+	// ServiceIntrospectionEndpointConfig is the client for interacting with the ServiceIntrospectionEndpointConfig builders.
+	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigClient
+	// ServiceTokenEndpointConfig is the client for interacting with the ServiceTokenEndpointConfig builders.
+	ServiceTokenEndpointConfig *ServiceTokenEndpointConfigClient
+	// ServiceUserInfoEndpointConfig is the client for interacting with the ServiceUserInfoEndpointConfig builders.
+	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfigClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// SigningKey is the client for interacting with the SigningKey builders.
@@ -178,14 +180,15 @@ func (tx *Tx) init() {
 	tx.Application = NewApplicationClient(tx.config)
 	tx.AuthorizationCode = NewAuthorizationCodeClient(tx.config)
 	tx.AuthorizationPayload = NewAuthorizationPayloadClient(tx.config)
-	tx.CodeGrant = NewCodeGrantClient(tx.config)
 	tx.CookieStore = NewCookieStoreClient(tx.config)
 	tx.Credentials = NewCredentialsClient(tx.config)
 	tx.KeySet = NewKeySetClient(tx.config)
-	tx.M2MGrant = NewM2MGrantClient(tx.config)
 	tx.RefreshToken = NewRefreshTokenClient(tx.config)
 	tx.Service = NewServiceClient(tx.config)
-	tx.ServiceConfig = NewServiceConfigClient(tx.config)
+	tx.ServiceAuthorizationEndpointConfig = NewServiceAuthorizationEndpointConfigClient(tx.config)
+	tx.ServiceIntrospectionEndpointConfig = NewServiceIntrospectionEndpointConfigClient(tx.config)
+	tx.ServiceTokenEndpointConfig = NewServiceTokenEndpointConfigClient(tx.config)
+	tx.ServiceUserInfoEndpointConfig = NewServiceUserInfoEndpointConfigClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.SigningKey = NewSigningKeyClient(tx.config)
 	tx.StandardClaims = NewStandardClaimsClient(tx.config)

@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
@@ -26,23 +26,23 @@ func (ksc *KeySetCreate) SetID(s string) *KeySetCreate {
 	return ksc
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (ksc *KeySetCreate) SetServiceConfigID(id string) *KeySetCreate {
-	ksc.mutation.SetServiceConfigID(id)
+// SetServicesID sets the "services" edge to the Service entity by ID.
+func (ksc *KeySetCreate) SetServicesID(id string) *KeySetCreate {
+	ksc.mutation.SetServicesID(id)
 	return ksc
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (ksc *KeySetCreate) SetNillableServiceConfigID(id *string) *KeySetCreate {
+// SetNillableServicesID sets the "services" edge to the Service entity by ID if the given value is not nil.
+func (ksc *KeySetCreate) SetNillableServicesID(id *string) *KeySetCreate {
 	if id != nil {
-		ksc = ksc.SetServiceConfigID(*id)
+		ksc = ksc.SetServicesID(*id)
 	}
 	return ksc
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (ksc *KeySetCreate) SetServiceConfig(s *ServiceConfig) *KeySetCreate {
-	return ksc.SetServiceConfigID(s.ID)
+// SetServices sets the "services" edge to the Service entity.
+func (ksc *KeySetCreate) SetServices(s *Service) *KeySetCreate {
+	return ksc.SetServicesID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -134,21 +134,21 @@ func (ksc *KeySetCreate) createSpec() (*KeySet, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if nodes := ksc.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if nodes := ksc.mutation.ServicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.ServiceConfigTable,
-			Columns: []string{keyset.ServiceConfigColumn},
+			Table:   keyset.ServicesTable,
+			Columns: []string{keyset.ServicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.service_config_key_sets = &nodes[0]
+		_node.service_key_sets = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ksc.mutation.SigningKeysIDs(); len(nodes) > 0 {

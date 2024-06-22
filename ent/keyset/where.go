@@ -63,21 +63,21 @@ func IDContainsFold(id string) predicate.KeySet {
 	return predicate.KeySet(sql.FieldContainsFold(FieldID, id))
 }
 
-// HasServiceConfig applies the HasEdge predicate on the "service_config" edge.
-func HasServiceConfig() predicate.KeySet {
+// HasServices applies the HasEdge predicate on the "services" edge.
+func HasServices() predicate.KeySet {
 	return predicate.KeySet(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ServiceConfigTable, ServiceConfigColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ServicesTable, ServicesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasServiceConfigWith applies the HasEdge predicate on the "service_config" edge with a given conditions (other predicates).
-func HasServiceConfigWith(preds ...predicate.ServiceConfig) predicate.KeySet {
+// HasServicesWith applies the HasEdge predicate on the "services" edge with a given conditions (other predicates).
+func HasServicesWith(preds ...predicate.Service) predicate.KeySet {
 	return predicate.KeySet(func(s *sql.Selector) {
-		step := newServiceConfigStep()
+		step := newServicesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

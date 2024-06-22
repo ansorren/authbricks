@@ -12,9 +12,13 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
+	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
+	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
 
 // ServiceUpdate is the builder for updating Service entities.
@@ -58,6 +62,20 @@ func (su *ServiceUpdate) SetNillableIssuer(s *string) *ServiceUpdate {
 	return su
 }
 
+// SetDescription sets the "description" field.
+func (su *ServiceUpdate) SetDescription(s string) *ServiceUpdate {
+	su.mutation.SetDescription(s)
+	return su
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (su *ServiceUpdate) SetNillableDescription(s *string) *ServiceUpdate {
+	if s != nil {
+		su.SetDescription(*s)
+	}
+	return su
+}
+
 // SetScopes sets the "scopes" field.
 func (su *ServiceUpdate) SetScopes(s []string) *ServiceUpdate {
 	su.mutation.SetScopes(s)
@@ -70,23 +88,145 @@ func (su *ServiceUpdate) AppendScopes(s []string) *ServiceUpdate {
 	return su
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (su *ServiceUpdate) SetServiceConfigID(id string) *ServiceUpdate {
-	su.mutation.SetServiceConfigID(id)
+// SetServiceMetadata sets the "service_metadata" field.
+func (su *ServiceUpdate) SetServiceMetadata(s string) *ServiceUpdate {
+	su.mutation.SetServiceMetadata(s)
 	return su
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (su *ServiceUpdate) SetNillableServiceConfigID(id *string) *ServiceUpdate {
-	if id != nil {
-		su = su.SetServiceConfigID(*id)
+// SetNillableServiceMetadata sets the "service_metadata" field if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceMetadata(s *string) *ServiceUpdate {
+	if s != nil {
+		su.SetServiceMetadata(*s)
 	}
 	return su
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (su *ServiceUpdate) SetServiceConfig(s *ServiceConfig) *ServiceUpdate {
-	return su.SetServiceConfigID(s.ID)
+// SetAllowedClientMetadata sets the "allowed_client_metadata" field.
+func (su *ServiceUpdate) SetAllowedClientMetadata(s []string) *ServiceUpdate {
+	su.mutation.SetAllowedClientMetadata(s)
+	return su
+}
+
+// AppendAllowedClientMetadata appends s to the "allowed_client_metadata" field.
+func (su *ServiceUpdate) AppendAllowedClientMetadata(s []string) *ServiceUpdate {
+	su.mutation.AppendAllowedClientMetadata(s)
+	return su
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (su *ServiceUpdate) SetGrantTypes(s []string) *ServiceUpdate {
+	su.mutation.SetGrantTypes(s)
+	return su
+}
+
+// AppendGrantTypes appends s to the "grant_types" field.
+func (su *ServiceUpdate) AppendGrantTypes(s []string) *ServiceUpdate {
+	su.mutation.AppendGrantTypes(s)
+	return su
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (su *ServiceUpdate) SetResponseTypes(s []string) *ServiceUpdate {
+	su.mutation.SetResponseTypes(s)
+	return su
+}
+
+// AppendResponseTypes appends s to the "response_types" field.
+func (su *ServiceUpdate) AppendResponseTypes(s []string) *ServiceUpdate {
+	su.mutation.AppendResponseTypes(s)
+	return su
+}
+
+// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
+func (su *ServiceUpdate) AddKeySetIDs(ids ...string) *ServiceUpdate {
+	su.mutation.AddKeySetIDs(ids...)
+	return su
+}
+
+// AddKeySets adds the "key_sets" edges to the KeySet entity.
+func (su *ServiceUpdate) AddKeySets(k ...*KeySet) *ServiceUpdate {
+	ids := make([]string, len(k))
+	for i := range k {
+		ids[i] = k[i].ID
+	}
+	return su.AddKeySetIDs(ids...)
+}
+
+// SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceAuthorizationEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceAuthorizationEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceAuthorizationEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceAuthorizationEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceAuthorizationEndpointConfig sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceAuthorizationEndpointConfig(s *ServiceAuthorizationEndpointConfig) *ServiceUpdate {
+	return su.SetServiceAuthorizationEndpointConfigID(s.ID)
+}
+
+// SetServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceIntrospectionEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceIntrospectionEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceIntrospectionEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceIntrospectionEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceIntrospectionEndpointConfig sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceIntrospectionEndpointConfig(s *ServiceIntrospectionEndpointConfig) *ServiceUpdate {
+	return su.SetServiceIntrospectionEndpointConfigID(s.ID)
+}
+
+// SetServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceTokenEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceTokenEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceTokenEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceTokenEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceTokenEndpointConfig sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceTokenEndpointConfig(s *ServiceTokenEndpointConfig) *ServiceUpdate {
+	return su.SetServiceTokenEndpointConfigID(s.ID)
+}
+
+// SetServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceUserInfoEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceUserInfoEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceUserInfoEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceUserInfoEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceUserInfoEndpointConfig sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceUserInfoEndpointConfig(s *ServiceUserInfoEndpointConfig) *ServiceUpdate {
+	return su.SetServiceUserInfoEndpointConfigID(s.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -109,9 +249,48 @@ func (su *ServiceUpdate) Mutation() *ServiceMutation {
 	return su.mutation
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (su *ServiceUpdate) ClearServiceConfig() *ServiceUpdate {
-	su.mutation.ClearServiceConfig()
+// ClearKeySets clears all "key_sets" edges to the KeySet entity.
+func (su *ServiceUpdate) ClearKeySets() *ServiceUpdate {
+	su.mutation.ClearKeySets()
+	return su
+}
+
+// RemoveKeySetIDs removes the "key_sets" edge to KeySet entities by IDs.
+func (su *ServiceUpdate) RemoveKeySetIDs(ids ...string) *ServiceUpdate {
+	su.mutation.RemoveKeySetIDs(ids...)
+	return su
+}
+
+// RemoveKeySets removes "key_sets" edges to KeySet entities.
+func (su *ServiceUpdate) RemoveKeySets(k ...*KeySet) *ServiceUpdate {
+	ids := make([]string, len(k))
+	for i := range k {
+		ids[i] = k[i].ID
+	}
+	return su.RemoveKeySetIDs(ids...)
+}
+
+// ClearServiceAuthorizationEndpointConfig clears the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceAuthorizationEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceAuthorizationEndpointConfig()
+	return su
+}
+
+// ClearServiceIntrospectionEndpointConfig clears the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceIntrospectionEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceIntrospectionEndpointConfig()
+	return su
+}
+
+// ClearServiceTokenEndpointConfig clears the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceTokenEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceTokenEndpointConfig()
+	return su
+}
+
+// ClearServiceUserInfoEndpointConfig clears the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceUserInfoEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceUserInfoEndpointConfig()
 	return su
 }
 
@@ -196,6 +375,9 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Issuer(); ok {
 		_spec.SetField(service.FieldIssuer, field.TypeString, value)
 	}
+	if value, ok := su.mutation.Description(); ok {
+		_spec.SetField(service.FieldDescription, field.TypeString, value)
+	}
 	if value, ok := su.mutation.Scopes(); ok {
 		_spec.SetField(service.FieldScopes, field.TypeJSON, value)
 	}
@@ -204,28 +386,187 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, service.FieldScopes, value)
 		})
 	}
-	if su.mutation.ServiceConfigCleared() {
+	if value, ok := su.mutation.ServiceMetadata(); ok {
+		_spec.SetField(service.FieldServiceMetadata, field.TypeString, value)
+	}
+	if value, ok := su.mutation.AllowedClientMetadata(); ok {
+		_spec.SetField(service.FieldAllowedClientMetadata, field.TypeJSON, value)
+	}
+	if value, ok := su.mutation.AppendedAllowedClientMetadata(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldAllowedClientMetadata, value)
+		})
+	}
+	if value, ok := su.mutation.GrantTypes(); ok {
+		_spec.SetField(service.FieldGrantTypes, field.TypeJSON, value)
+	}
+	if value, ok := su.mutation.AppendedGrantTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldGrantTypes, value)
+		})
+	}
+	if value, ok := su.mutation.ResponseTypes(); ok {
+		_spec.SetField(service.FieldResponseTypes, field.TypeJSON, value)
+	}
+	if value, ok := su.mutation.AppendedResponseTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldResponseTypes, value)
+		})
+	}
+	if su.mutation.KeySetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   service.ServiceConfigTable,
-			Columns: []string{service.ServiceConfigColumn},
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if nodes := su.mutation.RemovedKeySetsIDs(); len(nodes) > 0 && !su.mutation.KeySetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.KeySetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceAuthorizationEndpointConfigCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.ServiceConfigTable,
-			Columns: []string{service.ServiceConfigColumn},
+			Table:   service.ServiceAuthorizationEndpointConfigTable,
+			Columns: []string{service.ServiceAuthorizationEndpointConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(serviceauthorizationendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceAuthorizationEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceAuthorizationEndpointConfigTable,
+			Columns: []string{service.ServiceAuthorizationEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceauthorizationendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceIntrospectionEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceIntrospectionEndpointConfigTable,
+			Columns: []string{service.ServiceIntrospectionEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceintrospectionendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceIntrospectionEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceIntrospectionEndpointConfigTable,
+			Columns: []string{service.ServiceIntrospectionEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceintrospectionendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceTokenEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceTokenEndpointConfigTable,
+			Columns: []string{service.ServiceTokenEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicetokenendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceTokenEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceTokenEndpointConfigTable,
+			Columns: []string{service.ServiceTokenEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicetokenendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceUserInfoEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceUserInfoEndpointConfigTable,
+			Columns: []string{service.ServiceUserInfoEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceUserInfoEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceUserInfoEndpointConfigTable,
+			Columns: []string{service.ServiceUserInfoEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -326,6 +667,20 @@ func (suo *ServiceUpdateOne) SetNillableIssuer(s *string) *ServiceUpdateOne {
 	return suo
 }
 
+// SetDescription sets the "description" field.
+func (suo *ServiceUpdateOne) SetDescription(s string) *ServiceUpdateOne {
+	suo.mutation.SetDescription(s)
+	return suo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableDescription(s *string) *ServiceUpdateOne {
+	if s != nil {
+		suo.SetDescription(*s)
+	}
+	return suo
+}
+
 // SetScopes sets the "scopes" field.
 func (suo *ServiceUpdateOne) SetScopes(s []string) *ServiceUpdateOne {
 	suo.mutation.SetScopes(s)
@@ -338,23 +693,145 @@ func (suo *ServiceUpdateOne) AppendScopes(s []string) *ServiceUpdateOne {
 	return suo
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (suo *ServiceUpdateOne) SetServiceConfigID(id string) *ServiceUpdateOne {
-	suo.mutation.SetServiceConfigID(id)
+// SetServiceMetadata sets the "service_metadata" field.
+func (suo *ServiceUpdateOne) SetServiceMetadata(s string) *ServiceUpdateOne {
+	suo.mutation.SetServiceMetadata(s)
 	return suo
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (suo *ServiceUpdateOne) SetNillableServiceConfigID(id *string) *ServiceUpdateOne {
-	if id != nil {
-		suo = suo.SetServiceConfigID(*id)
+// SetNillableServiceMetadata sets the "service_metadata" field if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceMetadata(s *string) *ServiceUpdateOne {
+	if s != nil {
+		suo.SetServiceMetadata(*s)
 	}
 	return suo
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (suo *ServiceUpdateOne) SetServiceConfig(s *ServiceConfig) *ServiceUpdateOne {
-	return suo.SetServiceConfigID(s.ID)
+// SetAllowedClientMetadata sets the "allowed_client_metadata" field.
+func (suo *ServiceUpdateOne) SetAllowedClientMetadata(s []string) *ServiceUpdateOne {
+	suo.mutation.SetAllowedClientMetadata(s)
+	return suo
+}
+
+// AppendAllowedClientMetadata appends s to the "allowed_client_metadata" field.
+func (suo *ServiceUpdateOne) AppendAllowedClientMetadata(s []string) *ServiceUpdateOne {
+	suo.mutation.AppendAllowedClientMetadata(s)
+	return suo
+}
+
+// SetGrantTypes sets the "grant_types" field.
+func (suo *ServiceUpdateOne) SetGrantTypes(s []string) *ServiceUpdateOne {
+	suo.mutation.SetGrantTypes(s)
+	return suo
+}
+
+// AppendGrantTypes appends s to the "grant_types" field.
+func (suo *ServiceUpdateOne) AppendGrantTypes(s []string) *ServiceUpdateOne {
+	suo.mutation.AppendGrantTypes(s)
+	return suo
+}
+
+// SetResponseTypes sets the "response_types" field.
+func (suo *ServiceUpdateOne) SetResponseTypes(s []string) *ServiceUpdateOne {
+	suo.mutation.SetResponseTypes(s)
+	return suo
+}
+
+// AppendResponseTypes appends s to the "response_types" field.
+func (suo *ServiceUpdateOne) AppendResponseTypes(s []string) *ServiceUpdateOne {
+	suo.mutation.AppendResponseTypes(s)
+	return suo
+}
+
+// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
+func (suo *ServiceUpdateOne) AddKeySetIDs(ids ...string) *ServiceUpdateOne {
+	suo.mutation.AddKeySetIDs(ids...)
+	return suo
+}
+
+// AddKeySets adds the "key_sets" edges to the KeySet entity.
+func (suo *ServiceUpdateOne) AddKeySets(k ...*KeySet) *ServiceUpdateOne {
+	ids := make([]string, len(k))
+	for i := range k {
+		ids[i] = k[i].ID
+	}
+	return suo.AddKeySetIDs(ids...)
+}
+
+// SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceAuthorizationEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceAuthorizationEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceAuthorizationEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceAuthorizationEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceAuthorizationEndpointConfig sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceAuthorizationEndpointConfig(s *ServiceAuthorizationEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceAuthorizationEndpointConfigID(s.ID)
+}
+
+// SetServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceIntrospectionEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceIntrospectionEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceIntrospectionEndpointConfigID sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceIntrospectionEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceIntrospectionEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceIntrospectionEndpointConfig sets the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceIntrospectionEndpointConfig(s *ServiceIntrospectionEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceIntrospectionEndpointConfigID(s.ID)
+}
+
+// SetServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceTokenEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceTokenEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceTokenEndpointConfigID sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceTokenEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceTokenEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceTokenEndpointConfig sets the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceTokenEndpointConfig(s *ServiceTokenEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceTokenEndpointConfigID(s.ID)
+}
+
+// SetServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceUserInfoEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceUserInfoEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceUserInfoEndpointConfigID sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceUserInfoEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceUserInfoEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceUserInfoEndpointConfig sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceUserInfoEndpointConfig(s *ServiceUserInfoEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceUserInfoEndpointConfigID(s.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -377,9 +854,48 @@ func (suo *ServiceUpdateOne) Mutation() *ServiceMutation {
 	return suo.mutation
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (suo *ServiceUpdateOne) ClearServiceConfig() *ServiceUpdateOne {
-	suo.mutation.ClearServiceConfig()
+// ClearKeySets clears all "key_sets" edges to the KeySet entity.
+func (suo *ServiceUpdateOne) ClearKeySets() *ServiceUpdateOne {
+	suo.mutation.ClearKeySets()
+	return suo
+}
+
+// RemoveKeySetIDs removes the "key_sets" edge to KeySet entities by IDs.
+func (suo *ServiceUpdateOne) RemoveKeySetIDs(ids ...string) *ServiceUpdateOne {
+	suo.mutation.RemoveKeySetIDs(ids...)
+	return suo
+}
+
+// RemoveKeySets removes "key_sets" edges to KeySet entities.
+func (suo *ServiceUpdateOne) RemoveKeySets(k ...*KeySet) *ServiceUpdateOne {
+	ids := make([]string, len(k))
+	for i := range k {
+		ids[i] = k[i].ID
+	}
+	return suo.RemoveKeySetIDs(ids...)
+}
+
+// ClearServiceAuthorizationEndpointConfig clears the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceAuthorizationEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceAuthorizationEndpointConfig()
+	return suo
+}
+
+// ClearServiceIntrospectionEndpointConfig clears the "service_introspection_endpoint_config" edge to the ServiceIntrospectionEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceIntrospectionEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceIntrospectionEndpointConfig()
+	return suo
+}
+
+// ClearServiceTokenEndpointConfig clears the "service_token_endpoint_config" edge to the ServiceTokenEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceTokenEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceTokenEndpointConfig()
+	return suo
+}
+
+// ClearServiceUserInfoEndpointConfig clears the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceUserInfoEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceUserInfoEndpointConfig()
 	return suo
 }
 
@@ -494,6 +1010,9 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 	if value, ok := suo.mutation.Issuer(); ok {
 		_spec.SetField(service.FieldIssuer, field.TypeString, value)
 	}
+	if value, ok := suo.mutation.Description(); ok {
+		_spec.SetField(service.FieldDescription, field.TypeString, value)
+	}
 	if value, ok := suo.mutation.Scopes(); ok {
 		_spec.SetField(service.FieldScopes, field.TypeJSON, value)
 	}
@@ -502,28 +1021,187 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 			sqljson.Append(u, service.FieldScopes, value)
 		})
 	}
-	if suo.mutation.ServiceConfigCleared() {
+	if value, ok := suo.mutation.ServiceMetadata(); ok {
+		_spec.SetField(service.FieldServiceMetadata, field.TypeString, value)
+	}
+	if value, ok := suo.mutation.AllowedClientMetadata(); ok {
+		_spec.SetField(service.FieldAllowedClientMetadata, field.TypeJSON, value)
+	}
+	if value, ok := suo.mutation.AppendedAllowedClientMetadata(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldAllowedClientMetadata, value)
+		})
+	}
+	if value, ok := suo.mutation.GrantTypes(); ok {
+		_spec.SetField(service.FieldGrantTypes, field.TypeJSON, value)
+	}
+	if value, ok := suo.mutation.AppendedGrantTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldGrantTypes, value)
+		})
+	}
+	if value, ok := suo.mutation.ResponseTypes(); ok {
+		_spec.SetField(service.FieldResponseTypes, field.TypeJSON, value)
+	}
+	if value, ok := suo.mutation.AppendedResponseTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, service.FieldResponseTypes, value)
+		})
+	}
+	if suo.mutation.KeySetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   service.ServiceConfigTable,
-			Columns: []string{service.ServiceConfigColumn},
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if nodes := suo.mutation.RemovedKeySetsIDs(); len(nodes) > 0 && !suo.mutation.KeySetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.KeySetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   service.KeySetsTable,
+			Columns: []string{service.KeySetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceAuthorizationEndpointConfigCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.ServiceConfigTable,
-			Columns: []string{service.ServiceConfigColumn},
+			Table:   service.ServiceAuthorizationEndpointConfigTable,
+			Columns: []string{service.ServiceAuthorizationEndpointConfigColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(serviceauthorizationendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceAuthorizationEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceAuthorizationEndpointConfigTable,
+			Columns: []string{service.ServiceAuthorizationEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceauthorizationendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceIntrospectionEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceIntrospectionEndpointConfigTable,
+			Columns: []string{service.ServiceIntrospectionEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceintrospectionendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceIntrospectionEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceIntrospectionEndpointConfigTable,
+			Columns: []string{service.ServiceIntrospectionEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceintrospectionendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceTokenEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceTokenEndpointConfigTable,
+			Columns: []string{service.ServiceTokenEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicetokenendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceTokenEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceTokenEndpointConfigTable,
+			Columns: []string{service.ServiceTokenEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicetokenendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceUserInfoEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceUserInfoEndpointConfigTable,
+			Columns: []string{service.ServiceUserInfoEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceUserInfoEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceUserInfoEndpointConfigTable,
+			Columns: []string{service.ServiceUserInfoEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

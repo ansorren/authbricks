@@ -16,21 +16,67 @@ const (
 	FieldName = "name"
 	// FieldIssuer holds the string denoting the issuer field in the database.
 	FieldIssuer = "issuer"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// FieldScopes holds the string denoting the scopes field in the database.
 	FieldScopes = "scopes"
-	// EdgeServiceConfig holds the string denoting the service_config edge name in mutations.
-	EdgeServiceConfig = "service_config"
+	// FieldServiceMetadata holds the string denoting the service_metadata field in the database.
+	FieldServiceMetadata = "service_metadata"
+	// FieldAllowedClientMetadata holds the string denoting the allowed_client_metadata field in the database.
+	FieldAllowedClientMetadata = "allowed_client_metadata"
+	// FieldGrantTypes holds the string denoting the grant_types field in the database.
+	FieldGrantTypes = "grant_types"
+	// FieldResponseTypes holds the string denoting the response_types field in the database.
+	FieldResponseTypes = "response_types"
+	// EdgeKeySets holds the string denoting the key_sets edge name in mutations.
+	EdgeKeySets = "key_sets"
+	// EdgeServiceAuthorizationEndpointConfig holds the string denoting the service_authorization_endpoint_config edge name in mutations.
+	EdgeServiceAuthorizationEndpointConfig = "service_authorization_endpoint_config"
+	// EdgeServiceIntrospectionEndpointConfig holds the string denoting the service_introspection_endpoint_config edge name in mutations.
+	EdgeServiceIntrospectionEndpointConfig = "service_introspection_endpoint_config"
+	// EdgeServiceTokenEndpointConfig holds the string denoting the service_token_endpoint_config edge name in mutations.
+	EdgeServiceTokenEndpointConfig = "service_token_endpoint_config"
+	// EdgeServiceUserInfoEndpointConfig holds the string denoting the service_user_info_endpoint_config edge name in mutations.
+	EdgeServiceUserInfoEndpointConfig = "service_user_info_endpoint_config"
 	// EdgeApplications holds the string denoting the applications edge name in mutations.
 	EdgeApplications = "applications"
 	// Table holds the table name of the service in the database.
 	Table = "services"
-	// ServiceConfigTable is the table that holds the service_config relation/edge.
-	ServiceConfigTable = "service_configs"
-	// ServiceConfigInverseTable is the table name for the ServiceConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "serviceconfig" package.
-	ServiceConfigInverseTable = "service_configs"
-	// ServiceConfigColumn is the table column denoting the service_config relation/edge.
-	ServiceConfigColumn = "service_service_config"
+	// KeySetsTable is the table that holds the key_sets relation/edge.
+	KeySetsTable = "key_sets"
+	// KeySetsInverseTable is the table name for the KeySet entity.
+	// It exists in this package in order to avoid circular dependency with the "keyset" package.
+	KeySetsInverseTable = "key_sets"
+	// KeySetsColumn is the table column denoting the key_sets relation/edge.
+	KeySetsColumn = "service_key_sets"
+	// ServiceAuthorizationEndpointConfigTable is the table that holds the service_authorization_endpoint_config relation/edge.
+	ServiceAuthorizationEndpointConfigTable = "service_authorization_endpoint_configs"
+	// ServiceAuthorizationEndpointConfigInverseTable is the table name for the ServiceAuthorizationEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "serviceauthorizationendpointconfig" package.
+	ServiceAuthorizationEndpointConfigInverseTable = "service_authorization_endpoint_configs"
+	// ServiceAuthorizationEndpointConfigColumn is the table column denoting the service_authorization_endpoint_config relation/edge.
+	ServiceAuthorizationEndpointConfigColumn = "service_service_authorization_endpoint_config"
+	// ServiceIntrospectionEndpointConfigTable is the table that holds the service_introspection_endpoint_config relation/edge.
+	ServiceIntrospectionEndpointConfigTable = "service_introspection_endpoint_configs"
+	// ServiceIntrospectionEndpointConfigInverseTable is the table name for the ServiceIntrospectionEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "serviceintrospectionendpointconfig" package.
+	ServiceIntrospectionEndpointConfigInverseTable = "service_introspection_endpoint_configs"
+	// ServiceIntrospectionEndpointConfigColumn is the table column denoting the service_introspection_endpoint_config relation/edge.
+	ServiceIntrospectionEndpointConfigColumn = "service_service_introspection_endpoint_config"
+	// ServiceTokenEndpointConfigTable is the table that holds the service_token_endpoint_config relation/edge.
+	ServiceTokenEndpointConfigTable = "service_token_endpoint_configs"
+	// ServiceTokenEndpointConfigInverseTable is the table name for the ServiceTokenEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "servicetokenendpointconfig" package.
+	ServiceTokenEndpointConfigInverseTable = "service_token_endpoint_configs"
+	// ServiceTokenEndpointConfigColumn is the table column denoting the service_token_endpoint_config relation/edge.
+	ServiceTokenEndpointConfigColumn = "service_service_token_endpoint_config"
+	// ServiceUserInfoEndpointConfigTable is the table that holds the service_user_info_endpoint_config relation/edge.
+	ServiceUserInfoEndpointConfigTable = "service_user_info_endpoint_configs"
+	// ServiceUserInfoEndpointConfigInverseTable is the table name for the ServiceUserInfoEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "serviceuserinfoendpointconfig" package.
+	ServiceUserInfoEndpointConfigInverseTable = "service_user_info_endpoint_configs"
+	// ServiceUserInfoEndpointConfigColumn is the table column denoting the service_user_info_endpoint_config relation/edge.
+	ServiceUserInfoEndpointConfigColumn = "service_service_user_info_endpoint_config"
 	// ApplicationsTable is the table that holds the applications relation/edge.
 	ApplicationsTable = "applications"
 	// ApplicationsInverseTable is the table name for the Application entity.
@@ -45,7 +91,12 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldIssuer,
+	FieldDescription,
 	FieldScopes,
+	FieldServiceMetadata,
+	FieldAllowedClientMetadata,
+	FieldGrantTypes,
+	FieldResponseTypes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -85,10 +136,55 @@ func ByIssuer(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIssuer, opts...).ToFunc()
 }
 
-// ByServiceConfigField orders the results by service_config field.
-func ByServiceConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByServiceMetadata orders the results by the service_metadata field.
+func ByServiceMetadata(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldServiceMetadata, opts...).ToFunc()
+}
+
+// ByKeySetsCount orders the results by key_sets count.
+func ByKeySetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newServiceConfigStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newKeySetsStep(), opts...)
+	}
+}
+
+// ByKeySets orders the results by key_sets terms.
+func ByKeySets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newKeySetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByServiceAuthorizationEndpointConfigField orders the results by service_authorization_endpoint_config field.
+func ByServiceAuthorizationEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceAuthorizationEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByServiceIntrospectionEndpointConfigField orders the results by service_introspection_endpoint_config field.
+func ByServiceIntrospectionEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceIntrospectionEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByServiceTokenEndpointConfigField orders the results by service_token_endpoint_config field.
+func ByServiceTokenEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceTokenEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByServiceUserInfoEndpointConfigField orders the results by service_user_info_endpoint_config field.
+func ByServiceUserInfoEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceUserInfoEndpointConfigStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -105,11 +201,39 @@ func ByApplications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newApplicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newServiceConfigStep() *sqlgraph.Step {
+func newKeySetsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ServiceConfigInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, ServiceConfigTable, ServiceConfigColumn),
+		sqlgraph.To(KeySetsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, KeySetsTable, KeySetsColumn),
+	)
+}
+func newServiceAuthorizationEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceAuthorizationEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceAuthorizationEndpointConfigTable, ServiceAuthorizationEndpointConfigColumn),
+	)
+}
+func newServiceIntrospectionEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceIntrospectionEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceIntrospectionEndpointConfigTable, ServiceIntrospectionEndpointConfigColumn),
+	)
+}
+func newServiceTokenEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceTokenEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceTokenEndpointConfigTable, ServiceTokenEndpointConfigColumn),
+	)
+}
+func newServiceUserInfoEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceUserInfoEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceUserInfoEndpointConfigTable, ServiceUserInfoEndpointConfigColumn),
 	)
 }
 func newApplicationsStep() *sqlgraph.Step {

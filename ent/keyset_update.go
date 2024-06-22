@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/predicate"
-	"go.authbricks.com/bricks/ent/serviceconfig"
+	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/signingkey"
 )
 
@@ -29,23 +29,23 @@ func (ksu *KeySetUpdate) Where(ps ...predicate.KeySet) *KeySetUpdate {
 	return ksu
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (ksu *KeySetUpdate) SetServiceConfigID(id string) *KeySetUpdate {
-	ksu.mutation.SetServiceConfigID(id)
+// SetServicesID sets the "services" edge to the Service entity by ID.
+func (ksu *KeySetUpdate) SetServicesID(id string) *KeySetUpdate {
+	ksu.mutation.SetServicesID(id)
 	return ksu
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (ksu *KeySetUpdate) SetNillableServiceConfigID(id *string) *KeySetUpdate {
+// SetNillableServicesID sets the "services" edge to the Service entity by ID if the given value is not nil.
+func (ksu *KeySetUpdate) SetNillableServicesID(id *string) *KeySetUpdate {
 	if id != nil {
-		ksu = ksu.SetServiceConfigID(*id)
+		ksu = ksu.SetServicesID(*id)
 	}
 	return ksu
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (ksu *KeySetUpdate) SetServiceConfig(s *ServiceConfig) *KeySetUpdate {
-	return ksu.SetServiceConfigID(s.ID)
+// SetServices sets the "services" edge to the Service entity.
+func (ksu *KeySetUpdate) SetServices(s *Service) *KeySetUpdate {
+	return ksu.SetServicesID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -68,9 +68,9 @@ func (ksu *KeySetUpdate) Mutation() *KeySetMutation {
 	return ksu.mutation
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (ksu *KeySetUpdate) ClearServiceConfig() *KeySetUpdate {
-	ksu.mutation.ClearServiceConfig()
+// ClearServices clears the "services" edge to the Service entity.
+func (ksu *KeySetUpdate) ClearServices() *KeySetUpdate {
+	ksu.mutation.ClearServices()
 	return ksu
 }
 
@@ -131,28 +131,28 @@ func (ksu *KeySetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if ksu.mutation.ServiceConfigCleared() {
+	if ksu.mutation.ServicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.ServiceConfigTable,
-			Columns: []string{keyset.ServiceConfigColumn},
+			Table:   keyset.ServicesTable,
+			Columns: []string{keyset.ServicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ksu.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if nodes := ksu.mutation.ServicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.ServiceConfigTable,
-			Columns: []string{keyset.ServiceConfigColumn},
+			Table:   keyset.ServicesTable,
+			Columns: []string{keyset.ServicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -225,23 +225,23 @@ type KeySetUpdateOne struct {
 	mutation *KeySetMutation
 }
 
-// SetServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID.
-func (ksuo *KeySetUpdateOne) SetServiceConfigID(id string) *KeySetUpdateOne {
-	ksuo.mutation.SetServiceConfigID(id)
+// SetServicesID sets the "services" edge to the Service entity by ID.
+func (ksuo *KeySetUpdateOne) SetServicesID(id string) *KeySetUpdateOne {
+	ksuo.mutation.SetServicesID(id)
 	return ksuo
 }
 
-// SetNillableServiceConfigID sets the "service_config" edge to the ServiceConfig entity by ID if the given value is not nil.
-func (ksuo *KeySetUpdateOne) SetNillableServiceConfigID(id *string) *KeySetUpdateOne {
+// SetNillableServicesID sets the "services" edge to the Service entity by ID if the given value is not nil.
+func (ksuo *KeySetUpdateOne) SetNillableServicesID(id *string) *KeySetUpdateOne {
 	if id != nil {
-		ksuo = ksuo.SetServiceConfigID(*id)
+		ksuo = ksuo.SetServicesID(*id)
 	}
 	return ksuo
 }
 
-// SetServiceConfig sets the "service_config" edge to the ServiceConfig entity.
-func (ksuo *KeySetUpdateOne) SetServiceConfig(s *ServiceConfig) *KeySetUpdateOne {
-	return ksuo.SetServiceConfigID(s.ID)
+// SetServices sets the "services" edge to the Service entity.
+func (ksuo *KeySetUpdateOne) SetServices(s *Service) *KeySetUpdateOne {
+	return ksuo.SetServicesID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -264,9 +264,9 @@ func (ksuo *KeySetUpdateOne) Mutation() *KeySetMutation {
 	return ksuo.mutation
 }
 
-// ClearServiceConfig clears the "service_config" edge to the ServiceConfig entity.
-func (ksuo *KeySetUpdateOne) ClearServiceConfig() *KeySetUpdateOne {
-	ksuo.mutation.ClearServiceConfig()
+// ClearServices clears the "services" edge to the Service entity.
+func (ksuo *KeySetUpdateOne) ClearServices() *KeySetUpdateOne {
+	ksuo.mutation.ClearServices()
 	return ksuo
 }
 
@@ -357,28 +357,28 @@ func (ksuo *KeySetUpdateOne) sqlSave(ctx context.Context) (_node *KeySet, err er
 			}
 		}
 	}
-	if ksuo.mutation.ServiceConfigCleared() {
+	if ksuo.mutation.ServicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.ServiceConfigTable,
-			Columns: []string{keyset.ServiceConfigColumn},
+			Table:   keyset.ServicesTable,
+			Columns: []string{keyset.ServicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ksuo.mutation.ServiceConfigIDs(); len(nodes) > 0 {
+	if nodes := ksuo.mutation.ServicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   keyset.ServiceConfigTable,
-			Columns: []string{keyset.ServiceConfigColumn},
+			Table:   keyset.ServicesTable,
+			Columns: []string{keyset.ServicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(serviceconfig.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
