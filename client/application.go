@@ -3,13 +3,11 @@ package client
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/application"
-	"go.authbricks.com/bricks/ent/credentials"
-
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 )
 
 // CreateApplication creates a new application.
@@ -55,14 +53,10 @@ func (c *Client) DeleteApplication(ctx context.Context, name string) error {
 		return errors.Wrapf(err, "cannot delete application %s - not found", name)
 	}
 
-	credentials, err := c.DB.EntClient.Credentials.Query().Where(credentials.HasApplicationWith(application.ID(app.ID))).All(ctx)
+	// delete the application credentials first
+	err = c.DeleteCredentialsByApplication(ctx, app.Name)
 	if err != nil {
-		return errors.Wrapf(err, "cannot delete application %s - cannot retrieve credentials", name)
-	}
-	for _, cred := range credentials {
-		if err := c.DB.EntClient.Credentials.DeleteOne(cred).Exec(ctx); err != nil {
-			return errors.Wrapf(err, "cannot delete application %s - cannot delete associated credentials", name)
-		}
+		return errors.Wrapf(err, "cannot delete application %s - unable to delete credentials", name)
 	}
 
 	return c.DB.EntClient.Application.DeleteOne(app).Exec(ctx)
