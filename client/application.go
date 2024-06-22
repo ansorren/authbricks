@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/application"
+
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 // CreateApplication creates a new application.
