@@ -2,11 +2,12 @@ package client
 
 import (
 	"context"
-	"github.com/stretchr/testify/require"
-	"go.authbricks.com/bricks/config"
 	"testing"
 
+	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/testutils"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestService(t *testing.T) {

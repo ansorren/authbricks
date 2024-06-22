@@ -2,13 +2,13 @@ package client
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"go.authbricks.com/bricks/ent/application"
 
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
+	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/credentials"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
