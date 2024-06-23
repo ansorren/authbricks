@@ -152,4 +152,5 @@ func TestCredentials(t *testing.T) {
 	// List credentials - expected none
 	credsList, err = client.GetCredentialsByApplication(context.Background(), app.Name)
 	require.Nil(t, err)
+	require.Len(t, credsList, 0)
 }

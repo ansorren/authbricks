@@ -4,12 +4,14 @@ go 1.21.0
 
 require (
 	entgo.io/ent v0.13.1
+	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.9
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.2
+	gopkg.in/square/go-jose.v2 v2.6.0
 )
 
 require (
@@ -24,7 +26,8 @@ require (
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

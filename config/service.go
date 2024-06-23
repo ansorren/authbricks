@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto/rsa"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -37,6 +38,7 @@ type Service struct {
 	IntrospectionEndpoint IntrospectionEndpoint
 	TokenEndpoint         TokenEndpoint
 	UserInfoEndpoint      UserInfoEndpoint
+	Keys                  []*rsa.PrivateKey
 }
 
 // contains checks if the given string is in the given slice of strings.
