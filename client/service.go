@@ -2,9 +2,11 @@ package client
 
 import (
 	"context"
+	"crypto/rsa"
 	"encoding/json"
 
 	"go.authbricks.com/bricks/config"
+	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
@@ -82,6 +84,28 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 		SetService(svc).
 		SetEndpoint(cfg.UserInfoEndpoint.Endpoint).
 		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create user info endpoint configuration for service %s", cfg.Name)
+	}
+
+	// create the keyset and signing keys
+	// generate a key if none are provided
+	if len(cfg.Keys) > 0 {
+		_, err = c.CreateKeySet(ctx, cfg.Name, cfg.Keys)
+		if err != nil {
+			return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
+		}
+	}
+	if len(cfg.Keys) == 0 {
+		rsaKey, err := abcrypto.Generate4096BitsRSAKey()
+		if err != nil {
+			return nil, errors.Wrapf(err, "cannot generate RSA key")
+		}
+		_, err = c.CreateKeySet(ctx, cfg.Name, []*rsa.PrivateKey{rsaKey.Private})
+		if err != nil {
+			return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
+		}
+	}
 
 	return svc, nil
 }
@@ -116,6 +140,11 @@ func (c *Client) DeleteService(ctx context.Context, name string) error {
 	_, err = c.DB.EntClient.ServiceUserInfoEndpointConfig.Delete().Where(serviceuserinfoendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete user info endpoint configuration for service %s", name)
+	}
+
+	err = c.DeleteKeySetsByService(ctx, name)
+	if err != nil {
+		return errors.Wrapf(err, "cannot delete key sets for service %s", name)
 	}
 
 	return c.DB.EntClient.Service.DeleteOne(svc).Exec(ctx)

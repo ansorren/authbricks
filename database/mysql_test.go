@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/google/uuid"
@@ -10,6 +11,10 @@ import (
 )
 
 func TestNewMySQL(t *testing.T) {
+	_, shouldSkip := os.LookupEnv("AUTHBRICKS_SKIP_DOCKER_TESTS")
+	if shouldSkip {
+		t.Skip("POSTGRES_URL is not set")
+	}
 	db, err := NewMySQL(context.Background(), "user:pass@tcp(127.0.0.1:3306)/db?parseTime=True")
 	require.Nil(t, err)
 

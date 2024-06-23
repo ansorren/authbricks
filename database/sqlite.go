@@ -4,8 +4,9 @@ import (
 	"context"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
 	"go.authbricks.com/bricks/ent"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // fileExists checks if a file exists.
