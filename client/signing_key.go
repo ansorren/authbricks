@@ -27,6 +27,7 @@ func (c *Client) CreateSigningKey(ctx context.Context, ks *ent.KeySet, id string
 	return sk, nil
 }
 
+// CreateSigningKeysForKeySet creates new signing keys for the given keyset.
 func (c *Client) CreateSigningKeysForKeySet(ctx context.Context, ks *ent.KeySet, keys []crypto.PrivateKey) error {
 	for _, key := range keys {
 		// only RSA keys are supported
@@ -52,10 +53,12 @@ func (c *Client) CreateSigningKeysForKeySet(ctx context.Context, ks *ent.KeySet,
 	return nil
 }
 
+// GetSigningKeyByID retrieves the signing key with the given ID.
 func (c *Client) GetSigningKeyByID(ctx context.Context, keyID string) (*ent.SigningKey, error) {
 	return c.DB.EntClient.SigningKey.Query().Where(signingkey.ID(keyID)).Only(ctx)
 }
 
+// GetSigningKeysByService retrieves all signing keys for the given service.
 func (c *Client) GetSigningKeysByService(ctx context.Context, serviceName string) ([]*ent.SigningKey, error) {
 	return c.DB.EntClient.SigningKey.Query().Where(signingkey.HasKeySetWith(keyset.HasServiceWith(service.Name(serviceName)))).All(ctx)
 }
@@ -73,7 +76,7 @@ func (c *Client) DeleteSigningKeysForKeySet(ctx context.Context, ks *ent.KeySet)
 func (c *Client) UpdateSigningKeysByService(ctx context.Context, serviceName string, keys []crypto.PrivateKey) error {
 	// Update the signing keys
 	// It is simply easier to delete all signing keys and recreate them
-	// This might not be the most efficient way and may need to be revisited
+	// This is not the most efficient way and may need to be revisited
 
 	keySet, err := c.GetKeySetByService(ctx, serviceName)
 	if err != nil {
