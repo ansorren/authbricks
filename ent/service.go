@@ -9,9 +9,11 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
@@ -45,8 +47,8 @@ type Service struct {
 
 // ServiceEdges holds the relations/edges for other nodes in the graph.
 type ServiceEdges struct {
-	// KeySets holds the value of the key_sets edge.
-	KeySets []*KeySet `json:"key_sets,omitempty"`
+	// KeySet holds the value of the key_set edge.
+	KeySet *KeySet `json:"key_set,omitempty"`
 	// ServiceAuthorizationEndpointConfig holds the value of the service_authorization_endpoint_config edge.
 	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfig `json:"service_authorization_endpoint_config,omitempty"`
 	// ServiceIntrospectionEndpointConfig holds the value of the service_introspection_endpoint_config edge.
@@ -55,20 +57,24 @@ type ServiceEdges struct {
 	ServiceTokenEndpointConfig *ServiceTokenEndpointConfig `json:"service_token_endpoint_config,omitempty"`
 	// ServiceUserInfoEndpointConfig holds the value of the service_user_info_endpoint_config edge.
 	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfig `json:"service_user_info_endpoint_config,omitempty"`
+	// ServiceJwksEndpointConfig holds the value of the service_jwks_endpoint_config edge.
+	ServiceJwksEndpointConfig *ServiceJWKSEndpointConfig `json:"service_jwks_endpoint_config,omitempty"`
 	// Applications holds the value of the applications edge.
 	Applications []*Application `json:"applications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 }
 
-// KeySetsOrErr returns the KeySets value or an error if the edge
-// was not loaded in eager-loading.
-func (e ServiceEdges) KeySetsOrErr() ([]*KeySet, error) {
-	if e.loadedTypes[0] {
-		return e.KeySets, nil
+// KeySetOrErr returns the KeySet value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) KeySetOrErr() (*KeySet, error) {
+	if e.KeySet != nil {
+		return e.KeySet, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: keyset.Label}
 	}
-	return nil, &NotLoadedError{edge: "key_sets"}
+	return nil, &NotLoadedError{edge: "key_set"}
 }
 
 // ServiceAuthorizationEndpointConfigOrErr returns the ServiceAuthorizationEndpointConfig value or an error if the edge
@@ -115,10 +121,21 @@ func (e ServiceEdges) ServiceUserInfoEndpointConfigOrErr() (*ServiceUserInfoEndp
 	return nil, &NotLoadedError{edge: "service_user_info_endpoint_config"}
 }
 
+// ServiceJwksEndpointConfigOrErr returns the ServiceJwksEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceJwksEndpointConfigOrErr() (*ServiceJWKSEndpointConfig, error) {
+	if e.ServiceJwksEndpointConfig != nil {
+		return e.ServiceJwksEndpointConfig, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: servicejwksendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_jwks_endpoint_config"}
+}
+
 // ApplicationsOrErr returns the Applications value or an error if the edge
 // was not loaded in eager-loading.
 func (e ServiceEdges) ApplicationsOrErr() ([]*Application, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		return e.Applications, nil
 	}
 	return nil, &NotLoadedError{edge: "applications"}
@@ -223,9 +240,9 @@ func (s *Service) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryKeySets queries the "key_sets" edge of the Service entity.
-func (s *Service) QueryKeySets() *KeySetQuery {
-	return NewServiceClient(s.config).QueryKeySets(s)
+// QueryKeySet queries the "key_set" edge of the Service entity.
+func (s *Service) QueryKeySet() *KeySetQuery {
+	return NewServiceClient(s.config).QueryKeySet(s)
 }
 
 // QueryServiceAuthorizationEndpointConfig queries the "service_authorization_endpoint_config" edge of the Service entity.
@@ -246,6 +263,11 @@ func (s *Service) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointConfigQ
 // QueryServiceUserInfoEndpointConfig queries the "service_user_info_endpoint_config" edge of the Service entity.
 func (s *Service) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceUserInfoEndpointConfig(s)
+}
+
+// QueryServiceJwksEndpointConfig queries the "service_jwks_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceJwksEndpointConfig(s)
 }
 
 // QueryApplications queries the "applications" edge of the Service entity.

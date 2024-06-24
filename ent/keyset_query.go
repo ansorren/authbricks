@@ -24,7 +24,7 @@ type KeySetQuery struct {
 	order           []keyset.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.KeySet
-	withServices    *ServiceQuery
+	withService     *ServiceQuery
 	withSigningKeys *SigningKeyQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
@@ -63,8 +63,8 @@ func (ksq *KeySetQuery) Order(o ...keyset.OrderOption) *KeySetQuery {
 	return ksq
 }
 
-// QueryServices chains the current query on the "services" edge.
-func (ksq *KeySetQuery) QueryServices() *ServiceQuery {
+// QueryService chains the current query on the "service" edge.
+func (ksq *KeySetQuery) QueryService() *ServiceQuery {
 	query := (&ServiceClient{config: ksq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := ksq.prepareQuery(ctx); err != nil {
@@ -77,7 +77,7 @@ func (ksq *KeySetQuery) QueryServices() *ServiceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(keyset.Table, keyset.FieldID, selector),
 			sqlgraph.To(service.Table, service.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, keyset.ServicesTable, keyset.ServicesColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, keyset.ServiceTable, keyset.ServiceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ksq.driver.Dialect(), step)
 		return fromU, nil
@@ -299,7 +299,7 @@ func (ksq *KeySetQuery) Clone() *KeySetQuery {
 		order:           append([]keyset.OrderOption{}, ksq.order...),
 		inters:          append([]Interceptor{}, ksq.inters...),
 		predicates:      append([]predicate.KeySet{}, ksq.predicates...),
-		withServices:    ksq.withServices.Clone(),
+		withService:     ksq.withService.Clone(),
 		withSigningKeys: ksq.withSigningKeys.Clone(),
 		// clone intermediate query.
 		sql:  ksq.sql.Clone(),
@@ -307,14 +307,14 @@ func (ksq *KeySetQuery) Clone() *KeySetQuery {
 	}
 }
 
-// WithServices tells the query-builder to eager-load the nodes that are connected to
-// the "services" edge. The optional arguments are used to configure the query builder of the edge.
-func (ksq *KeySetQuery) WithServices(opts ...func(*ServiceQuery)) *KeySetQuery {
+// WithService tells the query-builder to eager-load the nodes that are connected to
+// the "service" edge. The optional arguments are used to configure the query builder of the edge.
+func (ksq *KeySetQuery) WithService(opts ...func(*ServiceQuery)) *KeySetQuery {
 	query := (&ServiceClient{config: ksq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	ksq.withServices = query
+	ksq.withService = query
 	return ksq
 }
 
@@ -387,11 +387,11 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 		withFKs     = ksq.withFKs
 		_spec       = ksq.querySpec()
 		loadedTypes = [2]bool{
-			ksq.withServices != nil,
+			ksq.withService != nil,
 			ksq.withSigningKeys != nil,
 		}
 	)
-	if ksq.withServices != nil {
+	if ksq.withService != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -415,9 +415,9 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := ksq.withServices; query != nil {
-		if err := ksq.loadServices(ctx, query, nodes, nil,
-			func(n *KeySet, e *Service) { n.Edges.Services = e }); err != nil {
+	if query := ksq.withService; query != nil {
+		if err := ksq.loadService(ctx, query, nodes, nil,
+			func(n *KeySet, e *Service) { n.Edges.Service = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -431,14 +431,14 @@ func (ksq *KeySetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*KeyS
 	return nodes, nil
 }
 
-func (ksq *KeySetQuery) loadServices(ctx context.Context, query *ServiceQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *Service)) error {
+func (ksq *KeySetQuery) loadService(ctx context.Context, query *ServiceQuery, nodes []*KeySet, init func(*KeySet), assign func(*KeySet, *Service)) error {
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*KeySet)
 	for i := range nodes {
-		if nodes[i].service_key_sets == nil {
+		if nodes[i].service_key_set == nil {
 			continue
 		}
-		fk := *nodes[i].service_key_sets
+		fk := *nodes[i].service_key_set
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -455,7 +455,7 @@ func (ksq *KeySetQuery) loadServices(ctx context.Context, query *ServiceQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "service_key_sets" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "service_key_set" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

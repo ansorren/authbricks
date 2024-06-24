@@ -36,6 +36,9 @@ type ServiceAuthorizationEndpointConfig func(*sql.Selector)
 // ServiceIntrospectionEndpointConfig is the predicate function for serviceintrospectionendpointconfig builders.
 type ServiceIntrospectionEndpointConfig func(*sql.Selector)
 
+// ServiceJWKSEndpointConfig is the predicate function for servicejwksendpointconfig builders.
+type ServiceJWKSEndpointConfig func(*sql.Selector)
+
 // ServiceTokenEndpointConfig is the predicate function for servicetokenendpointconfig builders.
 type ServiceTokenEndpointConfig func(*sql.Selector)
 

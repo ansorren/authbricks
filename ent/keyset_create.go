@@ -26,23 +26,23 @@ func (ksc *KeySetCreate) SetID(s string) *KeySetCreate {
 	return ksc
 }
 
-// SetServicesID sets the "services" edge to the Service entity by ID.
-func (ksc *KeySetCreate) SetServicesID(id string) *KeySetCreate {
-	ksc.mutation.SetServicesID(id)
+// SetServiceID sets the "service" edge to the Service entity by ID.
+func (ksc *KeySetCreate) SetServiceID(id string) *KeySetCreate {
+	ksc.mutation.SetServiceID(id)
 	return ksc
 }
 
-// SetNillableServicesID sets the "services" edge to the Service entity by ID if the given value is not nil.
-func (ksc *KeySetCreate) SetNillableServicesID(id *string) *KeySetCreate {
+// SetNillableServiceID sets the "service" edge to the Service entity by ID if the given value is not nil.
+func (ksc *KeySetCreate) SetNillableServiceID(id *string) *KeySetCreate {
 	if id != nil {
-		ksc = ksc.SetServicesID(*id)
+		ksc = ksc.SetServiceID(*id)
 	}
 	return ksc
 }
 
-// SetServices sets the "services" edge to the Service entity.
-func (ksc *KeySetCreate) SetServices(s *Service) *KeySetCreate {
-	return ksc.SetServicesID(s.ID)
+// SetService sets the "service" edge to the Service entity.
+func (ksc *KeySetCreate) SetService(s *Service) *KeySetCreate {
+	return ksc.SetServiceID(s.ID)
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by IDs.
@@ -134,12 +134,12 @@ func (ksc *KeySetCreate) createSpec() (*KeySet, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if nodes := ksc.mutation.ServicesIDs(); len(nodes) > 0 {
+	if nodes := ksc.mutation.ServiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
-			Table:   keyset.ServicesTable,
-			Columns: []string{keyset.ServicesColumn},
+			Table:   keyset.ServiceTable,
+			Columns: []string{keyset.ServiceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(service.FieldID, field.TypeString),
@@ -148,7 +148,7 @@ func (ksc *KeySetCreate) createSpec() (*KeySet, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.service_key_sets = &nodes[0]
+		_node.service_key_set = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ksc.mutation.SigningKeysIDs(); len(nodes) > 0 {

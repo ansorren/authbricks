@@ -22,6 +22,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
@@ -99,6 +100,7 @@ func checkColumn(table, column string) error {
 			service.Table:                            service.ValidColumn,
 			serviceauthorizationendpointconfig.Table: serviceauthorizationendpointconfig.ValidColumn,
 			serviceintrospectionendpointconfig.Table: serviceintrospectionendpointconfig.ValidColumn,
+			servicejwksendpointconfig.Table:          servicejwksendpointconfig.ValidColumn,
 			servicetokenendpointconfig.Table:         servicetokenendpointconfig.ValidColumn,
 			serviceuserinfoendpointconfig.Table:      serviceuserinfoendpointconfig.ValidColumn,
 			session.Table:                            session.ValidColumn,

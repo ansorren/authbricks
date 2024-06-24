@@ -28,8 +28,8 @@ const (
 	FieldGrantTypes = "grant_types"
 	// FieldResponseTypes holds the string denoting the response_types field in the database.
 	FieldResponseTypes = "response_types"
-	// EdgeKeySets holds the string denoting the key_sets edge name in mutations.
-	EdgeKeySets = "key_sets"
+	// EdgeKeySet holds the string denoting the key_set edge name in mutations.
+	EdgeKeySet = "key_set"
 	// EdgeServiceAuthorizationEndpointConfig holds the string denoting the service_authorization_endpoint_config edge name in mutations.
 	EdgeServiceAuthorizationEndpointConfig = "service_authorization_endpoint_config"
 	// EdgeServiceIntrospectionEndpointConfig holds the string denoting the service_introspection_endpoint_config edge name in mutations.
@@ -38,17 +38,19 @@ const (
 	EdgeServiceTokenEndpointConfig = "service_token_endpoint_config"
 	// EdgeServiceUserInfoEndpointConfig holds the string denoting the service_user_info_endpoint_config edge name in mutations.
 	EdgeServiceUserInfoEndpointConfig = "service_user_info_endpoint_config"
+	// EdgeServiceJwksEndpointConfig holds the string denoting the service_jwks_endpoint_config edge name in mutations.
+	EdgeServiceJwksEndpointConfig = "service_jwks_endpoint_config"
 	// EdgeApplications holds the string denoting the applications edge name in mutations.
 	EdgeApplications = "applications"
 	// Table holds the table name of the service in the database.
 	Table = "services"
-	// KeySetsTable is the table that holds the key_sets relation/edge.
-	KeySetsTable = "key_sets"
-	// KeySetsInverseTable is the table name for the KeySet entity.
+	// KeySetTable is the table that holds the key_set relation/edge.
+	KeySetTable = "key_sets"
+	// KeySetInverseTable is the table name for the KeySet entity.
 	// It exists in this package in order to avoid circular dependency with the "keyset" package.
-	KeySetsInverseTable = "key_sets"
-	// KeySetsColumn is the table column denoting the key_sets relation/edge.
-	KeySetsColumn = "service_key_sets"
+	KeySetInverseTable = "key_sets"
+	// KeySetColumn is the table column denoting the key_set relation/edge.
+	KeySetColumn = "service_key_set"
 	// ServiceAuthorizationEndpointConfigTable is the table that holds the service_authorization_endpoint_config relation/edge.
 	ServiceAuthorizationEndpointConfigTable = "service_authorization_endpoint_configs"
 	// ServiceAuthorizationEndpointConfigInverseTable is the table name for the ServiceAuthorizationEndpointConfig entity.
@@ -77,6 +79,13 @@ const (
 	ServiceUserInfoEndpointConfigInverseTable = "service_user_info_endpoint_configs"
 	// ServiceUserInfoEndpointConfigColumn is the table column denoting the service_user_info_endpoint_config relation/edge.
 	ServiceUserInfoEndpointConfigColumn = "service_service_user_info_endpoint_config"
+	// ServiceJwksEndpointConfigTable is the table that holds the service_jwks_endpoint_config relation/edge.
+	ServiceJwksEndpointConfigTable = "service_jwks_endpoint_configs"
+	// ServiceJwksEndpointConfigInverseTable is the table name for the ServiceJWKSEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "servicejwksendpointconfig" package.
+	ServiceJwksEndpointConfigInverseTable = "service_jwks_endpoint_configs"
+	// ServiceJwksEndpointConfigColumn is the table column denoting the service_jwks_endpoint_config relation/edge.
+	ServiceJwksEndpointConfigColumn = "service_service_jwks_endpoint_config"
 	// ApplicationsTable is the table that holds the applications relation/edge.
 	ApplicationsTable = "applications"
 	// ApplicationsInverseTable is the table name for the Application entity.
@@ -146,17 +155,10 @@ func ByServiceMetadata(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldServiceMetadata, opts...).ToFunc()
 }
 
-// ByKeySetsCount orders the results by key_sets count.
-func ByKeySetsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByKeySetField orders the results by key_set field.
+func ByKeySetField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newKeySetsStep(), opts...)
-	}
-}
-
-// ByKeySets orders the results by key_sets terms.
-func ByKeySets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newKeySetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newKeySetStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -188,6 +190,13 @@ func ByServiceUserInfoEndpointConfigField(field string, opts ...sql.OrderTermOpt
 	}
 }
 
+// ByServiceJwksEndpointConfigField orders the results by service_jwks_endpoint_config field.
+func ByServiceJwksEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceJwksEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByApplicationsCount orders the results by applications count.
 func ByApplicationsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -201,11 +210,11 @@ func ByApplications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newApplicationsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newKeySetsStep() *sqlgraph.Step {
+func newKeySetStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(KeySetsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, KeySetsTable, KeySetsColumn),
+		sqlgraph.To(KeySetInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, KeySetTable, KeySetColumn),
 	)
 }
 func newServiceAuthorizationEndpointConfigStep() *sqlgraph.Step {
@@ -234,6 +243,13 @@ func newServiceUserInfoEndpointConfigStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ServiceUserInfoEndpointConfigInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ServiceUserInfoEndpointConfigTable, ServiceUserInfoEndpointConfigColumn),
+	)
+}
+func newServiceJwksEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceJwksEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceJwksEndpointConfigTable, ServiceJwksEndpointConfigColumn),
 	)
 }
 func newApplicationsStep() *sqlgraph.Step {

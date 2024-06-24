@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RSAKey is a struct that holds an RSA private/public keypair.
 type RSAKey struct {
 	Private *rsa.PrivateKey
 	Public  *rsa.PublicKey
@@ -61,8 +62,8 @@ func GetRSAKeyFromPEM(pemKey []byte) (*RSAKey, error) {
 	}, nil
 }
 
-// Generate4096BitsRSAKey generates a 4096-bits RSA keypair.
-func Generate4096BitsRSAKey() (*RSAKey, error) {
+// generate4096BitsRSAKey generates a 4096-bits RSA keypair.
+func generate4096BitsRSAKey() (*RSAKey, error) {
 	key, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to generate 4096 bits RSA key")
@@ -72,4 +73,13 @@ func Generate4096BitsRSAKey() (*RSAKey, error) {
 		Private: key,
 		Public:  &key.PublicKey,
 	}, nil
+}
+
+// GenerateRSAPrivateKey generates an RSA private key.
+func GenerateRSAPrivateKey() (*rsa.PrivateKey, error) {
+	k, err := generate4096BitsRSAKey()
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to generate RSA key")
+	}
+	return k.Private, nil
 }

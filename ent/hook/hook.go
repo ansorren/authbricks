@@ -129,6 +129,18 @@ func (f ServiceIntrospectionEndpointConfigFunc) Mutate(ctx context.Context, m en
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceIntrospectionEndpointConfigMutation", m)
 }
 
+// The ServiceJWKSEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as ServiceJWKSEndpointConfig mutator.
+type ServiceJWKSEndpointConfigFunc func(context.Context, *ent.ServiceJWKSEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ServiceJWKSEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ServiceJWKSEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceJWKSEndpointConfigMutation", m)
+}
+
 // The ServiceTokenEndpointConfigFunc type is an adapter to allow the use of ordinary
 // function as ServiceTokenEndpointConfig mutator.
 type ServiceTokenEndpointConfigFunc func(context.Context, *ent.ServiceTokenEndpointConfigMutation) (ent.Value, error)

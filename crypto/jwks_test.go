@@ -11,7 +11,7 @@ import (
 )
 
 func TestNewJWKSFromRSAKey(t *testing.T) {
-	key, err := Generate4096BitsRSAKey()
+	key, err := generate4096BitsRSAKey()
 	require.Nil(t, err)
 
 	keys := []crypto.PublicKey{

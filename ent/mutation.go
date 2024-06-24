@@ -22,6 +22,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
@@ -50,6 +51,7 @@ const (
 	TypeService                            = "Service"
 	TypeServiceAuthorizationEndpointConfig = "ServiceAuthorizationEndpointConfig"
 	TypeServiceIntrospectionEndpointConfig = "ServiceIntrospectionEndpointConfig"
+	TypeServiceJWKSEndpointConfig          = "ServiceJWKSEndpointConfig"
 	TypeServiceTokenEndpointConfig         = "ServiceTokenEndpointConfig"
 	TypeServiceUserInfoEndpointConfig      = "ServiceUserInfoEndpointConfig"
 	TypeSession                            = "Session"
@@ -3712,8 +3714,8 @@ type KeySetMutation struct {
 	typ                 string
 	id                  *string
 	clearedFields       map[string]struct{}
-	services            *string
-	clearedservices     bool
+	service             *string
+	clearedservice      bool
 	signing_keys        map[string]struct{}
 	removedsigning_keys map[string]struct{}
 	clearedsigning_keys bool
@@ -3826,43 +3828,43 @@ func (m *KeySetMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetServicesID sets the "services" edge to the Service entity by id.
-func (m *KeySetMutation) SetServicesID(id string) {
-	m.services = &id
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *KeySetMutation) SetServiceID(id string) {
+	m.service = &id
 }
 
-// ClearServices clears the "services" edge to the Service entity.
-func (m *KeySetMutation) ClearServices() {
-	m.clearedservices = true
+// ClearService clears the "service" edge to the Service entity.
+func (m *KeySetMutation) ClearService() {
+	m.clearedservice = true
 }
 
-// ServicesCleared reports if the "services" edge to the Service entity was cleared.
-func (m *KeySetMutation) ServicesCleared() bool {
-	return m.clearedservices
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *KeySetMutation) ServiceCleared() bool {
+	return m.clearedservice
 }
 
-// ServicesID returns the "services" edge ID in the mutation.
-func (m *KeySetMutation) ServicesID() (id string, exists bool) {
-	if m.services != nil {
-		return *m.services, true
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *KeySetMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
 	}
 	return
 }
 
-// ServicesIDs returns the "services" edge IDs in the mutation.
+// ServiceIDs returns the "service" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ServicesID instead. It exists only for internal usage by the builders.
-func (m *KeySetMutation) ServicesIDs() (ids []string) {
-	if id := m.services; id != nil {
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *KeySetMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetServices resets all changes to the "services" edge.
-func (m *KeySetMutation) ResetServices() {
-	m.services = nil
-	m.clearedservices = false
+// ResetService resets all changes to the "service" edge.
+func (m *KeySetMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
 }
 
 // AddSigningKeyIDs adds the "signing_keys" edge to the SigningKey entity by ids.
@@ -4028,8 +4030,8 @@ func (m *KeySetMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *KeySetMutation) AddedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.services != nil {
-		edges = append(edges, keyset.EdgeServices)
+	if m.service != nil {
+		edges = append(edges, keyset.EdgeService)
 	}
 	if m.signing_keys != nil {
 		edges = append(edges, keyset.EdgeSigningKeys)
@@ -4041,8 +4043,8 @@ func (m *KeySetMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *KeySetMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case keyset.EdgeServices:
-		if id := m.services; id != nil {
+	case keyset.EdgeService:
+		if id := m.service; id != nil {
 			return []ent.Value{*id}
 		}
 	case keyset.EdgeSigningKeys:
@@ -4081,8 +4083,8 @@ func (m *KeySetMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *KeySetMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.clearedservices {
-		edges = append(edges, keyset.EdgeServices)
+	if m.clearedservice {
+		edges = append(edges, keyset.EdgeService)
 	}
 	if m.clearedsigning_keys {
 		edges = append(edges, keyset.EdgeSigningKeys)
@@ -4094,8 +4096,8 @@ func (m *KeySetMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *KeySetMutation) EdgeCleared(name string) bool {
 	switch name {
-	case keyset.EdgeServices:
-		return m.clearedservices
+	case keyset.EdgeService:
+		return m.clearedservice
 	case keyset.EdgeSigningKeys:
 		return m.clearedsigning_keys
 	}
@@ -4106,8 +4108,8 @@ func (m *KeySetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *KeySetMutation) ClearEdge(name string) error {
 	switch name {
-	case keyset.EdgeServices:
-		m.ClearServices()
+	case keyset.EdgeService:
+		m.ClearService()
 		return nil
 	}
 	return fmt.Errorf("unknown KeySet unique edge %s", name)
@@ -4117,8 +4119,8 @@ func (m *KeySetMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *KeySetMutation) ResetEdge(name string) error {
 	switch name {
-	case keyset.EdgeServices:
-		m.ResetServices()
+	case keyset.EdgeService:
+		m.ResetService()
 		return nil
 	case keyset.EdgeSigningKeys:
 		m.ResetSigningKeys()
@@ -4979,9 +4981,8 @@ type ServiceMutation struct {
 	response_types                               *[]string
 	appendresponse_types                         []string
 	clearedFields                                map[string]struct{}
-	key_sets                                     map[string]struct{}
-	removedkey_sets                              map[string]struct{}
-	clearedkey_sets                              bool
+	key_set                                      *string
+	clearedkey_set                               bool
 	service_authorization_endpoint_config        *string
 	clearedservice_authorization_endpoint_config bool
 	service_introspection_endpoint_config        *string
@@ -4990,6 +4991,8 @@ type ServiceMutation struct {
 	clearedservice_token_endpoint_config         bool
 	service_user_info_endpoint_config            *string
 	clearedservice_user_info_endpoint_config     bool
+	service_jwks_endpoint_config                 *string
+	clearedservice_jwks_endpoint_config          bool
 	applications                                 map[string]struct{}
 	removedapplications                          map[string]struct{}
 	clearedapplications                          bool
@@ -5450,58 +5453,43 @@ func (m *ServiceMutation) ResetResponseTypes() {
 	m.appendresponse_types = nil
 }
 
-// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by ids.
-func (m *ServiceMutation) AddKeySetIDs(ids ...string) {
-	if m.key_sets == nil {
-		m.key_sets = make(map[string]struct{})
-	}
-	for i := range ids {
-		m.key_sets[ids[i]] = struct{}{}
-	}
+// SetKeySetID sets the "key_set" edge to the KeySet entity by id.
+func (m *ServiceMutation) SetKeySetID(id string) {
+	m.key_set = &id
 }
 
-// ClearKeySets clears the "key_sets" edge to the KeySet entity.
-func (m *ServiceMutation) ClearKeySets() {
-	m.clearedkey_sets = true
+// ClearKeySet clears the "key_set" edge to the KeySet entity.
+func (m *ServiceMutation) ClearKeySet() {
+	m.clearedkey_set = true
 }
 
-// KeySetsCleared reports if the "key_sets" edge to the KeySet entity was cleared.
-func (m *ServiceMutation) KeySetsCleared() bool {
-	return m.clearedkey_sets
+// KeySetCleared reports if the "key_set" edge to the KeySet entity was cleared.
+func (m *ServiceMutation) KeySetCleared() bool {
+	return m.clearedkey_set
 }
 
-// RemoveKeySetIDs removes the "key_sets" edge to the KeySet entity by IDs.
-func (m *ServiceMutation) RemoveKeySetIDs(ids ...string) {
-	if m.removedkey_sets == nil {
-		m.removedkey_sets = make(map[string]struct{})
-	}
-	for i := range ids {
-		delete(m.key_sets, ids[i])
-		m.removedkey_sets[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedKeySets returns the removed IDs of the "key_sets" edge to the KeySet entity.
-func (m *ServiceMutation) RemovedKeySetsIDs() (ids []string) {
-	for id := range m.removedkey_sets {
-		ids = append(ids, id)
+// KeySetID returns the "key_set" edge ID in the mutation.
+func (m *ServiceMutation) KeySetID() (id string, exists bool) {
+	if m.key_set != nil {
+		return *m.key_set, true
 	}
 	return
 }
 
-// KeySetsIDs returns the "key_sets" edge IDs in the mutation.
-func (m *ServiceMutation) KeySetsIDs() (ids []string) {
-	for id := range m.key_sets {
-		ids = append(ids, id)
+// KeySetIDs returns the "key_set" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// KeySetID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) KeySetIDs() (ids []string) {
+	if id := m.key_set; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetKeySets resets all changes to the "key_sets" edge.
-func (m *ServiceMutation) ResetKeySets() {
-	m.key_sets = nil
-	m.clearedkey_sets = false
-	m.removedkey_sets = nil
+// ResetKeySet resets all changes to the "key_set" edge.
+func (m *ServiceMutation) ResetKeySet() {
+	m.key_set = nil
+	m.clearedkey_set = false
 }
 
 // SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by id.
@@ -5658,6 +5646,45 @@ func (m *ServiceMutation) ServiceUserInfoEndpointConfigIDs() (ids []string) {
 func (m *ServiceMutation) ResetServiceUserInfoEndpointConfig() {
 	m.service_user_info_endpoint_config = nil
 	m.clearedservice_user_info_endpoint_config = false
+}
+
+// SetServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceJwksEndpointConfigID(id string) {
+	m.service_jwks_endpoint_config = &id
+}
+
+// ClearServiceJwksEndpointConfig clears the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceJwksEndpointConfig() {
+	m.clearedservice_jwks_endpoint_config = true
+}
+
+// ServiceJwksEndpointConfigCleared reports if the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceJwksEndpointConfigCleared() bool {
+	return m.clearedservice_jwks_endpoint_config
+}
+
+// ServiceJwksEndpointConfigID returns the "service_jwks_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceJwksEndpointConfigID() (id string, exists bool) {
+	if m.service_jwks_endpoint_config != nil {
+		return *m.service_jwks_endpoint_config, true
+	}
+	return
+}
+
+// ServiceJwksEndpointConfigIDs returns the "service_jwks_endpoint_config" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceJwksEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceJwksEndpointConfigIDs() (ids []string) {
+	if id := m.service_jwks_endpoint_config; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServiceJwksEndpointConfig resets all changes to the "service_jwks_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceJwksEndpointConfig() {
+	m.service_jwks_endpoint_config = nil
+	m.clearedservice_jwks_endpoint_config = false
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by ids.
@@ -5966,9 +5993,9 @@ func (m *ServiceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ServiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
-	if m.key_sets != nil {
-		edges = append(edges, service.EdgeKeySets)
+	edges := make([]string, 0, 7)
+	if m.key_set != nil {
+		edges = append(edges, service.EdgeKeySet)
 	}
 	if m.service_authorization_endpoint_config != nil {
 		edges = append(edges, service.EdgeServiceAuthorizationEndpointConfig)
@@ -5982,6 +6009,9 @@ func (m *ServiceMutation) AddedEdges() []string {
 	if m.service_user_info_endpoint_config != nil {
 		edges = append(edges, service.EdgeServiceUserInfoEndpointConfig)
 	}
+	if m.service_jwks_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceJwksEndpointConfig)
+	}
 	if m.applications != nil {
 		edges = append(edges, service.EdgeApplications)
 	}
@@ -5992,12 +6022,10 @@ func (m *ServiceMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case service.EdgeKeySets:
-		ids := make([]ent.Value, 0, len(m.key_sets))
-		for id := range m.key_sets {
-			ids = append(ids, id)
+	case service.EdgeKeySet:
+		if id := m.key_set; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case service.EdgeServiceAuthorizationEndpointConfig:
 		if id := m.service_authorization_endpoint_config; id != nil {
 			return []ent.Value{*id}
@@ -6014,6 +6042,10 @@ func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.service_user_info_endpoint_config; id != nil {
 			return []ent.Value{*id}
 		}
+	case service.EdgeServiceJwksEndpointConfig:
+		if id := m.service_jwks_endpoint_config; id != nil {
+			return []ent.Value{*id}
+		}
 	case service.EdgeApplications:
 		ids := make([]ent.Value, 0, len(m.applications))
 		for id := range m.applications {
@@ -6026,10 +6058,7 @@ func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ServiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
-	if m.removedkey_sets != nil {
-		edges = append(edges, service.EdgeKeySets)
-	}
+	edges := make([]string, 0, 7)
 	if m.removedapplications != nil {
 		edges = append(edges, service.EdgeApplications)
 	}
@@ -6040,12 +6069,6 @@ func (m *ServiceMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ServiceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case service.EdgeKeySets:
-		ids := make([]ent.Value, 0, len(m.removedkey_sets))
-		for id := range m.removedkey_sets {
-			ids = append(ids, id)
-		}
-		return ids
 	case service.EdgeApplications:
 		ids := make([]ent.Value, 0, len(m.removedapplications))
 		for id := range m.removedapplications {
@@ -6058,9 +6081,9 @@ func (m *ServiceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ServiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
-	if m.clearedkey_sets {
-		edges = append(edges, service.EdgeKeySets)
+	edges := make([]string, 0, 7)
+	if m.clearedkey_set {
+		edges = append(edges, service.EdgeKeySet)
 	}
 	if m.clearedservice_authorization_endpoint_config {
 		edges = append(edges, service.EdgeServiceAuthorizationEndpointConfig)
@@ -6074,6 +6097,9 @@ func (m *ServiceMutation) ClearedEdges() []string {
 	if m.clearedservice_user_info_endpoint_config {
 		edges = append(edges, service.EdgeServiceUserInfoEndpointConfig)
 	}
+	if m.clearedservice_jwks_endpoint_config {
+		edges = append(edges, service.EdgeServiceJwksEndpointConfig)
+	}
 	if m.clearedapplications {
 		edges = append(edges, service.EdgeApplications)
 	}
@@ -6084,8 +6110,8 @@ func (m *ServiceMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ServiceMutation) EdgeCleared(name string) bool {
 	switch name {
-	case service.EdgeKeySets:
-		return m.clearedkey_sets
+	case service.EdgeKeySet:
+		return m.clearedkey_set
 	case service.EdgeServiceAuthorizationEndpointConfig:
 		return m.clearedservice_authorization_endpoint_config
 	case service.EdgeServiceIntrospectionEndpointConfig:
@@ -6094,6 +6120,8 @@ func (m *ServiceMutation) EdgeCleared(name string) bool {
 		return m.clearedservice_token_endpoint_config
 	case service.EdgeServiceUserInfoEndpointConfig:
 		return m.clearedservice_user_info_endpoint_config
+	case service.EdgeServiceJwksEndpointConfig:
+		return m.clearedservice_jwks_endpoint_config
 	case service.EdgeApplications:
 		return m.clearedapplications
 	}
@@ -6104,6 +6132,9 @@ func (m *ServiceMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ServiceMutation) ClearEdge(name string) error {
 	switch name {
+	case service.EdgeKeySet:
+		m.ClearKeySet()
+		return nil
 	case service.EdgeServiceAuthorizationEndpointConfig:
 		m.ClearServiceAuthorizationEndpointConfig()
 		return nil
@@ -6116,6 +6147,9 @@ func (m *ServiceMutation) ClearEdge(name string) error {
 	case service.EdgeServiceUserInfoEndpointConfig:
 		m.ClearServiceUserInfoEndpointConfig()
 		return nil
+	case service.EdgeServiceJwksEndpointConfig:
+		m.ClearServiceJwksEndpointConfig()
+		return nil
 	}
 	return fmt.Errorf("unknown Service unique edge %s", name)
 }
@@ -6124,8 +6158,8 @@ func (m *ServiceMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ServiceMutation) ResetEdge(name string) error {
 	switch name {
-	case service.EdgeKeySets:
-		m.ResetKeySets()
+	case service.EdgeKeySet:
+		m.ResetKeySet()
 		return nil
 	case service.EdgeServiceAuthorizationEndpointConfig:
 		m.ResetServiceAuthorizationEndpointConfig()
@@ -6138,6 +6172,9 @@ func (m *ServiceMutation) ResetEdge(name string) error {
 		return nil
 	case service.EdgeServiceUserInfoEndpointConfig:
 		m.ResetServiceUserInfoEndpointConfig()
+		return nil
+	case service.EdgeServiceJwksEndpointConfig:
+		m.ResetServiceJwksEndpointConfig()
 		return nil
 	case service.EdgeApplications:
 		m.ResetApplications()
@@ -7050,6 +7087,405 @@ func (m *ServiceIntrospectionEndpointConfigMutation) ResetEdge(name string) erro
 		return nil
 	}
 	return fmt.Errorf("unknown ServiceIntrospectionEndpointConfig edge %s", name)
+}
+
+// ServiceJWKSEndpointConfigMutation represents an operation that mutates the ServiceJWKSEndpointConfig nodes in the graph.
+type ServiceJWKSEndpointConfigMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *string
+	endpoint       *string
+	clearedFields  map[string]struct{}
+	service        *string
+	clearedservice bool
+	done           bool
+	oldValue       func(context.Context) (*ServiceJWKSEndpointConfig, error)
+	predicates     []predicate.ServiceJWKSEndpointConfig
+}
+
+var _ ent.Mutation = (*ServiceJWKSEndpointConfigMutation)(nil)
+
+// servicejwksendpointconfigOption allows management of the mutation configuration using functional options.
+type servicejwksendpointconfigOption func(*ServiceJWKSEndpointConfigMutation)
+
+// newServiceJWKSEndpointConfigMutation creates new mutation for the ServiceJWKSEndpointConfig entity.
+func newServiceJWKSEndpointConfigMutation(c config, op Op, opts ...servicejwksendpointconfigOption) *ServiceJWKSEndpointConfigMutation {
+	m := &ServiceJWKSEndpointConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeServiceJWKSEndpointConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withServiceJWKSEndpointConfigID sets the ID field of the mutation.
+func withServiceJWKSEndpointConfigID(id string) servicejwksendpointconfigOption {
+	return func(m *ServiceJWKSEndpointConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ServiceJWKSEndpointConfig
+		)
+		m.oldValue = func(ctx context.Context) (*ServiceJWKSEndpointConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ServiceJWKSEndpointConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withServiceJWKSEndpointConfig sets the old ServiceJWKSEndpointConfig of the mutation.
+func withServiceJWKSEndpointConfig(node *ServiceJWKSEndpointConfig) servicejwksendpointconfigOption {
+	return func(m *ServiceJWKSEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*ServiceJWKSEndpointConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ServiceJWKSEndpointConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ServiceJWKSEndpointConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ServiceJWKSEndpointConfig entities.
+func (m *ServiceJWKSEndpointConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ServiceJWKSEndpointConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ServiceJWKSEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ServiceJWKSEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *ServiceJWKSEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *ServiceJWKSEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the ServiceJWKSEndpointConfig entity.
+// If the ServiceJWKSEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ServiceJWKSEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *ServiceJWKSEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *ServiceJWKSEndpointConfigMutation) SetServiceID(id string) {
+	m.service = &id
+}
+
+// ClearService clears the "service" edge to the Service entity.
+func (m *ServiceJWKSEndpointConfigMutation) ClearService() {
+	m.clearedservice = true
+}
+
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *ServiceJWKSEndpointConfigMutation) ServiceCleared() bool {
+	return m.clearedservice
+}
+
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *ServiceJWKSEndpointConfigMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
+	}
+	return
+}
+
+// ServiceIDs returns the "service" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *ServiceJWKSEndpointConfigMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetService resets all changes to the "service" edge.
+func (m *ServiceJWKSEndpointConfigMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
+}
+
+// Where appends a list predicates to the ServiceJWKSEndpointConfigMutation builder.
+func (m *ServiceJWKSEndpointConfigMutation) Where(ps ...predicate.ServiceJWKSEndpointConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ServiceJWKSEndpointConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ServiceJWKSEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ServiceJWKSEndpointConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ServiceJWKSEndpointConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ServiceJWKSEndpointConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ServiceJWKSEndpointConfig).
+func (m *ServiceJWKSEndpointConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ServiceJWKSEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.endpoint != nil {
+		fields = append(fields, servicejwksendpointconfig.FieldEndpoint)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ServiceJWKSEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case servicejwksendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ServiceJWKSEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case servicejwksendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	}
+	return nil, fmt.Errorf("unknown ServiceJWKSEndpointConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceJWKSEndpointConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case servicejwksendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ServiceJWKSEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ServiceJWKSEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ServiceJWKSEndpointConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ServiceJWKSEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ServiceJWKSEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case servicejwksendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.service != nil {
+		edges = append(edges, servicejwksendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case servicejwksendpointconfig.EdgeService:
+		if id := m.service; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedservice {
+		edges = append(edges, servicejwksendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ServiceJWKSEndpointConfigMutation) EdgeCleared(name string) bool {
+	switch name {
+	case servicejwksendpointconfig.EdgeService:
+		return m.clearedservice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ServiceJWKSEndpointConfigMutation) ClearEdge(name string) error {
+	switch name {
+	case servicejwksendpointconfig.EdgeService:
+		m.ClearService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ServiceJWKSEndpointConfigMutation) ResetEdge(name string) error {
+	switch name {
+	case servicejwksendpointconfig.EdgeService:
+		m.ResetService()
+		return nil
+	}
+	return fmt.Errorf("unknown ServiceJWKSEndpointConfig edge %s", name)
 }
 
 // ServiceTokenEndpointConfigMutation represents an operation that mutates the ServiceTokenEndpointConfig nodes in the graph.

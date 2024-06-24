@@ -19,15 +19,15 @@ type KeySet struct {
 	ID string `json:"id" hcl:"id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the KeySetQuery when eager-loading is set.
-	Edges            KeySetEdges `json:"edges"`
-	service_key_sets *string
-	selectValues     sql.SelectValues
+	Edges           KeySetEdges `json:"edges"`
+	service_key_set *string
+	selectValues    sql.SelectValues
 }
 
 // KeySetEdges holds the relations/edges for other nodes in the graph.
 type KeySetEdges struct {
-	// Services holds the value of the services edge.
-	Services *Service `json:"services,omitempty"`
+	// Service holds the value of the service edge.
+	Service *Service `json:"service,omitempty"`
 	// SigningKeys holds the value of the signing_keys edge.
 	SigningKeys []*SigningKey `json:"signing_keys,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -35,15 +35,15 @@ type KeySetEdges struct {
 	loadedTypes [2]bool
 }
 
-// ServicesOrErr returns the Services value or an error if the edge
+// ServiceOrErr returns the Service value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e KeySetEdges) ServicesOrErr() (*Service, error) {
-	if e.Services != nil {
-		return e.Services, nil
+func (e KeySetEdges) ServiceOrErr() (*Service, error) {
+	if e.Service != nil {
+		return e.Service, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: service.Label}
 	}
-	return nil, &NotLoadedError{edge: "services"}
+	return nil, &NotLoadedError{edge: "service"}
 }
 
 // SigningKeysOrErr returns the SigningKeys value or an error if the edge
@@ -62,7 +62,7 @@ func (*KeySet) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case keyset.FieldID:
 			values[i] = new(sql.NullString)
-		case keyset.ForeignKeys[0]: // service_key_sets
+		case keyset.ForeignKeys[0]: // service_key_set
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -87,10 +87,10 @@ func (ks *KeySet) assignValues(columns []string, values []any) error {
 			}
 		case keyset.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_key_sets", values[i])
+				return fmt.Errorf("unexpected type %T for field service_key_set", values[i])
 			} else if value.Valid {
-				ks.service_key_sets = new(string)
-				*ks.service_key_sets = value.String
+				ks.service_key_set = new(string)
+				*ks.service_key_set = value.String
 			}
 		default:
 			ks.selectValues.Set(columns[i], values[i])
@@ -105,9 +105,9 @@ func (ks *KeySet) Value(name string) (ent.Value, error) {
 	return ks.selectValues.Get(name)
 }
 
-// QueryServices queries the "services" edge of the KeySet entity.
-func (ks *KeySet) QueryServices() *ServiceQuery {
-	return NewKeySetClient(ks.config).QueryServices(ks)
+// QueryService queries the "service" edge of the KeySet entity.
+func (ks *KeySet) QueryService() *ServiceQuery {
+	return NewKeySetClient(ks.config).QueryService(ks)
 }
 
 // QuerySigningKeys queries the "signing_keys" edge of the KeySet entity.

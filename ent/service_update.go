@@ -17,6 +17,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
@@ -138,19 +139,23 @@ func (su *ServiceUpdate) AppendResponseTypes(s []string) *ServiceUpdate {
 	return su
 }
 
-// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
-func (su *ServiceUpdate) AddKeySetIDs(ids ...string) *ServiceUpdate {
-	su.mutation.AddKeySetIDs(ids...)
+// SetKeySetID sets the "key_set" edge to the KeySet entity by ID.
+func (su *ServiceUpdate) SetKeySetID(id string) *ServiceUpdate {
+	su.mutation.SetKeySetID(id)
 	return su
 }
 
-// AddKeySets adds the "key_sets" edges to the KeySet entity.
-func (su *ServiceUpdate) AddKeySets(k ...*KeySet) *ServiceUpdate {
-	ids := make([]string, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
+// SetNillableKeySetID sets the "key_set" edge to the KeySet entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableKeySetID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetKeySetID(*id)
 	}
-	return su.AddKeySetIDs(ids...)
+	return su
+}
+
+// SetKeySet sets the "key_set" edge to the KeySet entity.
+func (su *ServiceUpdate) SetKeySet(k *KeySet) *ServiceUpdate {
+	return su.SetKeySetID(k.ID)
 }
 
 // SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
@@ -229,6 +234,25 @@ func (su *ServiceUpdate) SetServiceUserInfoEndpointConfig(s *ServiceUserInfoEndp
 	return su.SetServiceUserInfoEndpointConfigID(s.ID)
 }
 
+// SetServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceJwksEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceJwksEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceJwksEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceJwksEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceJwksEndpointConfig sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceJwksEndpointConfig(s *ServiceJWKSEndpointConfig) *ServiceUpdate {
+	return su.SetServiceJwksEndpointConfigID(s.ID)
+}
+
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
 func (su *ServiceUpdate) AddApplicationIDs(ids ...string) *ServiceUpdate {
 	su.mutation.AddApplicationIDs(ids...)
@@ -249,25 +273,10 @@ func (su *ServiceUpdate) Mutation() *ServiceMutation {
 	return su.mutation
 }
 
-// ClearKeySets clears all "key_sets" edges to the KeySet entity.
-func (su *ServiceUpdate) ClearKeySets() *ServiceUpdate {
-	su.mutation.ClearKeySets()
+// ClearKeySet clears the "key_set" edge to the KeySet entity.
+func (su *ServiceUpdate) ClearKeySet() *ServiceUpdate {
+	su.mutation.ClearKeySet()
 	return su
-}
-
-// RemoveKeySetIDs removes the "key_sets" edge to KeySet entities by IDs.
-func (su *ServiceUpdate) RemoveKeySetIDs(ids ...string) *ServiceUpdate {
-	su.mutation.RemoveKeySetIDs(ids...)
-	return su
-}
-
-// RemoveKeySets removes "key_sets" edges to KeySet entities.
-func (su *ServiceUpdate) RemoveKeySets(k ...*KeySet) *ServiceUpdate {
-	ids := make([]string, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return su.RemoveKeySetIDs(ids...)
 }
 
 // ClearServiceAuthorizationEndpointConfig clears the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
@@ -291,6 +300,12 @@ func (su *ServiceUpdate) ClearServiceTokenEndpointConfig() *ServiceUpdate {
 // ClearServiceUserInfoEndpointConfig clears the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
 func (su *ServiceUpdate) ClearServiceUserInfoEndpointConfig() *ServiceUpdate {
 	su.mutation.ClearServiceUserInfoEndpointConfig()
+	return su
+}
+
+// ClearServiceJwksEndpointConfig clears the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceJwksEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceJwksEndpointConfig()
 	return su
 }
 
@@ -413,12 +428,12 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, service.FieldResponseTypes, value)
 		})
 	}
-	if su.mutation.KeySetsCleared() {
+	if su.mutation.KeySetCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
+			Table:   service.KeySetTable,
+			Columns: []string{service.KeySetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
@@ -426,28 +441,12 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedKeySetsIDs(); len(nodes) > 0 && !su.mutation.KeySetsCleared() {
+	if nodes := su.mutation.KeySetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.KeySetsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
+			Table:   service.KeySetTable,
+			Columns: []string{service.KeySetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
@@ -567,6 +566,35 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceJwksEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceJwksEndpointConfigTable,
+			Columns: []string{service.ServiceJwksEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceJwksEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceJwksEndpointConfigTable,
+			Columns: []string{service.ServiceJwksEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -743,19 +771,23 @@ func (suo *ServiceUpdateOne) AppendResponseTypes(s []string) *ServiceUpdateOne {
 	return suo
 }
 
-// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
-func (suo *ServiceUpdateOne) AddKeySetIDs(ids ...string) *ServiceUpdateOne {
-	suo.mutation.AddKeySetIDs(ids...)
+// SetKeySetID sets the "key_set" edge to the KeySet entity by ID.
+func (suo *ServiceUpdateOne) SetKeySetID(id string) *ServiceUpdateOne {
+	suo.mutation.SetKeySetID(id)
 	return suo
 }
 
-// AddKeySets adds the "key_sets" edges to the KeySet entity.
-func (suo *ServiceUpdateOne) AddKeySets(k ...*KeySet) *ServiceUpdateOne {
-	ids := make([]string, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
+// SetNillableKeySetID sets the "key_set" edge to the KeySet entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableKeySetID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetKeySetID(*id)
 	}
-	return suo.AddKeySetIDs(ids...)
+	return suo
+}
+
+// SetKeySet sets the "key_set" edge to the KeySet entity.
+func (suo *ServiceUpdateOne) SetKeySet(k *KeySet) *ServiceUpdateOne {
+	return suo.SetKeySetID(k.ID)
 }
 
 // SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
@@ -834,6 +866,25 @@ func (suo *ServiceUpdateOne) SetServiceUserInfoEndpointConfig(s *ServiceUserInfo
 	return suo.SetServiceUserInfoEndpointConfigID(s.ID)
 }
 
+// SetServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceJwksEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceJwksEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceJwksEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceJwksEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceJwksEndpointConfig sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceJwksEndpointConfig(s *ServiceJWKSEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceJwksEndpointConfigID(s.ID)
+}
+
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
 func (suo *ServiceUpdateOne) AddApplicationIDs(ids ...string) *ServiceUpdateOne {
 	suo.mutation.AddApplicationIDs(ids...)
@@ -854,25 +905,10 @@ func (suo *ServiceUpdateOne) Mutation() *ServiceMutation {
 	return suo.mutation
 }
 
-// ClearKeySets clears all "key_sets" edges to the KeySet entity.
-func (suo *ServiceUpdateOne) ClearKeySets() *ServiceUpdateOne {
-	suo.mutation.ClearKeySets()
+// ClearKeySet clears the "key_set" edge to the KeySet entity.
+func (suo *ServiceUpdateOne) ClearKeySet() *ServiceUpdateOne {
+	suo.mutation.ClearKeySet()
 	return suo
-}
-
-// RemoveKeySetIDs removes the "key_sets" edge to KeySet entities by IDs.
-func (suo *ServiceUpdateOne) RemoveKeySetIDs(ids ...string) *ServiceUpdateOne {
-	suo.mutation.RemoveKeySetIDs(ids...)
-	return suo
-}
-
-// RemoveKeySets removes "key_sets" edges to KeySet entities.
-func (suo *ServiceUpdateOne) RemoveKeySets(k ...*KeySet) *ServiceUpdateOne {
-	ids := make([]string, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
-	}
-	return suo.RemoveKeySetIDs(ids...)
 }
 
 // ClearServiceAuthorizationEndpointConfig clears the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity.
@@ -896,6 +932,12 @@ func (suo *ServiceUpdateOne) ClearServiceTokenEndpointConfig() *ServiceUpdateOne
 // ClearServiceUserInfoEndpointConfig clears the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
 func (suo *ServiceUpdateOne) ClearServiceUserInfoEndpointConfig() *ServiceUpdateOne {
 	suo.mutation.ClearServiceUserInfoEndpointConfig()
+	return suo
+}
+
+// ClearServiceJwksEndpointConfig clears the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceJwksEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceJwksEndpointConfig()
 	return suo
 }
 
@@ -1048,12 +1090,12 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 			sqljson.Append(u, service.FieldResponseTypes, value)
 		})
 	}
-	if suo.mutation.KeySetsCleared() {
+	if suo.mutation.KeySetCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
+			Table:   service.KeySetTable,
+			Columns: []string{service.KeySetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
@@ -1061,28 +1103,12 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedKeySetsIDs(); len(nodes) > 0 && !suo.mutation.KeySetsCleared() {
+	if nodes := suo.mutation.KeySetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.KeySetsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
+			Table:   service.KeySetTable,
+			Columns: []string{service.KeySetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
@@ -1202,6 +1228,35 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceJwksEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceJwksEndpointConfigTable,
+			Columns: []string{service.ServiceJwksEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceJwksEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceJwksEndpointConfigTable,
+			Columns: []string{service.ServiceJwksEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

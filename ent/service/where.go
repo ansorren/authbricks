@@ -343,21 +343,21 @@ func ServiceMetadataContainsFold(v string) predicate.Service {
 	return predicate.Service(sql.FieldContainsFold(FieldServiceMetadata, v))
 }
 
-// HasKeySets applies the HasEdge predicate on the "key_sets" edge.
-func HasKeySets() predicate.Service {
+// HasKeySet applies the HasEdge predicate on the "key_set" edge.
+func HasKeySet() predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, KeySetsTable, KeySetsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, KeySetTable, KeySetColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasKeySetsWith applies the HasEdge predicate on the "key_sets" edge with a given conditions (other predicates).
-func HasKeySetsWith(preds ...predicate.KeySet) predicate.Service {
+// HasKeySetWith applies the HasEdge predicate on the "key_set" edge with a given conditions (other predicates).
+func HasKeySetWith(preds ...predicate.KeySet) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
-		step := newKeySetsStep()
+		step := newKeySetStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -450,6 +450,29 @@ func HasServiceUserInfoEndpointConfig() predicate.Service {
 func HasServiceUserInfoEndpointConfigWith(preds ...predicate.ServiceUserInfoEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceUserInfoEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceJwksEndpointConfig applies the HasEdge predicate on the "service_jwks_endpoint_config" edge.
+func HasServiceJwksEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceJwksEndpointConfigTable, ServiceJwksEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceJwksEndpointConfigWith applies the HasEdge predicate on the "service_jwks_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceJwksEndpointConfigWith(preds ...predicate.ServiceJWKSEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceJwksEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

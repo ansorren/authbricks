@@ -32,6 +32,8 @@ type Tx struct {
 	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigClient
 	// ServiceIntrospectionEndpointConfig is the client for interacting with the ServiceIntrospectionEndpointConfig builders.
 	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigClient
+	// ServiceJWKSEndpointConfig is the client for interacting with the ServiceJWKSEndpointConfig builders.
+	ServiceJWKSEndpointConfig *ServiceJWKSEndpointConfigClient
 	// ServiceTokenEndpointConfig is the client for interacting with the ServiceTokenEndpointConfig builders.
 	ServiceTokenEndpointConfig *ServiceTokenEndpointConfigClient
 	// ServiceUserInfoEndpointConfig is the client for interacting with the ServiceUserInfoEndpointConfig builders.
@@ -187,6 +189,7 @@ func (tx *Tx) init() {
 	tx.Service = NewServiceClient(tx.config)
 	tx.ServiceAuthorizationEndpointConfig = NewServiceAuthorizationEndpointConfigClient(tx.config)
 	tx.ServiceIntrospectionEndpointConfig = NewServiceIntrospectionEndpointConfigClient(tx.config)
+	tx.ServiceJWKSEndpointConfig = NewServiceJWKSEndpointConfigClient(tx.config)
 	tx.ServiceTokenEndpointConfig = NewServiceTokenEndpointConfigClient(tx.config)
 	tx.ServiceUserInfoEndpointConfig = NewServiceUserInfoEndpointConfigClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)

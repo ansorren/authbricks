@@ -2,9 +2,12 @@ package client
 
 import (
 	"context"
+	"crypto"
+	"go.authbricks.com/bricks/ent"
 	"testing"
 
 	"go.authbricks.com/bricks/config"
+	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/testutils"
 
 	"github.com/stretchr/testify/require"
@@ -16,6 +19,9 @@ func TestKeySet(t *testing.T) {
 
 	client := New(db)
 	require.NotNil(t, client)
+
+	key, err := abcrypto.GenerateRSAPrivateKey()
+	require.Nil(t, err)
 
 	cfg := config.Service{
 		Name:        "test-service",
@@ -43,15 +49,25 @@ func TestKeySet(t *testing.T) {
 		UserInfoEndpoint: config.UserInfoEndpoint{
 			Endpoint: "https://example.com/oauth2/userinfo",
 		},
+		JWKSEndpoint: config.JWKSEndpoint{
+			Endpoint: "https://example.com/oauth2/jwks",
+		},
+		Keys: []crypto.PrivateKey{key},
 	}
 
 	svc, err := client.CreateService(context.Background(), cfg)
 	require.Nil(t, err)
 	require.NotNil(t, svc)
 
-	keysets, err := client.GetKeySetByService(context.Background(), svc.Name)
+	keyset, err := client.GetKeySetByService(context.Background(), svc.Name)
 	require.Nil(t, err)
-	require.NotNil(t, keysets)
-	require.NotEmpty(t, keysets)
-	require.Len(t, keysets, 1)
+	require.NotNil(t, keyset)
+	require.NotEmpty(t, keyset)
+
+	err = client.DeleteKeySetByService(context.Background(), svc.Name)
+	require.Nil(t, err)
+
+	_, err = client.GetKeySetByService(context.Background(), svc.Name)
+	require.NotNil(t, err)
+	require.True(t, ent.IsNotFound(err))
 }

@@ -17,6 +17,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
@@ -28,11 +29,12 @@ type ServiceQuery struct {
 	order                                  []service.OrderOption
 	inters                                 []Interceptor
 	predicates                             []predicate.Service
-	withKeySets                            *KeySetQuery
+	withKeySet                             *KeySetQuery
 	withServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigQuery
 	withServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigQuery
 	withServiceTokenEndpointConfig         *ServiceTokenEndpointConfigQuery
 	withServiceUserInfoEndpointConfig      *ServiceUserInfoEndpointConfigQuery
+	withServiceJwksEndpointConfig          *ServiceJWKSEndpointConfigQuery
 	withApplications                       *ApplicationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -70,8 +72,8 @@ func (sq *ServiceQuery) Order(o ...service.OrderOption) *ServiceQuery {
 	return sq
 }
 
-// QueryKeySets chains the current query on the "key_sets" edge.
-func (sq *ServiceQuery) QueryKeySets() *KeySetQuery {
+// QueryKeySet chains the current query on the "key_set" edge.
+func (sq *ServiceQuery) QueryKeySet() *KeySetQuery {
 	query := (&KeySetClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
@@ -84,7 +86,7 @@ func (sq *ServiceQuery) QueryKeySets() *KeySetQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
 			sqlgraph.To(keyset.Table, keyset.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, service.KeySetsTable, service.KeySetsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.KeySetTable, service.KeySetColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -173,6 +175,28 @@ func (sq *ServiceQuery) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEnd
 			sqlgraph.From(service.Table, service.FieldID, selector),
 			sqlgraph.To(serviceuserinfoendpointconfig.Table, serviceuserinfoendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceUserInfoEndpointConfigTable, service.ServiceUserInfoEndpointConfigColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryServiceJwksEndpointConfig chains the current query on the "service_jwks_endpoint_config" edge.
+func (sq *ServiceQuery) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointConfigQuery {
+	query := (&ServiceJWKSEndpointConfigClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, selector),
+			sqlgraph.To(servicejwksendpointconfig.Table, servicejwksendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceJwksEndpointConfigTable, service.ServiceJwksEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -394,11 +418,12 @@ func (sq *ServiceQuery) Clone() *ServiceQuery {
 		order:                                  append([]service.OrderOption{}, sq.order...),
 		inters:                                 append([]Interceptor{}, sq.inters...),
 		predicates:                             append([]predicate.Service{}, sq.predicates...),
-		withKeySets:                            sq.withKeySets.Clone(),
+		withKeySet:                             sq.withKeySet.Clone(),
 		withServiceAuthorizationEndpointConfig: sq.withServiceAuthorizationEndpointConfig.Clone(),
 		withServiceIntrospectionEndpointConfig: sq.withServiceIntrospectionEndpointConfig.Clone(),
 		withServiceTokenEndpointConfig:         sq.withServiceTokenEndpointConfig.Clone(),
 		withServiceUserInfoEndpointConfig:      sq.withServiceUserInfoEndpointConfig.Clone(),
+		withServiceJwksEndpointConfig:          sq.withServiceJwksEndpointConfig.Clone(),
 		withApplications:                       sq.withApplications.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
@@ -406,14 +431,14 @@ func (sq *ServiceQuery) Clone() *ServiceQuery {
 	}
 }
 
-// WithKeySets tells the query-builder to eager-load the nodes that are connected to
-// the "key_sets" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithKeySets(opts ...func(*KeySetQuery)) *ServiceQuery {
+// WithKeySet tells the query-builder to eager-load the nodes that are connected to
+// the "key_set" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ServiceQuery) WithKeySet(opts ...func(*KeySetQuery)) *ServiceQuery {
 	query := (&KeySetClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	sq.withKeySets = query
+	sq.withKeySet = query
 	return sq
 }
 
@@ -458,6 +483,17 @@ func (sq *ServiceQuery) WithServiceUserInfoEndpointConfig(opts ...func(*ServiceU
 		opt(query)
 	}
 	sq.withServiceUserInfoEndpointConfig = query
+	return sq
+}
+
+// WithServiceJwksEndpointConfig tells the query-builder to eager-load the nodes that are connected to
+// the "service_jwks_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ServiceQuery) WithServiceJwksEndpointConfig(opts ...func(*ServiceJWKSEndpointConfigQuery)) *ServiceQuery {
+	query := (&ServiceJWKSEndpointConfigClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withServiceJwksEndpointConfig = query
 	return sq
 }
 
@@ -550,12 +586,13 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	var (
 		nodes       = []*Service{}
 		_spec       = sq.querySpec()
-		loadedTypes = [6]bool{
-			sq.withKeySets != nil,
+		loadedTypes = [7]bool{
+			sq.withKeySet != nil,
 			sq.withServiceAuthorizationEndpointConfig != nil,
 			sq.withServiceIntrospectionEndpointConfig != nil,
 			sq.withServiceTokenEndpointConfig != nil,
 			sq.withServiceUserInfoEndpointConfig != nil,
+			sq.withServiceJwksEndpointConfig != nil,
 			sq.withApplications != nil,
 		}
 	)
@@ -577,10 +614,9 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := sq.withKeySets; query != nil {
-		if err := sq.loadKeySets(ctx, query, nodes,
-			func(n *Service) { n.Edges.KeySets = []*KeySet{} },
-			func(n *Service, e *KeySet) { n.Edges.KeySets = append(n.Edges.KeySets, e) }); err != nil {
+	if query := sq.withKeySet; query != nil {
+		if err := sq.loadKeySet(ctx, query, nodes, nil,
+			func(n *Service, e *KeySet) { n.Edges.KeySet = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -612,6 +648,12 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 			return nil, err
 		}
 	}
+	if query := sq.withServiceJwksEndpointConfig; query != nil {
+		if err := sq.loadServiceJwksEndpointConfig(ctx, query, nodes, nil,
+			func(n *Service, e *ServiceJWKSEndpointConfig) { n.Edges.ServiceJwksEndpointConfig = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := sq.withApplications; query != nil {
 		if err := sq.loadApplications(ctx, query, nodes,
 			func(n *Service) { n.Edges.Applications = []*Application{} },
@@ -622,32 +664,29 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	return nodes, nil
 }
 
-func (sq *ServiceQuery) loadKeySets(ctx context.Context, query *KeySetQuery, nodes []*Service, init func(*Service), assign func(*Service, *KeySet)) error {
+func (sq *ServiceQuery) loadKeySet(ctx context.Context, query *KeySetQuery, nodes []*Service, init func(*Service), assign func(*Service, *KeySet)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.KeySet(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(service.KeySetsColumn), fks...))
+		s.Where(sql.InValues(s.C(service.KeySetColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.service_key_sets
+		fk := n.service_key_set
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "service_key_sets" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "service_key_set" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "service_key_sets" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "service_key_set" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -760,6 +799,34 @@ func (sq *ServiceQuery) loadServiceUserInfoEndpointConfig(ctx context.Context, q
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "service_service_user_info_endpoint_config" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *ServiceQuery) loadServiceJwksEndpointConfig(ctx context.Context, query *ServiceJWKSEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceJWKSEndpointConfig)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Service)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.ServiceJWKSEndpointConfig(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(service.ServiceJwksEndpointConfigColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.service_service_jwks_endpoint_config
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "service_service_jwks_endpoint_config" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "service_service_jwks_endpoint_config" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

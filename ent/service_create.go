@@ -14,6 +14,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 )
@@ -79,19 +80,23 @@ func (sc *ServiceCreate) SetID(s string) *ServiceCreate {
 	return sc
 }
 
-// AddKeySetIDs adds the "key_sets" edge to the KeySet entity by IDs.
-func (sc *ServiceCreate) AddKeySetIDs(ids ...string) *ServiceCreate {
-	sc.mutation.AddKeySetIDs(ids...)
+// SetKeySetID sets the "key_set" edge to the KeySet entity by ID.
+func (sc *ServiceCreate) SetKeySetID(id string) *ServiceCreate {
+	sc.mutation.SetKeySetID(id)
 	return sc
 }
 
-// AddKeySets adds the "key_sets" edges to the KeySet entity.
-func (sc *ServiceCreate) AddKeySets(k ...*KeySet) *ServiceCreate {
-	ids := make([]string, len(k))
-	for i := range k {
-		ids[i] = k[i].ID
+// SetNillableKeySetID sets the "key_set" edge to the KeySet entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableKeySetID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetKeySetID(*id)
 	}
-	return sc.AddKeySetIDs(ids...)
+	return sc
+}
+
+// SetKeySet sets the "key_set" edge to the KeySet entity.
+func (sc *ServiceCreate) SetKeySet(k *KeySet) *ServiceCreate {
+	return sc.SetKeySetID(k.ID)
 }
 
 // SetServiceAuthorizationEndpointConfigID sets the "service_authorization_endpoint_config" edge to the ServiceAuthorizationEndpointConfig entity by ID.
@@ -168,6 +173,25 @@ func (sc *ServiceCreate) SetNillableServiceUserInfoEndpointConfigID(id *string) 
 // SetServiceUserInfoEndpointConfig sets the "service_user_info_endpoint_config" edge to the ServiceUserInfoEndpointConfig entity.
 func (sc *ServiceCreate) SetServiceUserInfoEndpointConfig(s *ServiceUserInfoEndpointConfig) *ServiceCreate {
 	return sc.SetServiceUserInfoEndpointConfigID(s.ID)
+}
+
+// SetServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceJwksEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceJwksEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceJwksEndpointConfigID sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceJwksEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceJwksEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceJwksEndpointConfig sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceJwksEndpointConfig(s *ServiceJWKSEndpointConfig) *ServiceCreate {
+	return sc.SetServiceJwksEndpointConfigID(s.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -325,12 +349,12 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 		_spec.SetField(service.FieldResponseTypes, field.TypeJSON, value)
 		_node.ResponseTypes = value
 	}
-	if nodes := sc.mutation.KeySetsIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.KeySetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   service.KeySetsTable,
-			Columns: []string{service.KeySetsColumn},
+			Table:   service.KeySetTable,
+			Columns: []string{service.KeySetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(keyset.FieldID, field.TypeString),
@@ -398,6 +422,22 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(serviceuserinfoendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceJwksEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceJwksEndpointConfigTable,
+			Columns: []string{service.ServiceJwksEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
