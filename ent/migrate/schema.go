@@ -123,7 +123,7 @@ var (
 	// KeySetsColumns holds the columns for the "key_sets" table.
 	KeySetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "service_key_sets", Type: field.TypeString, Nullable: true},
+		{Name: "service_key_set", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// KeySetsTable holds the schema information for the "key_sets" table.
 	KeySetsTable = &schema.Table{
@@ -132,7 +132,7 @@ var (
 		PrimaryKey: []*schema.Column{KeySetsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "key_sets_services_key_sets",
+				Symbol:     "key_sets_services_key_set",
 				Columns:    []*schema.Column{KeySetsColumns[1]},
 				RefColumns: []*schema.Column{ServicesColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -220,6 +220,26 @@ var (
 			{
 				Symbol:     "service_introspection_endpoint_configs_services_service_introspection_endpoint_config",
 				Columns:    []*schema.Column{ServiceIntrospectionEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// ServiceJwksEndpointConfigsColumns holds the columns for the "service_jwks_endpoint_configs" table.
+	ServiceJwksEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_jwks_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// ServiceJwksEndpointConfigsTable holds the schema information for the "service_jwks_endpoint_configs" table.
+	ServiceJwksEndpointConfigsTable = &schema.Table{
+		Name:       "service_jwks_endpoint_configs",
+		Columns:    ServiceJwksEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{ServiceJwksEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "service_jwks_endpoint_configs_services_service_jwks_endpoint_config",
+				Columns:    []*schema.Column{ServiceJwksEndpointConfigsColumns[2]},
 				RefColumns: []*schema.Column{ServicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -380,6 +400,7 @@ var (
 		ServicesTable,
 		ServiceAuthorizationEndpointConfigsTable,
 		ServiceIntrospectionEndpointConfigsTable,
+		ServiceJwksEndpointConfigsTable,
 		ServiceTokenEndpointConfigsTable,
 		ServiceUserInfoEndpointConfigsTable,
 		SessionsTable,
@@ -397,6 +418,7 @@ func init() {
 	KeySetsTable.ForeignKeys[0].RefTable = ServicesTable
 	ServiceAuthorizationEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	ServiceIntrospectionEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	ServiceJwksEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	ServiceTokenEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	ServiceUserInfoEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	SigningKeysTable.ForeignKeys[0].RefTable = KeySetsTable

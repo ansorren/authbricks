@@ -2,15 +2,14 @@ package client
 
 import (
 	"context"
-	"crypto/rsa"
 	"encoding/json"
 
 	"go.authbricks.com/bricks/config"
-	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 
@@ -88,23 +87,19 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 		return nil, errors.Wrapf(err, "cannot create user info endpoint configuration for service %s", cfg.Name)
 	}
 
-	// create the keyset and signing keys
-	// generate a key if none are provided
-	if len(cfg.Keys) > 0 {
-		_, err = c.CreateKeySet(ctx, cfg.Name, cfg.Keys)
-		if err != nil {
-			return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
-		}
+	// create the JWKS endpoint
+	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.Create().
+		SetID(uuid.New().String()).
+		SetService(svc).
+		SetEndpoint(cfg.JWKSEndpoint.Endpoint).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create JWKS endpoint configuration for service %s", cfg.Name)
 	}
-	if len(cfg.Keys) == 0 {
-		rsaKey, err := abcrypto.Generate4096BitsRSAKey()
-		if err != nil {
-			return nil, errors.Wrapf(err, "cannot generate RSA key")
-		}
-		_, err = c.CreateKeySet(ctx, cfg.Name, []*rsa.PrivateKey{rsaKey.Private})
-		if err != nil {
-			return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
-		}
+
+	_, err = c.CreateKeySet(ctx, cfg.Name, cfg.Keys)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
 	}
 
 	return svc, nil
@@ -141,8 +136,12 @@ func (c *Client) DeleteService(ctx context.Context, name string) error {
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete user info endpoint configuration for service %s", name)
 	}
+	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.Delete().Where(servicejwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "cannot delete JWKS endpoint configuration for service %s", name)
+	}
 
-	err = c.DeleteKeySetsByService(ctx, name)
+	err = c.DeleteKeySetByService(ctx, name)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete key sets for service %s", name)
 	}
@@ -157,6 +156,10 @@ func (c *Client) ListServices(ctx context.Context) ([]*ent.Service, error) {
 
 // UpdateService updates a service in the database.
 func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Service, error) {
+	if err := cfg.Validate(); err != nil {
+		return nil, errors.Wrapf(err, "cannot create service %s - invalid configuration", cfg.Name)
+	}
+
 	current, err := c.GetService(ctx, cfg.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get service %s", cfg.Name)
@@ -225,6 +228,22 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 		Save(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot update user info endpoint configuration for service %s", cfg.Name)
+	}
+
+	// update the JWKS endpoint
+	jwksEndpointConfig, err := c.DB.EntClient.ServiceJWKSEndpointConfig.Query().Where(servicejwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to get JWKS endpoint config")
+	}
+	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.UpdateOne(jwksEndpointConfig).
+		SetEndpoint(cfg.JWKSEndpoint.Endpoint).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update JWKS endpoint configuration for service %s", cfg.Name)
+	}
+
+	if err := c.UpdateSigningKeysByService(ctx, cfg.Name, cfg.Keys); err != nil {
+		return nil, errors.Wrapf(err, "cannot update signing keys for service %s", cfg.Name)
 	}
 
 	return svc, nil

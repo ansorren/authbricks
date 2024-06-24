@@ -6,8 +6,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRSA(t *testing.T) {
-	_, err := Generate4096BitsRSAKey()
+func TestGenerate(t *testing.T) {
+	_, err := generate4096BitsRSAKey()
+	require.Nil(t, err)
+}
+
+func TestGenerateRSAPrivateKey(t *testing.T) {
+	_, err := GenerateRSAPrivateKey()
 	require.Nil(t, err)
 }
 

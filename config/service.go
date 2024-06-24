@@ -1,6 +1,7 @@
 package config
 
 import (
+	"crypto"
 	"crypto/rsa"
 	"fmt"
 
@@ -38,7 +39,8 @@ type Service struct {
 	IntrospectionEndpoint IntrospectionEndpoint
 	TokenEndpoint         TokenEndpoint
 	UserInfoEndpoint      UserInfoEndpoint
-	Keys                  []*rsa.PrivateKey
+	JWKSEndpoint          JWKSEndpoint
+	Keys                  []crypto.PrivateKey
 }
 
 // contains checks if the given string is in the given slice of strings.
@@ -92,6 +94,29 @@ func (s Service) Validate() error {
 	if err := s.UserInfoEndpoint.Validate(); err != nil {
 		return errors.Wrapf(err, "userinfo endpoint validation failed")
 	}
+	if err := s.JWKSEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "JWKS endpoint validation failed")
+	}
 
+	if err := validateKeys(s.Keys); err != nil {
+		return errors.Wrapf(err, "invalid keys configuration")
+	}
+
+	return nil
+}
+
+func validateKeys(keys []crypto.PrivateKey) error {
+	if len(keys) == 0 {
+		return fmt.Errorf("at least one key is required")
+	}
+	for _, k := range keys {
+		if k == nil {
+			return fmt.Errorf("key cannot be nil")
+		}
+		_, ok := k.(*rsa.PrivateKey)
+		if !ok {
+			return fmt.Errorf("only RSA keys are supported")
+		}
+	}
 	return nil
 }

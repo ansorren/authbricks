@@ -12,16 +12,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestApplication(t *testing.T) {
+func TestSigningKey(t *testing.T) {
 	db, cancel := testutils.DB(t)
 	defer cancel(t)
 
 	client := New(db)
+	require.NotNil(t, client)
 
 	key, err := abcrypto.GenerateRSAPrivateKey()
 	require.Nil(t, err)
 
-	serviceConfig := config.Service{
+	cfg := config.Service{
 		Name:        "test-service",
 		Identifier:  "test-identifier",
 		Description: "test-description",
@@ -53,52 +54,12 @@ func TestApplication(t *testing.T) {
 		Keys: []crypto.PrivateKey{key},
 	}
 
-	svc, err := client.CreateService(context.Background(), serviceConfig)
+	svc, err := client.CreateService(context.Background(), cfg)
 	require.Nil(t, err)
 	require.NotNil(t, svc)
 
-	cfg := config.Application{
-		Name:          "test-application",
-		Description:   "test-description",
-		Service:       svc.Name,
-		Public:        false,
-		RedirectURIs:  []string{"https://example.com/oauth2/callback"},
-		ResponseTypes: []string{config.ResponseTypeCode},
-		GrantTypes:    []string{config.GrantTypeAuthorizationCode},
-		Scopes:        []string{"calendar:read"},
-		PKCERequired:  true,
-	}
-	app, err := client.CreateApplication(context.Background(), cfg)
+	signingKeys, err := client.GetSigningKeysByService(context.Background(), svc.Name)
 	require.Nil(t, err)
-	require.NotNil(t, app)
-	require.NotEmpty(t, app.ID)
-	require.Equal(t, cfg.Name, app.Name)
-	require.Equal(t, cfg.Description, app.Description)
-	require.Equal(t, cfg.Public, app.Public)
-	require.Equal(t, cfg.RedirectURIs, app.RedirectUris)
-	require.Equal(t, cfg.ResponseTypes, app.ResponseTypes)
-	require.Equal(t, cfg.GrantTypes, app.GrantTypes)
-	require.Equal(t, cfg.Scopes, app.Scopes)
-	require.Equal(t, cfg.PKCERequired, app.PkceRequired)
-
-	// Get application
-	app, err = client.GetApplication(context.Background(), cfg.Name)
-	require.Nil(t, err)
-	require.NotNil(t, app)
-
-	// List applications - expected one
-	apps, err := client.ListApplications(context.Background())
-	require.Nil(t, err)
-	require.NotNil(t, apps)
-	require.Len(t, apps, 1)
-
-	// Delete application
-	err = client.DeleteApplication(context.Background(), cfg.Name)
-	require.Nil(t, err)
-
-	// List applications - expected none
-	apps, err = client.ListApplications(context.Background())
-	require.Nil(t, err)
-	require.NotNil(t, apps)
-	require.Len(t, apps, 0)
+	require.NotNil(t, signingKeys)
+	require.Len(t, signingKeys, 1)
 }

@@ -2,9 +2,11 @@ package client
 
 import (
 	"context"
+	"crypto"
 	"testing"
 
 	"go.authbricks.com/bricks/config"
+	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/testutils"
 
 	"github.com/stretchr/testify/require"
@@ -16,6 +18,9 @@ func TestCredentials(t *testing.T) {
 
 	client := New(db)
 	require.NotNil(t, client)
+
+	key, err := abcrypto.GenerateRSAPrivateKey()
+	require.Nil(t, err)
 
 	serviceConfig := config.Service{
 		Name:        "test-service",
@@ -43,6 +48,10 @@ func TestCredentials(t *testing.T) {
 		UserInfoEndpoint: config.UserInfoEndpoint{
 			Endpoint: "https://example.com/oauth2/userinfo",
 		},
+		JWKSEndpoint: config.JWKSEndpoint{
+			Endpoint: "https://example.com/oauth2/jwks",
+		},
+		Keys: []crypto.PrivateKey{key},
 	}
 
 	svc, err := client.CreateService(context.Background(), serviceConfig)

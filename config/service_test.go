@@ -1,10 +1,16 @@
 package config
 
 import (
+	"crypto"
+	"github.com/stretchr/testify/require"
+	abcrypto "go.authbricks.com/bricks/crypto"
 	"testing"
 )
 
 func TestServiceValidate(t *testing.T) {
+	key, err := abcrypto.GenerateRSAPrivateKey()
+	require.Nil(t, err)
+
 	tests := []struct {
 		Name          string
 		Service       Service
@@ -196,6 +202,60 @@ func TestServiceValidate(t *testing.T) {
 			ExpectedError: true,
 		},
 		{
+			Name: "empty jwks endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				Keys: []crypto.PrivateKey{key},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "no keys",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				Keys: []crypto.PrivateKey{},
+			},
+			ExpectedError: true,
+		},
+		{
 			Name: "valid Service",
 			Service: Service{
 				Name:       "test",
@@ -218,6 +278,10 @@ func TestServiceValidate(t *testing.T) {
 				UserInfoEndpoint: UserInfoEndpoint{
 					Endpoint: "http://localhost:8080/oauth2/userinfo",
 				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				Keys: []crypto.PrivateKey{key},
 			},
 			ExpectedError: false,
 		},

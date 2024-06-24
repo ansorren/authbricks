@@ -14,6 +14,7 @@ import (
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
+	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/session"
@@ -139,6 +140,16 @@ func init() {
 	serviceintrospectionendpointconfigDescID := serviceintrospectionendpointconfigFields[0].Descriptor()
 	// serviceintrospectionendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	serviceintrospectionendpointconfig.IDValidator = serviceintrospectionendpointconfigDescID.Validators[0].(func(string) error)
+	servicejwksendpointconfigFields := schema.ServiceJWKSEndpointConfig{}.Fields()
+	_ = servicejwksendpointconfigFields
+	// servicejwksendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	servicejwksendpointconfigDescEndpoint := servicejwksendpointconfigFields[1].Descriptor()
+	// servicejwksendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	servicejwksendpointconfig.EndpointValidator = servicejwksendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// servicejwksendpointconfigDescID is the schema descriptor for id field.
+	servicejwksendpointconfigDescID := servicejwksendpointconfigFields[0].Descriptor()
+	// servicejwksendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	servicejwksendpointconfig.IDValidator = servicejwksendpointconfigDescID.Validators[0].(func(string) error)
 	servicetokenendpointconfigFields := schema.ServiceTokenEndpointConfig{}.Fields()
 	_ = servicetokenendpointconfigFields
 	// servicetokenendpointconfigDescEndpoint is the schema descriptor for endpoint field.

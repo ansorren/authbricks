@@ -48,8 +48,13 @@ func newJSONWebKeyFromRSA(pub *rsa.PublicKey) (*jose.JSONWebKey, error) {
 }
 
 // GetKeyID returns the key ID for the given public key.
-func GetKeyID(pub *rsa.PublicKey) (string, error) {
-	jwk, err := newJSONWebKeyFromRSA(pub)
+// Note: Only RSA public keys are supported at the moment.
+func GetKeyID(pub crypto.PublicKey) (string, error) {
+	rsaPub, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		return "", errors.New("only RSA public keys are supported")
+	}
+	jwk, err := newJSONWebKeyFromRSA(rsaPub)
 	if err != nil {
 		return "", err
 	}
