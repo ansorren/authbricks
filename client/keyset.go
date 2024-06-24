@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"crypto"
+
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/service"
@@ -11,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// CreateKeySet creates a new key set for the given service.
+// CreateKeySet creates a new keyset for the given service.
 func (c *Client) CreateKeySet(ctx context.Context, serviceName string, keys []crypto.PrivateKey) (*ent.KeySet, error) {
 	svc, err := c.GetService(ctx, serviceName)
 	if err != nil {
@@ -22,7 +23,7 @@ func (c *Client) CreateKeySet(ctx context.Context, serviceName string, keys []cr
 		SetID(uuid.New().String()).
 		Save(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to create key set")
+		return nil, errors.Wrapf(err, "unable to create keyset")
 	}
 
 	if err := c.CreateSigningKeysForKeySet(ctx, keySet, keys); err != nil {
@@ -33,7 +34,7 @@ func (c *Client) CreateKeySet(ctx context.Context, serviceName string, keys []cr
 
 }
 
-// GetKeySetByService returns the key set for the given service.
+// GetKeySetByService returns the keyset for the given service.
 func (c *Client) GetKeySetByService(ctx context.Context, serviceName string) (*ent.KeySet, error) {
 	svc, err := c.GetService(ctx, serviceName)
 	if err != nil {
@@ -43,21 +44,22 @@ func (c *Client) GetKeySetByService(ctx context.Context, serviceName string) (*e
 	return c.DB.EntClient.KeySet.Query().Where(keyset.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 }
 
+// GetKeySetByID retrieves the keyset with the given ID.
 func (c *Client) GetKeySetByID(ctx context.Context, keySetID string) (*ent.KeySet, error) {
 	return c.DB.EntClient.KeySet.Query().Where(keyset.ID(keySetID)).Only(ctx)
 }
 
-// DeleteKeySet deletes a key set from the database.
+// DeleteKeySet deletes a keyset from the database.
 func (c *Client) DeleteKeySet(ctx context.Context, keySetID string) error {
 	keySet, err := c.GetKeySetByID(ctx, keySetID)
 	if err != nil {
-		return errors.Wrapf(err, "cannot delete key set %s - not found", keySetID)
+		return errors.Wrapf(err, "cannot delete keyset %s - not found", keySetID)
 	}
 
 	// delete the signing keys first
 	err = c.DeleteSigningKeysForKeySet(ctx, keySet)
 	if err != nil {
-		return errors.Wrapf(err, "cannot delete key set %s - unable to delete signing keys", keySetID)
+		return errors.Wrapf(err, "cannot delete keyset %s - unable to delete signing keys", keySetID)
 	}
 
 	return c.DB.EntClient.KeySet.DeleteOne(keySet).Exec(ctx)
@@ -67,12 +69,12 @@ func (c *Client) DeleteKeySet(ctx context.Context, keySetID string) error {
 func (c *Client) DeleteKeySetByService(ctx context.Context, serviceName string) error {
 	ks, err := c.GetKeySetByService(ctx, serviceName)
 	if err != nil {
-		return errors.Wrapf(err, "cannot delete key set for service %s - not found", serviceName)
+		return errors.Wrapf(err, "cannot delete keyset for service %s - not found", serviceName)
 	}
 
 	err = c.DeleteKeySet(ctx, ks.ID)
 	if err != nil {
-		return errors.Wrapf(err, "cannot delete key set for service %s", serviceName)
+		return errors.Wrapf(err, "cannot delete keyset for service %s", serviceName)
 	}
 	return nil
 }
