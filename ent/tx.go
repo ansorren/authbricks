@@ -16,36 +16,36 @@ type Tx struct {
 	Application *ApplicationClient
 	// AuthorizationCode is the client for interacting with the AuthorizationCode builders.
 	AuthorizationCode *AuthorizationCodeClient
+	// AuthorizationEndpointConfig is the client for interacting with the AuthorizationEndpointConfig builders.
+	AuthorizationEndpointConfig *AuthorizationEndpointConfigClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
 	AuthorizationPayload *AuthorizationPayloadClient
 	// CookieStore is the client for interacting with the CookieStore builders.
 	CookieStore *CookieStoreClient
 	// Credentials is the client for interacting with the Credentials builders.
 	Credentials *CredentialsClient
+	// IntrospectionEndpointConfig is the client for interacting with the IntrospectionEndpointConfig builders.
+	IntrospectionEndpointConfig *IntrospectionEndpointConfigClient
+	// JwksEndpointConfig is the client for interacting with the JwksEndpointConfig builders.
+	JwksEndpointConfig *JwksEndpointConfigClient
 	// KeySet is the client for interacting with the KeySet builders.
 	KeySet *KeySetClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
 	// Service is the client for interacting with the Service builders.
 	Service *ServiceClient
-	// ServiceAuthorizationEndpointConfig is the client for interacting with the ServiceAuthorizationEndpointConfig builders.
-	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigClient
-	// ServiceIntrospectionEndpointConfig is the client for interacting with the ServiceIntrospectionEndpointConfig builders.
-	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigClient
-	// ServiceJWKSEndpointConfig is the client for interacting with the ServiceJWKSEndpointConfig builders.
-	ServiceJWKSEndpointConfig *ServiceJWKSEndpointConfigClient
-	// ServiceTokenEndpointConfig is the client for interacting with the ServiceTokenEndpointConfig builders.
-	ServiceTokenEndpointConfig *ServiceTokenEndpointConfigClient
-	// ServiceUserInfoEndpointConfig is the client for interacting with the ServiceUserInfoEndpointConfig builders.
-	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfigClient
 	// Session is the client for interacting with the Session builders.
 	Session *SessionClient
 	// SigningKey is the client for interacting with the SigningKey builders.
 	SigningKey *SigningKeyClient
 	// StandardClaims is the client for interacting with the StandardClaims builders.
 	StandardClaims *StandardClaimsClient
+	// TokenEndpointConfig is the client for interacting with the TokenEndpointConfig builders.
+	TokenEndpointConfig *TokenEndpointConfigClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserInfoEndpointConfig is the client for interacting with the UserInfoEndpointConfig builders.
+	UserInfoEndpointConfig *UserInfoEndpointConfigClient
 	// UserPool is the client for interacting with the UserPool builders.
 	UserPool *UserPoolClient
 	// WellKnownEndpointConfig is the client for interacting with the WellKnownEndpointConfig builders.
@@ -183,21 +183,21 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Application = NewApplicationClient(tx.config)
 	tx.AuthorizationCode = NewAuthorizationCodeClient(tx.config)
+	tx.AuthorizationEndpointConfig = NewAuthorizationEndpointConfigClient(tx.config)
 	tx.AuthorizationPayload = NewAuthorizationPayloadClient(tx.config)
 	tx.CookieStore = NewCookieStoreClient(tx.config)
 	tx.Credentials = NewCredentialsClient(tx.config)
+	tx.IntrospectionEndpointConfig = NewIntrospectionEndpointConfigClient(tx.config)
+	tx.JwksEndpointConfig = NewJwksEndpointConfigClient(tx.config)
 	tx.KeySet = NewKeySetClient(tx.config)
 	tx.RefreshToken = NewRefreshTokenClient(tx.config)
 	tx.Service = NewServiceClient(tx.config)
-	tx.ServiceAuthorizationEndpointConfig = NewServiceAuthorizationEndpointConfigClient(tx.config)
-	tx.ServiceIntrospectionEndpointConfig = NewServiceIntrospectionEndpointConfigClient(tx.config)
-	tx.ServiceJWKSEndpointConfig = NewServiceJWKSEndpointConfigClient(tx.config)
-	tx.ServiceTokenEndpointConfig = NewServiceTokenEndpointConfigClient(tx.config)
-	tx.ServiceUserInfoEndpointConfig = NewServiceUserInfoEndpointConfigClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.SigningKey = NewSigningKeyClient(tx.config)
 	tx.StandardClaims = NewStandardClaimsClient(tx.config)
+	tx.TokenEndpointConfig = NewTokenEndpointConfigClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserInfoEndpointConfig = NewUserInfoEndpointConfigClient(tx.config)
 	tx.UserPool = NewUserPoolClient(tx.config)
 	tx.WellKnownEndpointConfig = NewWellKnownEndpointConfigClient(tx.config)
 }

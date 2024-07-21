@@ -3,16 +3,16 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
+	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
+	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
-	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
-	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/tokenendpointconfig"
+	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -46,7 +46,7 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// create the authorization endpoint
-	_, err = c.DB.EntClient.ServiceAuthorizationEndpointConfig.Create().
+	_, err = c.DB.EntClient.AuthorizationEndpointConfig.Create().
 		SetID(uuid.New().String()).
 		SetService(svc).
 		SetEndpoint(cfg.AuthorizationEndpoint.Endpoint).
@@ -58,7 +58,7 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// create the introspection endpoint
-	_, err = c.DB.EntClient.ServiceIntrospectionEndpointConfig.Create().
+	_, err = c.DB.EntClient.IntrospectionEndpointConfig.Create().
 		SetID(uuid.New().String()).
 		SetService(svc).
 		SetEndpoint(cfg.IntrospectionEndpoint.Endpoint).
@@ -68,7 +68,7 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// create the token endpoint
-	_, err = c.DB.EntClient.ServiceTokenEndpointConfig.Create().
+	_, err = c.DB.EntClient.TokenEndpointConfig.Create().
 		SetID(uuid.New().String()).
 		SetService(svc).
 		SetEndpoint(cfg.TokenEndpoint.Endpoint).
@@ -79,7 +79,7 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// create the user info endpoint
-	_, err = c.DB.EntClient.ServiceUserInfoEndpointConfig.Create().
+	_, err = c.DB.EntClient.UserInfoEndpointConfig.Create().
 		SetID(uuid.New().String()).
 		SetService(svc).
 		SetEndpoint(cfg.UserInfoEndpoint.Endpoint).
@@ -89,7 +89,7 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// create the JWKS endpoint
-	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.Create().
+	_, err = c.DB.EntClient.JwksEndpointConfig.Create().
 		SetID(uuid.New().String()).
 		SetService(svc).
 		SetEndpoint(cfg.JWKSEndpoint.Endpoint).
@@ -127,26 +127,26 @@ func (c *Client) DeleteService(ctx context.Context, name string) error {
 		return errors.Wrapf(err, "cannot delete service %s", name)
 	}
 
-	_, err = c.DB.EntClient.ServiceAuthorizationEndpointConfig.Delete().Where(serviceauthorizationendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	_, err = c.DB.EntClient.AuthorizationEndpointConfig.Delete().Where(authorizationendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete authorization endpoint configuration for service %s", name)
 	}
 
-	_, err = c.DB.EntClient.ServiceIntrospectionEndpointConfig.Delete().Where(serviceintrospectionendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	_, err = c.DB.EntClient.IntrospectionEndpointConfig.Delete().Where(introspectionendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete introspection endpoint configuration for service %s", name)
 	}
 
-	_, err = c.DB.EntClient.ServiceTokenEndpointConfig.Delete().Where(servicetokenendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	_, err = c.DB.EntClient.TokenEndpointConfig.Delete().Where(tokenendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete token endpoint configuration for service %s", name)
 	}
 
-	_, err = c.DB.EntClient.ServiceUserInfoEndpointConfig.Delete().Where(serviceuserinfoendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	_, err = c.DB.EntClient.UserInfoEndpointConfig.Delete().Where(userinfoendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete user info endpoint configuration for service %s", name)
 	}
-	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.Delete().Where(servicejwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	_, err = c.DB.EntClient.JwksEndpointConfig.Delete().Where(jwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete JWKS endpoint configuration for service %s", name)
 	}
@@ -199,11 +199,11 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// update the authorization endpoint
-	authEndpointConfig, err := c.DB.EntClient.ServiceAuthorizationEndpointConfig.Query().Where(serviceauthorizationendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	authEndpointConfig, err := c.DB.EntClient.AuthorizationEndpointConfig.Query().Where(authorizationendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get authorization endpoint config")
 	}
-	_, err = c.DB.EntClient.ServiceAuthorizationEndpointConfig.UpdateOne(authEndpointConfig).
+	_, err = c.DB.EntClient.AuthorizationEndpointConfig.UpdateOne(authEndpointConfig).
 		SetService(svc).
 		SetEndpoint(cfg.AuthorizationEndpoint.Endpoint).
 		SetPkceRequired(cfg.AuthorizationEndpoint.PKCERequired).
@@ -211,20 +211,20 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 		Save(ctx)
 
 	// update the introspection endpoint
-	introspectionEndpointConfig, err := c.DB.EntClient.ServiceIntrospectionEndpointConfig.Query().Where(serviceintrospectionendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	introspectionEndpointConfig, err := c.DB.EntClient.IntrospectionEndpointConfig.Query().Where(introspectionendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get introspection endpoint config")
 	}
-	_, err = c.DB.EntClient.ServiceIntrospectionEndpointConfig.UpdateOne(introspectionEndpointConfig).
+	_, err = c.DB.EntClient.IntrospectionEndpointConfig.UpdateOne(introspectionEndpointConfig).
 		SetEndpoint(cfg.IntrospectionEndpoint.Endpoint).
 		Save(ctx)
 
 	// update the token endpoint
-	tokenEndpointConfig, err := c.DB.EntClient.ServiceTokenEndpointConfig.Query().Where(servicetokenendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	tokenEndpointConfig, err := c.DB.EntClient.TokenEndpointConfig.Query().Where(tokenendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get token endpoint config")
 	}
-	_, err = c.DB.EntClient.ServiceTokenEndpointConfig.UpdateOne(tokenEndpointConfig).
+	_, err = c.DB.EntClient.TokenEndpointConfig.UpdateOne(tokenEndpointConfig).
 		SetEndpoint(cfg.TokenEndpoint.Endpoint).
 		SetAllowedAuthenticationMethods(cfg.TokenEndpoint.AllowedAuthenticationMethods).
 		Save(ctx)
@@ -233,11 +233,11 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// update the user info endpoint
-	userInfoEndpointConfig, err := c.DB.EntClient.ServiceUserInfoEndpointConfig.Query().Where(serviceuserinfoendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	userInfoEndpointConfig, err := c.DB.EntClient.UserInfoEndpointConfig.Query().Where(userinfoendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get user info endpoint config")
 	}
-	_, err = c.DB.EntClient.ServiceUserInfoEndpointConfig.UpdateOne(userInfoEndpointConfig).
+	_, err = c.DB.EntClient.UserInfoEndpointConfig.UpdateOne(userInfoEndpointConfig).
 		SetEndpoint(cfg.UserInfoEndpoint.Endpoint).
 		Save(ctx)
 	if err != nil {
@@ -245,11 +245,11 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 	}
 
 	// update the JWKS endpoint
-	jwksEndpointConfig, err := c.DB.EntClient.ServiceJWKSEndpointConfig.Query().Where(servicejwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	jwksEndpointConfig, err := c.DB.EntClient.JwksEndpointConfig.Query().Where(jwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get JWKS endpoint config")
 	}
-	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.UpdateOne(jwksEndpointConfig).
+	_, err = c.DB.EntClient.JwksEndpointConfig.UpdateOne(jwksEndpointConfig).
 		SetEndpoint(cfg.JWKSEndpoint.Endpoint).
 		Save(ctx)
 	if err != nil {

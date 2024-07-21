@@ -33,6 +33,18 @@ func (f AuthorizationCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthorizationCodeMutation", m)
 }
 
+// The AuthorizationEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as AuthorizationEndpointConfig mutator.
+type AuthorizationEndpointConfigFunc func(context.Context, *ent.AuthorizationEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AuthorizationEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AuthorizationEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthorizationEndpointConfigMutation", m)
+}
+
 // The AuthorizationPayloadFunc type is an adapter to allow the use of ordinary
 // function as AuthorizationPayload mutator.
 type AuthorizationPayloadFunc func(context.Context, *ent.AuthorizationPayloadMutation) (ent.Value, error)
@@ -67,6 +79,30 @@ func (f CredentialsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CredentialsMutation", m)
+}
+
+// The IntrospectionEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as IntrospectionEndpointConfig mutator.
+type IntrospectionEndpointConfigFunc func(context.Context, *ent.IntrospectionEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IntrospectionEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.IntrospectionEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IntrospectionEndpointConfigMutation", m)
+}
+
+// The JwksEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as JwksEndpointConfig mutator.
+type JwksEndpointConfigFunc func(context.Context, *ent.JwksEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f JwksEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.JwksEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.JwksEndpointConfigMutation", m)
 }
 
 // The KeySetFunc type is an adapter to allow the use of ordinary
@@ -105,66 +141,6 @@ func (f ServiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceMutation", m)
 }
 
-// The ServiceAuthorizationEndpointConfigFunc type is an adapter to allow the use of ordinary
-// function as ServiceAuthorizationEndpointConfig mutator.
-type ServiceAuthorizationEndpointConfigFunc func(context.Context, *ent.ServiceAuthorizationEndpointConfigMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServiceAuthorizationEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ServiceAuthorizationEndpointConfigMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceAuthorizationEndpointConfigMutation", m)
-}
-
-// The ServiceIntrospectionEndpointConfigFunc type is an adapter to allow the use of ordinary
-// function as ServiceIntrospectionEndpointConfig mutator.
-type ServiceIntrospectionEndpointConfigFunc func(context.Context, *ent.ServiceIntrospectionEndpointConfigMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServiceIntrospectionEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ServiceIntrospectionEndpointConfigMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceIntrospectionEndpointConfigMutation", m)
-}
-
-// The ServiceJWKSEndpointConfigFunc type is an adapter to allow the use of ordinary
-// function as ServiceJWKSEndpointConfig mutator.
-type ServiceJWKSEndpointConfigFunc func(context.Context, *ent.ServiceJWKSEndpointConfigMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServiceJWKSEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ServiceJWKSEndpointConfigMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceJWKSEndpointConfigMutation", m)
-}
-
-// The ServiceTokenEndpointConfigFunc type is an adapter to allow the use of ordinary
-// function as ServiceTokenEndpointConfig mutator.
-type ServiceTokenEndpointConfigFunc func(context.Context, *ent.ServiceTokenEndpointConfigMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServiceTokenEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ServiceTokenEndpointConfigMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceTokenEndpointConfigMutation", m)
-}
-
-// The ServiceUserInfoEndpointConfigFunc type is an adapter to allow the use of ordinary
-// function as ServiceUserInfoEndpointConfig mutator.
-type ServiceUserInfoEndpointConfigFunc func(context.Context, *ent.ServiceUserInfoEndpointConfigMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ServiceUserInfoEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ServiceUserInfoEndpointConfigMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ServiceUserInfoEndpointConfigMutation", m)
-}
-
 // The SessionFunc type is an adapter to allow the use of ordinary
 // function as Session mutator.
 type SessionFunc func(context.Context, *ent.SessionMutation) (ent.Value, error)
@@ -201,6 +177,18 @@ func (f StandardClaimsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StandardClaimsMutation", m)
 }
 
+// The TokenEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as TokenEndpointConfig mutator.
+type TokenEndpointConfigFunc func(context.Context, *ent.TokenEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TokenEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TokenEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TokenEndpointConfigMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
@@ -211,6 +199,18 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The UserInfoEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as UserInfoEndpointConfig mutator.
+type UserInfoEndpointConfigFunc func(context.Context, *ent.UserInfoEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserInfoEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserInfoEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserInfoEndpointConfigMutation", m)
 }
 
 // The UserPoolFunc type is an adapter to allow the use of ordinary

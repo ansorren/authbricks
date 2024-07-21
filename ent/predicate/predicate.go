@@ -12,6 +12,9 @@ type Application func(*sql.Selector)
 // AuthorizationCode is the predicate function for authorizationcode builders.
 type AuthorizationCode func(*sql.Selector)
 
+// AuthorizationEndpointConfig is the predicate function for authorizationendpointconfig builders.
+type AuthorizationEndpointConfig func(*sql.Selector)
+
 // AuthorizationPayload is the predicate function for authorizationpayload builders.
 type AuthorizationPayload func(*sql.Selector)
 
@@ -20,6 +23,12 @@ type CookieStore func(*sql.Selector)
 
 // Credentials is the predicate function for credentials builders.
 type Credentials func(*sql.Selector)
+
+// IntrospectionEndpointConfig is the predicate function for introspectionendpointconfig builders.
+type IntrospectionEndpointConfig func(*sql.Selector)
+
+// JwksEndpointConfig is the predicate function for jwksendpointconfig builders.
+type JwksEndpointConfig func(*sql.Selector)
 
 // KeySet is the predicate function for keyset builders.
 type KeySet func(*sql.Selector)
@@ -30,21 +39,6 @@ type RefreshToken func(*sql.Selector)
 // Service is the predicate function for service builders.
 type Service func(*sql.Selector)
 
-// ServiceAuthorizationEndpointConfig is the predicate function for serviceauthorizationendpointconfig builders.
-type ServiceAuthorizationEndpointConfig func(*sql.Selector)
-
-// ServiceIntrospectionEndpointConfig is the predicate function for serviceintrospectionendpointconfig builders.
-type ServiceIntrospectionEndpointConfig func(*sql.Selector)
-
-// ServiceJWKSEndpointConfig is the predicate function for servicejwksendpointconfig builders.
-type ServiceJWKSEndpointConfig func(*sql.Selector)
-
-// ServiceTokenEndpointConfig is the predicate function for servicetokenendpointconfig builders.
-type ServiceTokenEndpointConfig func(*sql.Selector)
-
-// ServiceUserInfoEndpointConfig is the predicate function for serviceuserinfoendpointconfig builders.
-type ServiceUserInfoEndpointConfig func(*sql.Selector)
-
 // Session is the predicate function for session builders.
 type Session func(*sql.Selector)
 
@@ -54,8 +48,14 @@ type SigningKey func(*sql.Selector)
 // StandardClaims is the predicate function for standardclaims builders.
 type StandardClaims func(*sql.Selector)
 
+// TokenEndpointConfig is the predicate function for tokenendpointconfig builders.
+type TokenEndpointConfig func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserInfoEndpointConfig is the predicate function for userinfoendpointconfig builders.
+type UserInfoEndpointConfig func(*sql.Selector)
 
 // UserPool is the predicate function for userpool builders.
 type UserPool func(*sql.Selector)

@@ -378,7 +378,7 @@ func HasServiceAuthorizationEndpointConfig() predicate.Service {
 }
 
 // HasServiceAuthorizationEndpointConfigWith applies the HasEdge predicate on the "service_authorization_endpoint_config" edge with a given conditions (other predicates).
-func HasServiceAuthorizationEndpointConfigWith(preds ...predicate.ServiceAuthorizationEndpointConfig) predicate.Service {
+func HasServiceAuthorizationEndpointConfigWith(preds ...predicate.AuthorizationEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceAuthorizationEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -401,7 +401,7 @@ func HasServiceIntrospectionEndpointConfig() predicate.Service {
 }
 
 // HasServiceIntrospectionEndpointConfigWith applies the HasEdge predicate on the "service_introspection_endpoint_config" edge with a given conditions (other predicates).
-func HasServiceIntrospectionEndpointConfigWith(preds ...predicate.ServiceIntrospectionEndpointConfig) predicate.Service {
+func HasServiceIntrospectionEndpointConfigWith(preds ...predicate.IntrospectionEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceIntrospectionEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -424,7 +424,7 @@ func HasServiceTokenEndpointConfig() predicate.Service {
 }
 
 // HasServiceTokenEndpointConfigWith applies the HasEdge predicate on the "service_token_endpoint_config" edge with a given conditions (other predicates).
-func HasServiceTokenEndpointConfigWith(preds ...predicate.ServiceTokenEndpointConfig) predicate.Service {
+func HasServiceTokenEndpointConfigWith(preds ...predicate.TokenEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceTokenEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -447,7 +447,7 @@ func HasServiceUserInfoEndpointConfig() predicate.Service {
 }
 
 // HasServiceUserInfoEndpointConfigWith applies the HasEdge predicate on the "service_user_info_endpoint_config" edge with a given conditions (other predicates).
-func HasServiceUserInfoEndpointConfigWith(preds ...predicate.ServiceUserInfoEndpointConfig) predicate.Service {
+func HasServiceUserInfoEndpointConfigWith(preds ...predicate.UserInfoEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceUserInfoEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -470,7 +470,7 @@ func HasServiceJwksEndpointConfig() predicate.Service {
 }
 
 // HasServiceJwksEndpointConfigWith applies the HasEdge predicate on the "service_jwks_endpoint_config" edge with a given conditions (other predicates).
-func HasServiceJwksEndpointConfigWith(preds ...predicate.ServiceJWKSEndpointConfig) predicate.Service {
+func HasServiceJwksEndpointConfigWith(preds ...predicate.JwksEndpointConfig) predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {
 		step := newServiceJwksEndpointConfigStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

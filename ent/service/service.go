@@ -54,38 +54,38 @@ const (
 	// KeySetColumn is the table column denoting the key_set relation/edge.
 	KeySetColumn = "service_key_set"
 	// ServiceAuthorizationEndpointConfigTable is the table that holds the service_authorization_endpoint_config relation/edge.
-	ServiceAuthorizationEndpointConfigTable = "service_authorization_endpoint_configs"
-	// ServiceAuthorizationEndpointConfigInverseTable is the table name for the ServiceAuthorizationEndpointConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "serviceauthorizationendpointconfig" package.
-	ServiceAuthorizationEndpointConfigInverseTable = "service_authorization_endpoint_configs"
+	ServiceAuthorizationEndpointConfigTable = "authorization_endpoint_configs"
+	// ServiceAuthorizationEndpointConfigInverseTable is the table name for the AuthorizationEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "authorizationendpointconfig" package.
+	ServiceAuthorizationEndpointConfigInverseTable = "authorization_endpoint_configs"
 	// ServiceAuthorizationEndpointConfigColumn is the table column denoting the service_authorization_endpoint_config relation/edge.
 	ServiceAuthorizationEndpointConfigColumn = "service_service_authorization_endpoint_config"
 	// ServiceIntrospectionEndpointConfigTable is the table that holds the service_introspection_endpoint_config relation/edge.
-	ServiceIntrospectionEndpointConfigTable = "service_introspection_endpoint_configs"
-	// ServiceIntrospectionEndpointConfigInverseTable is the table name for the ServiceIntrospectionEndpointConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "serviceintrospectionendpointconfig" package.
-	ServiceIntrospectionEndpointConfigInverseTable = "service_introspection_endpoint_configs"
+	ServiceIntrospectionEndpointConfigTable = "introspection_endpoint_configs"
+	// ServiceIntrospectionEndpointConfigInverseTable is the table name for the IntrospectionEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "introspectionendpointconfig" package.
+	ServiceIntrospectionEndpointConfigInverseTable = "introspection_endpoint_configs"
 	// ServiceIntrospectionEndpointConfigColumn is the table column denoting the service_introspection_endpoint_config relation/edge.
 	ServiceIntrospectionEndpointConfigColumn = "service_service_introspection_endpoint_config"
 	// ServiceTokenEndpointConfigTable is the table that holds the service_token_endpoint_config relation/edge.
-	ServiceTokenEndpointConfigTable = "service_token_endpoint_configs"
-	// ServiceTokenEndpointConfigInverseTable is the table name for the ServiceTokenEndpointConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "servicetokenendpointconfig" package.
-	ServiceTokenEndpointConfigInverseTable = "service_token_endpoint_configs"
+	ServiceTokenEndpointConfigTable = "token_endpoint_configs"
+	// ServiceTokenEndpointConfigInverseTable is the table name for the TokenEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "tokenendpointconfig" package.
+	ServiceTokenEndpointConfigInverseTable = "token_endpoint_configs"
 	// ServiceTokenEndpointConfigColumn is the table column denoting the service_token_endpoint_config relation/edge.
 	ServiceTokenEndpointConfigColumn = "service_service_token_endpoint_config"
 	// ServiceUserInfoEndpointConfigTable is the table that holds the service_user_info_endpoint_config relation/edge.
-	ServiceUserInfoEndpointConfigTable = "service_user_info_endpoint_configs"
-	// ServiceUserInfoEndpointConfigInverseTable is the table name for the ServiceUserInfoEndpointConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "serviceuserinfoendpointconfig" package.
-	ServiceUserInfoEndpointConfigInverseTable = "service_user_info_endpoint_configs"
+	ServiceUserInfoEndpointConfigTable = "user_info_endpoint_configs"
+	// ServiceUserInfoEndpointConfigInverseTable is the table name for the UserInfoEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "userinfoendpointconfig" package.
+	ServiceUserInfoEndpointConfigInverseTable = "user_info_endpoint_configs"
 	// ServiceUserInfoEndpointConfigColumn is the table column denoting the service_user_info_endpoint_config relation/edge.
 	ServiceUserInfoEndpointConfigColumn = "service_service_user_info_endpoint_config"
 	// ServiceJwksEndpointConfigTable is the table that holds the service_jwks_endpoint_config relation/edge.
-	ServiceJwksEndpointConfigTable = "service_jwks_endpoint_configs"
-	// ServiceJwksEndpointConfigInverseTable is the table name for the ServiceJWKSEndpointConfig entity.
-	// It exists in this package in order to avoid circular dependency with the "servicejwksendpointconfig" package.
-	ServiceJwksEndpointConfigInverseTable = "service_jwks_endpoint_configs"
+	ServiceJwksEndpointConfigTable = "jwks_endpoint_configs"
+	// ServiceJwksEndpointConfigInverseTable is the table name for the JwksEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "jwksendpointconfig" package.
+	ServiceJwksEndpointConfigInverseTable = "jwks_endpoint_configs"
 	// ServiceJwksEndpointConfigColumn is the table column denoting the service_jwks_endpoint_config relation/edge.
 	ServiceJwksEndpointConfigColumn = "service_service_jwks_endpoint_config"
 	// ServiceWellKnownEndpointConfigTable is the table that holds the service_well_known_endpoint_config relation/edge.
