@@ -58,6 +58,28 @@ var (
 		Columns:    AuthorizationCodesColumns,
 		PrimaryKey: []*schema.Column{AuthorizationCodesColumns[0]},
 	}
+	// AuthorizationEndpointConfigsColumns holds the columns for the "authorization_endpoint_configs" table.
+	AuthorizationEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "pkce_required", Type: field.TypeBool},
+		{Name: "pkce_s256_code_challenge_method_required", Type: field.TypeBool},
+		{Name: "service_service_authorization_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// AuthorizationEndpointConfigsTable holds the schema information for the "authorization_endpoint_configs" table.
+	AuthorizationEndpointConfigsTable = &schema.Table{
+		Name:       "authorization_endpoint_configs",
+		Columns:    AuthorizationEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{AuthorizationEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "authorization_endpoint_configs_services_service_authorization_endpoint_config",
+				Columns:    []*schema.Column{AuthorizationEndpointConfigsColumns[4]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// AuthorizationPayloadsColumns holds the columns for the "authorization_payloads" table.
 	AuthorizationPayloadsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -117,6 +139,46 @@ var (
 				Columns:    []*schema.Column{CredentialsColumns[3]},
 				RefColumns: []*schema.Column{ApplicationsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// IntrospectionEndpointConfigsColumns holds the columns for the "introspection_endpoint_configs" table.
+	IntrospectionEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_introspection_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// IntrospectionEndpointConfigsTable holds the schema information for the "introspection_endpoint_configs" table.
+	IntrospectionEndpointConfigsTable = &schema.Table{
+		Name:       "introspection_endpoint_configs",
+		Columns:    IntrospectionEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{IntrospectionEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "introspection_endpoint_configs_services_service_introspection_endpoint_config",
+				Columns:    []*schema.Column{IntrospectionEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// JwksEndpointConfigsColumns holds the columns for the "jwks_endpoint_configs" table.
+	JwksEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_jwks_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// JwksEndpointConfigsTable holds the schema information for the "jwks_endpoint_configs" table.
+	JwksEndpointConfigsTable = &schema.Table{
+		Name:       "jwks_endpoint_configs",
+		Columns:    JwksEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{JwksEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "jwks_endpoint_configs_services_service_jwks_endpoint_config",
+				Columns:    []*schema.Column{JwksEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -182,109 +244,6 @@ var (
 		Name:       "services",
 		Columns:    ServicesColumns,
 		PrimaryKey: []*schema.Column{ServicesColumns[0]},
-	}
-	// ServiceAuthorizationEndpointConfigsColumns holds the columns for the "service_authorization_endpoint_configs" table.
-	ServiceAuthorizationEndpointConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "endpoint", Type: field.TypeString, Unique: true},
-		{Name: "pkce_required", Type: field.TypeBool},
-		{Name: "pkce_s256_code_challenge_method_required", Type: field.TypeBool},
-		{Name: "service_service_authorization_endpoint_config", Type: field.TypeString, Unique: true},
-	}
-	// ServiceAuthorizationEndpointConfigsTable holds the schema information for the "service_authorization_endpoint_configs" table.
-	ServiceAuthorizationEndpointConfigsTable = &schema.Table{
-		Name:       "service_authorization_endpoint_configs",
-		Columns:    ServiceAuthorizationEndpointConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceAuthorizationEndpointConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "service_authorization_endpoint_configs_services_service_authorization_endpoint_config",
-				Columns:    []*schema.Column{ServiceAuthorizationEndpointConfigsColumns[4]},
-				RefColumns: []*schema.Column{ServicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ServiceIntrospectionEndpointConfigsColumns holds the columns for the "service_introspection_endpoint_configs" table.
-	ServiceIntrospectionEndpointConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "endpoint", Type: field.TypeString, Unique: true},
-		{Name: "service_service_introspection_endpoint_config", Type: field.TypeString, Unique: true},
-	}
-	// ServiceIntrospectionEndpointConfigsTable holds the schema information for the "service_introspection_endpoint_configs" table.
-	ServiceIntrospectionEndpointConfigsTable = &schema.Table{
-		Name:       "service_introspection_endpoint_configs",
-		Columns:    ServiceIntrospectionEndpointConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceIntrospectionEndpointConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "service_introspection_endpoint_configs_services_service_introspection_endpoint_config",
-				Columns:    []*schema.Column{ServiceIntrospectionEndpointConfigsColumns[2]},
-				RefColumns: []*schema.Column{ServicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ServiceJwksEndpointConfigsColumns holds the columns for the "service_jwks_endpoint_configs" table.
-	ServiceJwksEndpointConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "endpoint", Type: field.TypeString, Unique: true},
-		{Name: "service_service_jwks_endpoint_config", Type: field.TypeString, Unique: true},
-	}
-	// ServiceJwksEndpointConfigsTable holds the schema information for the "service_jwks_endpoint_configs" table.
-	ServiceJwksEndpointConfigsTable = &schema.Table{
-		Name:       "service_jwks_endpoint_configs",
-		Columns:    ServiceJwksEndpointConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceJwksEndpointConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "service_jwks_endpoint_configs_services_service_jwks_endpoint_config",
-				Columns:    []*schema.Column{ServiceJwksEndpointConfigsColumns[2]},
-				RefColumns: []*schema.Column{ServicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ServiceTokenEndpointConfigsColumns holds the columns for the "service_token_endpoint_configs" table.
-	ServiceTokenEndpointConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "endpoint", Type: field.TypeString, Unique: true},
-		{Name: "allowed_authentication_methods", Type: field.TypeJSON},
-		{Name: "service_service_token_endpoint_config", Type: field.TypeString, Unique: true},
-	}
-	// ServiceTokenEndpointConfigsTable holds the schema information for the "service_token_endpoint_configs" table.
-	ServiceTokenEndpointConfigsTable = &schema.Table{
-		Name:       "service_token_endpoint_configs",
-		Columns:    ServiceTokenEndpointConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceTokenEndpointConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "service_token_endpoint_configs_services_service_token_endpoint_config",
-				Columns:    []*schema.Column{ServiceTokenEndpointConfigsColumns[3]},
-				RefColumns: []*schema.Column{ServicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
-	// ServiceUserInfoEndpointConfigsColumns holds the columns for the "service_user_info_endpoint_configs" table.
-	ServiceUserInfoEndpointConfigsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "endpoint", Type: field.TypeString, Unique: true},
-		{Name: "service_service_user_info_endpoint_config", Type: field.TypeString, Unique: true},
-	}
-	// ServiceUserInfoEndpointConfigsTable holds the schema information for the "service_user_info_endpoint_configs" table.
-	ServiceUserInfoEndpointConfigsTable = &schema.Table{
-		Name:       "service_user_info_endpoint_configs",
-		Columns:    ServiceUserInfoEndpointConfigsColumns,
-		PrimaryKey: []*schema.Column{ServiceUserInfoEndpointConfigsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "service_user_info_endpoint_configs_services_service_user_info_endpoint_config",
-				Columns:    []*schema.Column{ServiceUserInfoEndpointConfigsColumns[2]},
-				RefColumns: []*schema.Column{ServicesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
 	}
 	// SessionsColumns holds the columns for the "sessions" table.
 	SessionsColumns = []*schema.Column{
@@ -357,6 +316,27 @@ var (
 			},
 		},
 	}
+	// TokenEndpointConfigsColumns holds the columns for the "token_endpoint_configs" table.
+	TokenEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "allowed_authentication_methods", Type: field.TypeJSON},
+		{Name: "service_service_token_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// TokenEndpointConfigsTable holds the schema information for the "token_endpoint_configs" table.
+	TokenEndpointConfigsTable = &schema.Table{
+		Name:       "token_endpoint_configs",
+		Columns:    TokenEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{TokenEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "token_endpoint_configs_services_service_token_endpoint_config",
+				Columns:    []*schema.Column{TokenEndpointConfigsColumns[3]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -375,6 +355,26 @@ var (
 				Columns:    []*schema.Column{UsersColumns[3]},
 				RefColumns: []*schema.Column{UserPoolsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// UserInfoEndpointConfigsColumns holds the columns for the "user_info_endpoint_configs" table.
+	UserInfoEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_user_info_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// UserInfoEndpointConfigsTable holds the schema information for the "user_info_endpoint_configs" table.
+	UserInfoEndpointConfigsTable = &schema.Table{
+		Name:       "user_info_endpoint_configs",
+		Columns:    UserInfoEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{UserInfoEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_info_endpoint_configs_services_service_user_info_endpoint_config",
+				Columns:    []*schema.Column{UserInfoEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -412,21 +412,21 @@ var (
 	Tables = []*schema.Table{
 		ApplicationsTable,
 		AuthorizationCodesTable,
+		AuthorizationEndpointConfigsTable,
 		AuthorizationPayloadsTable,
 		CookieStoresTable,
 		CredentialsTable,
+		IntrospectionEndpointConfigsTable,
+		JwksEndpointConfigsTable,
 		KeySetsTable,
 		RefreshTokensTable,
 		ServicesTable,
-		ServiceAuthorizationEndpointConfigsTable,
-		ServiceIntrospectionEndpointConfigsTable,
-		ServiceJwksEndpointConfigsTable,
-		ServiceTokenEndpointConfigsTable,
-		ServiceUserInfoEndpointConfigsTable,
 		SessionsTable,
 		SigningKeysTable,
 		StandardClaimsTable,
+		TokenEndpointConfigsTable,
 		UsersTable,
+		UserInfoEndpointConfigsTable,
 		UserPoolsTable,
 		WellKnownEndpointConfigsTable,
 	}
@@ -434,16 +434,16 @@ var (
 
 func init() {
 	ApplicationsTable.ForeignKeys[0].RefTable = ServicesTable
+	AuthorizationEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	AuthorizationPayloadsTable.ForeignKeys[0].RefTable = SessionsTable
 	CredentialsTable.ForeignKeys[0].RefTable = ApplicationsTable
+	IntrospectionEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	JwksEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	KeySetsTable.ForeignKeys[0].RefTable = ServicesTable
-	ServiceAuthorizationEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
-	ServiceIntrospectionEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
-	ServiceJwksEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
-	ServiceTokenEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
-	ServiceUserInfoEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	SigningKeysTable.ForeignKeys[0].RefTable = KeySetsTable
 	StandardClaimsTable.ForeignKeys[0].RefTable = UsersTable
+	TokenEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	UsersTable.ForeignKeys[0].RefTable = UserPoolsTable
+	UserInfoEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	WellKnownEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 }

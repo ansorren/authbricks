@@ -12,14 +12,14 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
+	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
+	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
-	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
-	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/tokenendpointconfig"
+	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
@@ -31,11 +31,11 @@ type ServiceQuery struct {
 	inters                                 []Interceptor
 	predicates                             []predicate.Service
 	withKeySet                             *KeySetQuery
-	withServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfigQuery
-	withServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfigQuery
-	withServiceTokenEndpointConfig         *ServiceTokenEndpointConfigQuery
-	withServiceUserInfoEndpointConfig      *ServiceUserInfoEndpointConfigQuery
-	withServiceJwksEndpointConfig          *ServiceJWKSEndpointConfigQuery
+	withServiceAuthorizationEndpointConfig *AuthorizationEndpointConfigQuery
+	withServiceIntrospectionEndpointConfig *IntrospectionEndpointConfigQuery
+	withServiceTokenEndpointConfig         *TokenEndpointConfigQuery
+	withServiceUserInfoEndpointConfig      *UserInfoEndpointConfigQuery
+	withServiceJwksEndpointConfig          *JwksEndpointConfigQuery
 	withServiceWellKnownEndpointConfig     *WellKnownEndpointConfigQuery
 	withApplications                       *ApplicationQuery
 	// intermediate query (i.e. traversal path).
@@ -97,8 +97,8 @@ func (sq *ServiceQuery) QueryKeySet() *KeySetQuery {
 }
 
 // QueryServiceAuthorizationEndpointConfig chains the current query on the "service_authorization_endpoint_config" edge.
-func (sq *ServiceQuery) QueryServiceAuthorizationEndpointConfig() *ServiceAuthorizationEndpointConfigQuery {
-	query := (&ServiceAuthorizationEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) QueryServiceAuthorizationEndpointConfig() *AuthorizationEndpointConfigQuery {
+	query := (&AuthorizationEndpointConfigClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -109,7 +109,7 @@ func (sq *ServiceQuery) QueryServiceAuthorizationEndpointConfig() *ServiceAuthor
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
-			sqlgraph.To(serviceauthorizationendpointconfig.Table, serviceauthorizationendpointconfig.FieldID),
+			sqlgraph.To(authorizationendpointconfig.Table, authorizationendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceAuthorizationEndpointConfigTable, service.ServiceAuthorizationEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
@@ -119,8 +119,8 @@ func (sq *ServiceQuery) QueryServiceAuthorizationEndpointConfig() *ServiceAuthor
 }
 
 // QueryServiceIntrospectionEndpointConfig chains the current query on the "service_introspection_endpoint_config" edge.
-func (sq *ServiceQuery) QueryServiceIntrospectionEndpointConfig() *ServiceIntrospectionEndpointConfigQuery {
-	query := (&ServiceIntrospectionEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) QueryServiceIntrospectionEndpointConfig() *IntrospectionEndpointConfigQuery {
+	query := (&IntrospectionEndpointConfigClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -131,7 +131,7 @@ func (sq *ServiceQuery) QueryServiceIntrospectionEndpointConfig() *ServiceIntros
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
-			sqlgraph.To(serviceintrospectionendpointconfig.Table, serviceintrospectionendpointconfig.FieldID),
+			sqlgraph.To(introspectionendpointconfig.Table, introspectionendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceIntrospectionEndpointConfigTable, service.ServiceIntrospectionEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
@@ -141,8 +141,8 @@ func (sq *ServiceQuery) QueryServiceIntrospectionEndpointConfig() *ServiceIntros
 }
 
 // QueryServiceTokenEndpointConfig chains the current query on the "service_token_endpoint_config" edge.
-func (sq *ServiceQuery) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointConfigQuery {
-	query := (&ServiceTokenEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) QueryServiceTokenEndpointConfig() *TokenEndpointConfigQuery {
+	query := (&TokenEndpointConfigClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -153,7 +153,7 @@ func (sq *ServiceQuery) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointC
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
-			sqlgraph.To(servicetokenendpointconfig.Table, servicetokenendpointconfig.FieldID),
+			sqlgraph.To(tokenendpointconfig.Table, tokenendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceTokenEndpointConfigTable, service.ServiceTokenEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
@@ -163,8 +163,8 @@ func (sq *ServiceQuery) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointC
 }
 
 // QueryServiceUserInfoEndpointConfig chains the current query on the "service_user_info_endpoint_config" edge.
-func (sq *ServiceQuery) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEndpointConfigQuery {
-	query := (&ServiceUserInfoEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) QueryServiceUserInfoEndpointConfig() *UserInfoEndpointConfigQuery {
+	query := (&UserInfoEndpointConfigClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -175,7 +175,7 @@ func (sq *ServiceQuery) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEnd
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
-			sqlgraph.To(serviceuserinfoendpointconfig.Table, serviceuserinfoendpointconfig.FieldID),
+			sqlgraph.To(userinfoendpointconfig.Table, userinfoendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceUserInfoEndpointConfigTable, service.ServiceUserInfoEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
@@ -185,8 +185,8 @@ func (sq *ServiceQuery) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEnd
 }
 
 // QueryServiceJwksEndpointConfig chains the current query on the "service_jwks_endpoint_config" edge.
-func (sq *ServiceQuery) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointConfigQuery {
-	query := (&ServiceJWKSEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) QueryServiceJwksEndpointConfig() *JwksEndpointConfigQuery {
+	query := (&JwksEndpointConfigClient{config: sq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := sq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -197,7 +197,7 @@ func (sq *ServiceQuery) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointCon
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(service.Table, service.FieldID, selector),
-			sqlgraph.To(servicejwksendpointconfig.Table, servicejwksendpointconfig.FieldID),
+			sqlgraph.To(jwksendpointconfig.Table, jwksendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceJwksEndpointConfigTable, service.ServiceJwksEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
@@ -469,8 +469,8 @@ func (sq *ServiceQuery) WithKeySet(opts ...func(*KeySetQuery)) *ServiceQuery {
 
 // WithServiceAuthorizationEndpointConfig tells the query-builder to eager-load the nodes that are connected to
 // the "service_authorization_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithServiceAuthorizationEndpointConfig(opts ...func(*ServiceAuthorizationEndpointConfigQuery)) *ServiceQuery {
-	query := (&ServiceAuthorizationEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) WithServiceAuthorizationEndpointConfig(opts ...func(*AuthorizationEndpointConfigQuery)) *ServiceQuery {
+	query := (&AuthorizationEndpointConfigClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -480,8 +480,8 @@ func (sq *ServiceQuery) WithServiceAuthorizationEndpointConfig(opts ...func(*Ser
 
 // WithServiceIntrospectionEndpointConfig tells the query-builder to eager-load the nodes that are connected to
 // the "service_introspection_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithServiceIntrospectionEndpointConfig(opts ...func(*ServiceIntrospectionEndpointConfigQuery)) *ServiceQuery {
-	query := (&ServiceIntrospectionEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) WithServiceIntrospectionEndpointConfig(opts ...func(*IntrospectionEndpointConfigQuery)) *ServiceQuery {
+	query := (&IntrospectionEndpointConfigClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -491,8 +491,8 @@ func (sq *ServiceQuery) WithServiceIntrospectionEndpointConfig(opts ...func(*Ser
 
 // WithServiceTokenEndpointConfig tells the query-builder to eager-load the nodes that are connected to
 // the "service_token_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithServiceTokenEndpointConfig(opts ...func(*ServiceTokenEndpointConfigQuery)) *ServiceQuery {
-	query := (&ServiceTokenEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) WithServiceTokenEndpointConfig(opts ...func(*TokenEndpointConfigQuery)) *ServiceQuery {
+	query := (&TokenEndpointConfigClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -502,8 +502,8 @@ func (sq *ServiceQuery) WithServiceTokenEndpointConfig(opts ...func(*ServiceToke
 
 // WithServiceUserInfoEndpointConfig tells the query-builder to eager-load the nodes that are connected to
 // the "service_user_info_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithServiceUserInfoEndpointConfig(opts ...func(*ServiceUserInfoEndpointConfigQuery)) *ServiceQuery {
-	query := (&ServiceUserInfoEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) WithServiceUserInfoEndpointConfig(opts ...func(*UserInfoEndpointConfigQuery)) *ServiceQuery {
+	query := (&UserInfoEndpointConfigClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -513,8 +513,8 @@ func (sq *ServiceQuery) WithServiceUserInfoEndpointConfig(opts ...func(*ServiceU
 
 // WithServiceJwksEndpointConfig tells the query-builder to eager-load the nodes that are connected to
 // the "service_jwks_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
-func (sq *ServiceQuery) WithServiceJwksEndpointConfig(opts ...func(*ServiceJWKSEndpointConfigQuery)) *ServiceQuery {
-	query := (&ServiceJWKSEndpointConfigClient{config: sq.config}).Query()
+func (sq *ServiceQuery) WithServiceJwksEndpointConfig(opts ...func(*JwksEndpointConfigQuery)) *ServiceQuery {
+	query := (&JwksEndpointConfigClient{config: sq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -659,35 +659,31 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	}
 	if query := sq.withServiceAuthorizationEndpointConfig; query != nil {
 		if err := sq.loadServiceAuthorizationEndpointConfig(ctx, query, nodes, nil,
-			func(n *Service, e *ServiceAuthorizationEndpointConfig) {
-				n.Edges.ServiceAuthorizationEndpointConfig = e
-			}); err != nil {
+			func(n *Service, e *AuthorizationEndpointConfig) { n.Edges.ServiceAuthorizationEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withServiceIntrospectionEndpointConfig; query != nil {
 		if err := sq.loadServiceIntrospectionEndpointConfig(ctx, query, nodes, nil,
-			func(n *Service, e *ServiceIntrospectionEndpointConfig) {
-				n.Edges.ServiceIntrospectionEndpointConfig = e
-			}); err != nil {
+			func(n *Service, e *IntrospectionEndpointConfig) { n.Edges.ServiceIntrospectionEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withServiceTokenEndpointConfig; query != nil {
 		if err := sq.loadServiceTokenEndpointConfig(ctx, query, nodes, nil,
-			func(n *Service, e *ServiceTokenEndpointConfig) { n.Edges.ServiceTokenEndpointConfig = e }); err != nil {
+			func(n *Service, e *TokenEndpointConfig) { n.Edges.ServiceTokenEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withServiceUserInfoEndpointConfig; query != nil {
 		if err := sq.loadServiceUserInfoEndpointConfig(ctx, query, nodes, nil,
-			func(n *Service, e *ServiceUserInfoEndpointConfig) { n.Edges.ServiceUserInfoEndpointConfig = e }); err != nil {
+			func(n *Service, e *UserInfoEndpointConfig) { n.Edges.ServiceUserInfoEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
 	if query := sq.withServiceJwksEndpointConfig; query != nil {
 		if err := sq.loadServiceJwksEndpointConfig(ctx, query, nodes, nil,
-			func(n *Service, e *ServiceJWKSEndpointConfig) { n.Edges.ServiceJwksEndpointConfig = e }); err != nil {
+			func(n *Service, e *JwksEndpointConfig) { n.Edges.ServiceJwksEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -735,7 +731,7 @@ func (sq *ServiceQuery) loadKeySet(ctx context.Context, query *KeySetQuery, node
 	}
 	return nil
 }
-func (sq *ServiceQuery) loadServiceAuthorizationEndpointConfig(ctx context.Context, query *ServiceAuthorizationEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceAuthorizationEndpointConfig)) error {
+func (sq *ServiceQuery) loadServiceAuthorizationEndpointConfig(ctx context.Context, query *AuthorizationEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *AuthorizationEndpointConfig)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
@@ -743,7 +739,7 @@ func (sq *ServiceQuery) loadServiceAuthorizationEndpointConfig(ctx context.Conte
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.ServiceAuthorizationEndpointConfig(func(s *sql.Selector) {
+	query.Where(predicate.AuthorizationEndpointConfig(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(service.ServiceAuthorizationEndpointConfigColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -763,7 +759,7 @@ func (sq *ServiceQuery) loadServiceAuthorizationEndpointConfig(ctx context.Conte
 	}
 	return nil
 }
-func (sq *ServiceQuery) loadServiceIntrospectionEndpointConfig(ctx context.Context, query *ServiceIntrospectionEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceIntrospectionEndpointConfig)) error {
+func (sq *ServiceQuery) loadServiceIntrospectionEndpointConfig(ctx context.Context, query *IntrospectionEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *IntrospectionEndpointConfig)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
@@ -771,7 +767,7 @@ func (sq *ServiceQuery) loadServiceIntrospectionEndpointConfig(ctx context.Conte
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.ServiceIntrospectionEndpointConfig(func(s *sql.Selector) {
+	query.Where(predicate.IntrospectionEndpointConfig(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(service.ServiceIntrospectionEndpointConfigColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -791,7 +787,7 @@ func (sq *ServiceQuery) loadServiceIntrospectionEndpointConfig(ctx context.Conte
 	}
 	return nil
 }
-func (sq *ServiceQuery) loadServiceTokenEndpointConfig(ctx context.Context, query *ServiceTokenEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceTokenEndpointConfig)) error {
+func (sq *ServiceQuery) loadServiceTokenEndpointConfig(ctx context.Context, query *TokenEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *TokenEndpointConfig)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
@@ -799,7 +795,7 @@ func (sq *ServiceQuery) loadServiceTokenEndpointConfig(ctx context.Context, quer
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.ServiceTokenEndpointConfig(func(s *sql.Selector) {
+	query.Where(predicate.TokenEndpointConfig(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(service.ServiceTokenEndpointConfigColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -819,7 +815,7 @@ func (sq *ServiceQuery) loadServiceTokenEndpointConfig(ctx context.Context, quer
 	}
 	return nil
 }
-func (sq *ServiceQuery) loadServiceUserInfoEndpointConfig(ctx context.Context, query *ServiceUserInfoEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceUserInfoEndpointConfig)) error {
+func (sq *ServiceQuery) loadServiceUserInfoEndpointConfig(ctx context.Context, query *UserInfoEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *UserInfoEndpointConfig)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
@@ -827,7 +823,7 @@ func (sq *ServiceQuery) loadServiceUserInfoEndpointConfig(ctx context.Context, q
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.ServiceUserInfoEndpointConfig(func(s *sql.Selector) {
+	query.Where(predicate.UserInfoEndpointConfig(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(service.ServiceUserInfoEndpointConfigColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -847,7 +843,7 @@ func (sq *ServiceQuery) loadServiceUserInfoEndpointConfig(ctx context.Context, q
 	}
 	return nil
 }
-func (sq *ServiceQuery) loadServiceJwksEndpointConfig(ctx context.Context, query *ServiceJWKSEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *ServiceJWKSEndpointConfig)) error {
+func (sq *ServiceQuery) loadServiceJwksEndpointConfig(ctx context.Context, query *JwksEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *JwksEndpointConfig)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*Service)
 	for i := range nodes {
@@ -855,7 +851,7 @@ func (sq *ServiceQuery) loadServiceJwksEndpointConfig(ctx context.Context, query
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.ServiceJWKSEndpointConfig(func(s *sql.Selector) {
+	query.Where(predicate.JwksEndpointConfig(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(service.ServiceJwksEndpointConfigColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)

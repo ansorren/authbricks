@@ -9,13 +9,13 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
+	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
 	"go.authbricks.com/bricks/ent/service"
-	"go.authbricks.com/bricks/ent/serviceauthorizationendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceintrospectionendpointconfig"
-	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
-	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
-	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/tokenendpointconfig"
+	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
 	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
@@ -51,15 +51,15 @@ type ServiceEdges struct {
 	// KeySet holds the value of the key_set edge.
 	KeySet *KeySet `json:"key_set,omitempty"`
 	// ServiceAuthorizationEndpointConfig holds the value of the service_authorization_endpoint_config edge.
-	ServiceAuthorizationEndpointConfig *ServiceAuthorizationEndpointConfig `json:"service_authorization_endpoint_config,omitempty"`
+	ServiceAuthorizationEndpointConfig *AuthorizationEndpointConfig `json:"service_authorization_endpoint_config,omitempty"`
 	// ServiceIntrospectionEndpointConfig holds the value of the service_introspection_endpoint_config edge.
-	ServiceIntrospectionEndpointConfig *ServiceIntrospectionEndpointConfig `json:"service_introspection_endpoint_config,omitempty"`
+	ServiceIntrospectionEndpointConfig *IntrospectionEndpointConfig `json:"service_introspection_endpoint_config,omitempty"`
 	// ServiceTokenEndpointConfig holds the value of the service_token_endpoint_config edge.
-	ServiceTokenEndpointConfig *ServiceTokenEndpointConfig `json:"service_token_endpoint_config,omitempty"`
+	ServiceTokenEndpointConfig *TokenEndpointConfig `json:"service_token_endpoint_config,omitempty"`
 	// ServiceUserInfoEndpointConfig holds the value of the service_user_info_endpoint_config edge.
-	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfig `json:"service_user_info_endpoint_config,omitempty"`
+	ServiceUserInfoEndpointConfig *UserInfoEndpointConfig `json:"service_user_info_endpoint_config,omitempty"`
 	// ServiceJwksEndpointConfig holds the value of the service_jwks_endpoint_config edge.
-	ServiceJwksEndpointConfig *ServiceJWKSEndpointConfig `json:"service_jwks_endpoint_config,omitempty"`
+	ServiceJwksEndpointConfig *JwksEndpointConfig `json:"service_jwks_endpoint_config,omitempty"`
 	// ServiceWellKnownEndpointConfig holds the value of the service_well_known_endpoint_config edge.
 	ServiceWellKnownEndpointConfig *WellKnownEndpointConfig `json:"service_well_known_endpoint_config,omitempty"`
 	// Applications holds the value of the applications edge.
@@ -82,55 +82,55 @@ func (e ServiceEdges) KeySetOrErr() (*KeySet, error) {
 
 // ServiceAuthorizationEndpointConfigOrErr returns the ServiceAuthorizationEndpointConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceAuthorizationEndpointConfigOrErr() (*ServiceAuthorizationEndpointConfig, error) {
+func (e ServiceEdges) ServiceAuthorizationEndpointConfigOrErr() (*AuthorizationEndpointConfig, error) {
 	if e.ServiceAuthorizationEndpointConfig != nil {
 		return e.ServiceAuthorizationEndpointConfig, nil
 	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: serviceauthorizationendpointconfig.Label}
+		return nil, &NotFoundError{label: authorizationendpointconfig.Label}
 	}
 	return nil, &NotLoadedError{edge: "service_authorization_endpoint_config"}
 }
 
 // ServiceIntrospectionEndpointConfigOrErr returns the ServiceIntrospectionEndpointConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceIntrospectionEndpointConfigOrErr() (*ServiceIntrospectionEndpointConfig, error) {
+func (e ServiceEdges) ServiceIntrospectionEndpointConfigOrErr() (*IntrospectionEndpointConfig, error) {
 	if e.ServiceIntrospectionEndpointConfig != nil {
 		return e.ServiceIntrospectionEndpointConfig, nil
 	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: serviceintrospectionendpointconfig.Label}
+		return nil, &NotFoundError{label: introspectionendpointconfig.Label}
 	}
 	return nil, &NotLoadedError{edge: "service_introspection_endpoint_config"}
 }
 
 // ServiceTokenEndpointConfigOrErr returns the ServiceTokenEndpointConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceTokenEndpointConfigOrErr() (*ServiceTokenEndpointConfig, error) {
+func (e ServiceEdges) ServiceTokenEndpointConfigOrErr() (*TokenEndpointConfig, error) {
 	if e.ServiceTokenEndpointConfig != nil {
 		return e.ServiceTokenEndpointConfig, nil
 	} else if e.loadedTypes[3] {
-		return nil, &NotFoundError{label: servicetokenendpointconfig.Label}
+		return nil, &NotFoundError{label: tokenendpointconfig.Label}
 	}
 	return nil, &NotLoadedError{edge: "service_token_endpoint_config"}
 }
 
 // ServiceUserInfoEndpointConfigOrErr returns the ServiceUserInfoEndpointConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceUserInfoEndpointConfigOrErr() (*ServiceUserInfoEndpointConfig, error) {
+func (e ServiceEdges) ServiceUserInfoEndpointConfigOrErr() (*UserInfoEndpointConfig, error) {
 	if e.ServiceUserInfoEndpointConfig != nil {
 		return e.ServiceUserInfoEndpointConfig, nil
 	} else if e.loadedTypes[4] {
-		return nil, &NotFoundError{label: serviceuserinfoendpointconfig.Label}
+		return nil, &NotFoundError{label: userinfoendpointconfig.Label}
 	}
 	return nil, &NotLoadedError{edge: "service_user_info_endpoint_config"}
 }
 
 // ServiceJwksEndpointConfigOrErr returns the ServiceJwksEndpointConfig value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e ServiceEdges) ServiceJwksEndpointConfigOrErr() (*ServiceJWKSEndpointConfig, error) {
+func (e ServiceEdges) ServiceJwksEndpointConfigOrErr() (*JwksEndpointConfig, error) {
 	if e.ServiceJwksEndpointConfig != nil {
 		return e.ServiceJwksEndpointConfig, nil
 	} else if e.loadedTypes[5] {
-		return nil, &NotFoundError{label: servicejwksendpointconfig.Label}
+		return nil, &NotFoundError{label: jwksendpointconfig.Label}
 	}
 	return nil, &NotLoadedError{edge: "service_jwks_endpoint_config"}
 }
@@ -260,27 +260,27 @@ func (s *Service) QueryKeySet() *KeySetQuery {
 }
 
 // QueryServiceAuthorizationEndpointConfig queries the "service_authorization_endpoint_config" edge of the Service entity.
-func (s *Service) QueryServiceAuthorizationEndpointConfig() *ServiceAuthorizationEndpointConfigQuery {
+func (s *Service) QueryServiceAuthorizationEndpointConfig() *AuthorizationEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceAuthorizationEndpointConfig(s)
 }
 
 // QueryServiceIntrospectionEndpointConfig queries the "service_introspection_endpoint_config" edge of the Service entity.
-func (s *Service) QueryServiceIntrospectionEndpointConfig() *ServiceIntrospectionEndpointConfigQuery {
+func (s *Service) QueryServiceIntrospectionEndpointConfig() *IntrospectionEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceIntrospectionEndpointConfig(s)
 }
 
 // QueryServiceTokenEndpointConfig queries the "service_token_endpoint_config" edge of the Service entity.
-func (s *Service) QueryServiceTokenEndpointConfig() *ServiceTokenEndpointConfigQuery {
+func (s *Service) QueryServiceTokenEndpointConfig() *TokenEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceTokenEndpointConfig(s)
 }
 
 // QueryServiceUserInfoEndpointConfig queries the "service_user_info_endpoint_config" edge of the Service entity.
-func (s *Service) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEndpointConfigQuery {
+func (s *Service) QueryServiceUserInfoEndpointConfig() *UserInfoEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceUserInfoEndpointConfig(s)
 }
 
 // QueryServiceJwksEndpointConfig queries the "service_jwks_endpoint_config" edge of the Service entity.
-func (s *Service) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointConfigQuery {
+func (s *Service) QueryServiceJwksEndpointConfig() *JwksEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceJwksEndpointConfig(s)
 }
 

@@ -30,11 +30,11 @@ func (Service) Fields() []ent.Field {
 func (Service) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("key_set", KeySet.Type).Unique(),
-		edge.To("service_authorization_endpoint_config", ServiceAuthorizationEndpointConfig.Type).Unique(),
-		edge.To("service_introspection_endpoint_config", ServiceIntrospectionEndpointConfig.Type).Unique(),
-		edge.To("service_token_endpoint_config", ServiceTokenEndpointConfig.Type).Unique(),
-		edge.To("service_user_info_endpoint_config", ServiceUserInfoEndpointConfig.Type).Unique(),
-		edge.To("service_jwks_endpoint_config", ServiceJWKSEndpointConfig.Type).Unique(),
+		edge.To("service_authorization_endpoint_config", AuthorizationEndpointConfig.Type).Unique(),
+		edge.To("service_introspection_endpoint_config", IntrospectionEndpointConfig.Type).Unique(),
+		edge.To("service_token_endpoint_config", TokenEndpointConfig.Type).Unique(),
+		edge.To("service_user_info_endpoint_config", UserInfoEndpointConfig.Type).Unique(),
+		edge.To("service_jwks_endpoint_config", JwksEndpointConfig.Type).Unique(),
 		edge.To("service_well_known_endpoint_config", WellKnownEndpointConfig.Type).Unique(),
 		edge.To("applications", Application.Type),
 	}
