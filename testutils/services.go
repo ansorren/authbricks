@@ -4,9 +4,10 @@ import (
 	"crypto"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"go.authbricks.com/bricks/config"
 	abcrypto "go.authbricks.com/bricks/crypto"
+
+	"github.com/stretchr/testify/require"
 )
 
 // privateKey generates a new RSA private key for testing.

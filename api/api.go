@@ -3,12 +3,13 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/go-hclog"
-	"github.com/labstack/echo/v4/middleware"
+
 	"go.authbricks.com/bricks/database"
 	"go.authbricks.com/bricks/ent"
 
+	"github.com/hashicorp/go-hclog"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 )
 
