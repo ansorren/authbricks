@@ -20,6 +20,7 @@ import (
 	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // ServiceQuery is the builder for querying Service entities.
@@ -35,6 +36,7 @@ type ServiceQuery struct {
 	withServiceTokenEndpointConfig         *ServiceTokenEndpointConfigQuery
 	withServiceUserInfoEndpointConfig      *ServiceUserInfoEndpointConfigQuery
 	withServiceJwksEndpointConfig          *ServiceJWKSEndpointConfigQuery
+	withServiceWellKnownEndpointConfig     *WellKnownEndpointConfigQuery
 	withApplications                       *ApplicationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -197,6 +199,28 @@ func (sq *ServiceQuery) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointCon
 			sqlgraph.From(service.Table, service.FieldID, selector),
 			sqlgraph.To(servicejwksendpointconfig.Table, servicejwksendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceJwksEndpointConfigTable, service.ServiceJwksEndpointConfigColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryServiceWellKnownEndpointConfig chains the current query on the "service_well_known_endpoint_config" edge.
+func (sq *ServiceQuery) QueryServiceWellKnownEndpointConfig() *WellKnownEndpointConfigQuery {
+	query := (&WellKnownEndpointConfigClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, selector),
+			sqlgraph.To(wellknownendpointconfig.Table, wellknownendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceWellKnownEndpointConfigTable, service.ServiceWellKnownEndpointConfigColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -424,6 +448,7 @@ func (sq *ServiceQuery) Clone() *ServiceQuery {
 		withServiceTokenEndpointConfig:         sq.withServiceTokenEndpointConfig.Clone(),
 		withServiceUserInfoEndpointConfig:      sq.withServiceUserInfoEndpointConfig.Clone(),
 		withServiceJwksEndpointConfig:          sq.withServiceJwksEndpointConfig.Clone(),
+		withServiceWellKnownEndpointConfig:     sq.withServiceWellKnownEndpointConfig.Clone(),
 		withApplications:                       sq.withApplications.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
@@ -494,6 +519,17 @@ func (sq *ServiceQuery) WithServiceJwksEndpointConfig(opts ...func(*ServiceJWKSE
 		opt(query)
 	}
 	sq.withServiceJwksEndpointConfig = query
+	return sq
+}
+
+// WithServiceWellKnownEndpointConfig tells the query-builder to eager-load the nodes that are connected to
+// the "service_well_known_endpoint_config" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ServiceQuery) WithServiceWellKnownEndpointConfig(opts ...func(*WellKnownEndpointConfigQuery)) *ServiceQuery {
+	query := (&WellKnownEndpointConfigClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withServiceWellKnownEndpointConfig = query
 	return sq
 }
 
@@ -586,13 +622,14 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	var (
 		nodes       = []*Service{}
 		_spec       = sq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [8]bool{
 			sq.withKeySet != nil,
 			sq.withServiceAuthorizationEndpointConfig != nil,
 			sq.withServiceIntrospectionEndpointConfig != nil,
 			sq.withServiceTokenEndpointConfig != nil,
 			sq.withServiceUserInfoEndpointConfig != nil,
 			sq.withServiceJwksEndpointConfig != nil,
+			sq.withServiceWellKnownEndpointConfig != nil,
 			sq.withApplications != nil,
 		}
 	)
@@ -651,6 +688,12 @@ func (sq *ServiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Serv
 	if query := sq.withServiceJwksEndpointConfig; query != nil {
 		if err := sq.loadServiceJwksEndpointConfig(ctx, query, nodes, nil,
 			func(n *Service, e *ServiceJWKSEndpointConfig) { n.Edges.ServiceJwksEndpointConfig = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withServiceWellKnownEndpointConfig; query != nil {
+		if err := sq.loadServiceWellKnownEndpointConfig(ctx, query, nodes, nil,
+			func(n *Service, e *WellKnownEndpointConfig) { n.Edges.ServiceWellKnownEndpointConfig = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -827,6 +870,34 @@ func (sq *ServiceQuery) loadServiceJwksEndpointConfig(ctx context.Context, query
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "service_service_jwks_endpoint_config" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *ServiceQuery) loadServiceWellKnownEndpointConfig(ctx context.Context, query *WellKnownEndpointConfigQuery, nodes []*Service, init func(*Service), assign func(*Service, *WellKnownEndpointConfig)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Service)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.WellKnownEndpointConfig(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(service.ServiceWellKnownEndpointConfigColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.service_service_well_known_endpoint_config
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "service_service_well_known_endpoint_config" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "service_service_well_known_endpoint_config" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

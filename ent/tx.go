@@ -48,6 +48,8 @@ type Tx struct {
 	User *UserClient
 	// UserPool is the client for interacting with the UserPool builders.
 	UserPool *UserPoolClient
+	// WellKnownEndpointConfig is the client for interacting with the WellKnownEndpointConfig builders.
+	WellKnownEndpointConfig *WellKnownEndpointConfigClient
 
 	// lazily loaded.
 	client     *Client
@@ -197,6 +199,7 @@ func (tx *Tx) init() {
 	tx.StandardClaims = NewStandardClaimsClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserPool = NewUserPoolClient(tx.config)
+	tx.WellKnownEndpointConfig = NewWellKnownEndpointConfigClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

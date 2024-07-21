@@ -40,6 +40,7 @@ type Service struct {
 	TokenEndpoint         TokenEndpoint
 	UserInfoEndpoint      UserInfoEndpoint
 	JWKSEndpoint          JWKSEndpoint
+	WellKnownEndpoint     WellKnownEndpoint
 	Keys                  []crypto.PrivateKey
 }
 
@@ -96,6 +97,9 @@ func (s Service) Validate() error {
 	}
 	if err := s.JWKSEndpoint.Validate(); err != nil {
 		return errors.Wrapf(err, "JWKS endpoint validation failed")
+	}
+	if err := s.WellKnownEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "well-known endpoint validation failed")
 	}
 
 	if err := validateKeys(s.Keys); err != nil {

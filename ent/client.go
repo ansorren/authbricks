@@ -33,6 +33,7 @@ import (
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userpool"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // Client is the client that holds all ent builders.
@@ -76,6 +77,8 @@ type Client struct {
 	User *UserClient
 	// UserPool is the client for interacting with the UserPool builders.
 	UserPool *UserPoolClient
+	// WellKnownEndpointConfig is the client for interacting with the WellKnownEndpointConfig builders.
+	WellKnownEndpointConfig *WellKnownEndpointConfigClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -105,6 +108,7 @@ func (c *Client) init() {
 	c.StandardClaims = NewStandardClaimsClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserPool = NewUserPoolClient(c.config)
+	c.WellKnownEndpointConfig = NewWellKnownEndpointConfigClient(c.config)
 }
 
 type (
@@ -215,6 +219,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		StandardClaims:                     NewStandardClaimsClient(cfg),
 		User:                               NewUserClient(cfg),
 		UserPool:                           NewUserPoolClient(cfg),
+		WellKnownEndpointConfig:            NewWellKnownEndpointConfigClient(cfg),
 	}, nil
 }
 
@@ -252,6 +257,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		StandardClaims:                     NewStandardClaimsClient(cfg),
 		User:                               NewUserClient(cfg),
 		UserPool:                           NewUserPoolClient(cfg),
+		WellKnownEndpointConfig:            NewWellKnownEndpointConfigClient(cfg),
 	}, nil
 }
 
@@ -286,7 +292,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.ServiceAuthorizationEndpointConfig, c.ServiceIntrospectionEndpointConfig,
 		c.ServiceJWKSEndpointConfig, c.ServiceTokenEndpointConfig,
 		c.ServiceUserInfoEndpointConfig, c.Session, c.SigningKey, c.StandardClaims,
-		c.User, c.UserPool,
+		c.User, c.UserPool, c.WellKnownEndpointConfig,
 	} {
 		n.Use(hooks...)
 	}
@@ -301,7 +307,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.ServiceAuthorizationEndpointConfig, c.ServiceIntrospectionEndpointConfig,
 		c.ServiceJWKSEndpointConfig, c.ServiceTokenEndpointConfig,
 		c.ServiceUserInfoEndpointConfig, c.Session, c.SigningKey, c.StandardClaims,
-		c.User, c.UserPool,
+		c.User, c.UserPool, c.WellKnownEndpointConfig,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -346,6 +352,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	case *UserPoolMutation:
 		return c.UserPool.mutate(ctx, m)
+	case *WellKnownEndpointConfigMutation:
+		return c.WellKnownEndpointConfig.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -1575,6 +1583,22 @@ func (c *ServiceClient) QueryServiceJwksEndpointConfig(s *Service) *ServiceJWKSE
 			sqlgraph.From(service.Table, service.FieldID, id),
 			sqlgraph.To(servicejwksendpointconfig.Table, servicejwksendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceJwksEndpointConfigTable, service.ServiceJwksEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceWellKnownEndpointConfig queries the service_well_known_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceWellKnownEndpointConfig(s *Service) *WellKnownEndpointConfigQuery {
+	query := (&WellKnownEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(wellknownendpointconfig.Table, wellknownendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceWellKnownEndpointConfigTable, service.ServiceWellKnownEndpointConfigColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -3129,6 +3153,155 @@ func (c *UserPoolClient) mutate(ctx context.Context, m *UserPoolMutation) (Value
 	}
 }
 
+// WellKnownEndpointConfigClient is a client for the WellKnownEndpointConfig schema.
+type WellKnownEndpointConfigClient struct {
+	config
+}
+
+// NewWellKnownEndpointConfigClient returns a client for the WellKnownEndpointConfig from the given config.
+func NewWellKnownEndpointConfigClient(c config) *WellKnownEndpointConfigClient {
+	return &WellKnownEndpointConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `wellknownendpointconfig.Hooks(f(g(h())))`.
+func (c *WellKnownEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.WellKnownEndpointConfig = append(c.hooks.WellKnownEndpointConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `wellknownendpointconfig.Intercept(f(g(h())))`.
+func (c *WellKnownEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WellKnownEndpointConfig = append(c.inters.WellKnownEndpointConfig, interceptors...)
+}
+
+// Create returns a builder for creating a WellKnownEndpointConfig entity.
+func (c *WellKnownEndpointConfigClient) Create() *WellKnownEndpointConfigCreate {
+	mutation := newWellKnownEndpointConfigMutation(c.config, OpCreate)
+	return &WellKnownEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WellKnownEndpointConfig entities.
+func (c *WellKnownEndpointConfigClient) CreateBulk(builders ...*WellKnownEndpointConfigCreate) *WellKnownEndpointConfigCreateBulk {
+	return &WellKnownEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WellKnownEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*WellKnownEndpointConfigCreate, int)) *WellKnownEndpointConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WellKnownEndpointConfigCreateBulk{err: fmt.Errorf("calling to WellKnownEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WellKnownEndpointConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WellKnownEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WellKnownEndpointConfig.
+func (c *WellKnownEndpointConfigClient) Update() *WellKnownEndpointConfigUpdate {
+	mutation := newWellKnownEndpointConfigMutation(c.config, OpUpdate)
+	return &WellKnownEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WellKnownEndpointConfigClient) UpdateOne(wkec *WellKnownEndpointConfig) *WellKnownEndpointConfigUpdateOne {
+	mutation := newWellKnownEndpointConfigMutation(c.config, OpUpdateOne, withWellKnownEndpointConfig(wkec))
+	return &WellKnownEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WellKnownEndpointConfigClient) UpdateOneID(id string) *WellKnownEndpointConfigUpdateOne {
+	mutation := newWellKnownEndpointConfigMutation(c.config, OpUpdateOne, withWellKnownEndpointConfigID(id))
+	return &WellKnownEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WellKnownEndpointConfig.
+func (c *WellKnownEndpointConfigClient) Delete() *WellKnownEndpointConfigDelete {
+	mutation := newWellKnownEndpointConfigMutation(c.config, OpDelete)
+	return &WellKnownEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WellKnownEndpointConfigClient) DeleteOne(wkec *WellKnownEndpointConfig) *WellKnownEndpointConfigDeleteOne {
+	return c.DeleteOneID(wkec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WellKnownEndpointConfigClient) DeleteOneID(id string) *WellKnownEndpointConfigDeleteOne {
+	builder := c.Delete().Where(wellknownendpointconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WellKnownEndpointConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for WellKnownEndpointConfig.
+func (c *WellKnownEndpointConfigClient) Query() *WellKnownEndpointConfigQuery {
+	return &WellKnownEndpointConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWellKnownEndpointConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a WellKnownEndpointConfig entity by its id.
+func (c *WellKnownEndpointConfigClient) Get(ctx context.Context, id string) (*WellKnownEndpointConfig, error) {
+	return c.Query().Where(wellknownendpointconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WellKnownEndpointConfigClient) GetX(ctx context.Context, id string) *WellKnownEndpointConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a WellKnownEndpointConfig.
+func (c *WellKnownEndpointConfigClient) QueryService(wkec *WellKnownEndpointConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wkec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(wellknownendpointconfig.Table, wellknownendpointconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, wellknownendpointconfig.ServiceTable, wellknownendpointconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(wkec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WellKnownEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.WellKnownEndpointConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *WellKnownEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.WellKnownEndpointConfig
+}
+
+func (c *WellKnownEndpointConfigClient) mutate(ctx context.Context, m *WellKnownEndpointConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WellKnownEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WellKnownEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WellKnownEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WellKnownEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WellKnownEndpointConfig mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
@@ -3136,13 +3309,13 @@ type (
 		KeySet, RefreshToken, Service, ServiceAuthorizationEndpointConfig,
 		ServiceIntrospectionEndpointConfig, ServiceJWKSEndpointConfig,
 		ServiceTokenEndpointConfig, ServiceUserInfoEndpointConfig, Session, SigningKey,
-		StandardClaims, User, UserPool []ent.Hook
+		StandardClaims, User, UserPool, WellKnownEndpointConfig []ent.Hook
 	}
 	inters struct {
 		Application, AuthorizationCode, AuthorizationPayload, CookieStore, Credentials,
 		KeySet, RefreshToken, Service, ServiceAuthorizationEndpointConfig,
 		ServiceIntrospectionEndpointConfig, ServiceJWKSEndpointConfig,
 		ServiceTokenEndpointConfig, ServiceUserInfoEndpointConfig, Session, SigningKey,
-		StandardClaims, User, UserPool []ent.Interceptor
+		StandardClaims, User, UserPool, WellKnownEndpointConfig []ent.Interceptor
 	}
 )

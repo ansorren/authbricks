@@ -22,6 +22,7 @@ import (
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userpool"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -228,4 +229,14 @@ func init() {
 	userpoolDescID := userpoolFields[0].Descriptor()
 	// userpool.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	userpool.IDValidator = userpoolDescID.Validators[0].(func(string) error)
+	wellknownendpointconfigFields := schema.WellKnownEndpointConfig{}.Fields()
+	_ = wellknownendpointconfigFields
+	// wellknownendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	wellknownendpointconfigDescEndpoint := wellknownendpointconfigFields[1].Descriptor()
+	// wellknownendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	wellknownendpointconfig.EndpointValidator = wellknownendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// wellknownendpointconfigDescID is the schema descriptor for id field.
+	wellknownendpointconfigDescID := wellknownendpointconfigFields[0].Descriptor()
+	// wellknownendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	wellknownendpointconfig.IDValidator = wellknownendpointconfigDescID.Validators[0].(func(string) error)
 }

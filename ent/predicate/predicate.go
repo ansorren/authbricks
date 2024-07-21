@@ -59,3 +59,6 @@ type User func(*sql.Selector)
 
 // UserPool is the predicate function for userpool builders.
 type UserPool func(*sql.Selector)
+
+// WellKnownEndpointConfig is the predicate function for wellknownendpointconfig builders.
+type WellKnownEndpointConfig func(*sql.Selector)

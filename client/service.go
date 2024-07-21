@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
@@ -96,6 +97,15 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create JWKS endpoint configuration for service %s", cfg.Name)
 	}
+	// create the well known endpoint
+	_, err = c.DB.EntClient.WellKnownEndpointConfig.Create().
+		SetID(uuid.New().String()).
+		SetService(svc).
+		SetEndpoint(cfg.WellKnownEndpoint.Endpoint).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create well known endpoint configuration for service %s", cfg.Name)
+	}
 
 	_, err = c.CreateKeySet(ctx, cfg.Name, cfg.Keys)
 	if err != nil {
@@ -139,6 +149,10 @@ func (c *Client) DeleteService(ctx context.Context, name string) error {
 	_, err = c.DB.EntClient.ServiceJWKSEndpointConfig.Delete().Where(servicejwksendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete JWKS endpoint configuration for service %s", name)
+	}
+	_, err = c.DB.EntClient.WellKnownEndpointConfig.Delete().Where(wellknownendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "cannot delete well known endpoint configuration for service %s", name)
 	}
 
 	err = c.DeleteKeySetByService(ctx, name)
@@ -240,6 +254,18 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 		Save(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot update JWKS endpoint configuration for service %s", cfg.Name)
+	}
+
+	// update the well known endpoint
+	wellKnownEndpointConfig, err := c.DB.EntClient.WellKnownEndpointConfig.Query().Where(wellknownendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to get well known endpoint config")
+	}
+	_, err = c.DB.EntClient.WellKnownEndpointConfig.UpdateOne(wellKnownEndpointConfig).
+		SetEndpoint(cfg.WellKnownEndpoint.Endpoint).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update well known endpoint configuration for service %s", cfg.Name)
 	}
 
 	if err := c.UpdateSigningKeysByService(ctx, cfg.Name, cfg.Keys); err != nil {

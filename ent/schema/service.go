@@ -35,6 +35,7 @@ func (Service) Edges() []ent.Edge {
 		edge.To("service_token_endpoint_config", ServiceTokenEndpointConfig.Type).Unique(),
 		edge.To("service_user_info_endpoint_config", ServiceUserInfoEndpointConfig.Type).Unique(),
 		edge.To("service_jwks_endpoint_config", ServiceJWKSEndpointConfig.Type).Unique(),
+		edge.To("service_well_known_endpoint_config", WellKnownEndpointConfig.Type).Unique(),
 		edge.To("applications", Application.Type),
 	}
 }

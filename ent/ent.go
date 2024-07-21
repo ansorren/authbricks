@@ -30,6 +30,7 @@ import (
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userpool"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -108,6 +109,7 @@ func checkColumn(table, column string) error {
 			standardclaims.Table:                     standardclaims.ValidColumn,
 			user.Table:                               user.ValidColumn,
 			userpool.Table:                           userpool.ValidColumn,
+			wellknownendpointconfig.Table:            wellknownendpointconfig.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
