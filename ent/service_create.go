@@ -17,6 +17,7 @@ import (
 	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // ServiceCreate is the builder for creating a Service entity.
@@ -192,6 +193,25 @@ func (sc *ServiceCreate) SetNillableServiceJwksEndpointConfigID(id *string) *Ser
 // SetServiceJwksEndpointConfig sets the "service_jwks_endpoint_config" edge to the ServiceJWKSEndpointConfig entity.
 func (sc *ServiceCreate) SetServiceJwksEndpointConfig(s *ServiceJWKSEndpointConfig) *ServiceCreate {
 	return sc.SetServiceJwksEndpointConfigID(s.ID)
+}
+
+// SetServiceWellKnownEndpointConfigID sets the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceWellKnownEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceWellKnownEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceWellKnownEndpointConfigID sets the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceWellKnownEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceWellKnownEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceWellKnownEndpointConfig sets the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceWellKnownEndpointConfig(w *WellKnownEndpointConfig) *ServiceCreate {
+	return sc.SetServiceWellKnownEndpointConfigID(w.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -438,6 +458,22 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(servicejwksendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceWellKnownEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceWellKnownEndpointConfigTable,
+			Columns: []string{service.ServiceWellKnownEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(wellknownendpointconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

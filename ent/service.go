@@ -16,6 +16,7 @@ import (
 	"go.authbricks.com/bricks/ent/servicejwksendpointconfig"
 	"go.authbricks.com/bricks/ent/servicetokenendpointconfig"
 	"go.authbricks.com/bricks/ent/serviceuserinfoendpointconfig"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 // Service is the model entity for the Service schema.
@@ -59,11 +60,13 @@ type ServiceEdges struct {
 	ServiceUserInfoEndpointConfig *ServiceUserInfoEndpointConfig `json:"service_user_info_endpoint_config,omitempty"`
 	// ServiceJwksEndpointConfig holds the value of the service_jwks_endpoint_config edge.
 	ServiceJwksEndpointConfig *ServiceJWKSEndpointConfig `json:"service_jwks_endpoint_config,omitempty"`
+	// ServiceWellKnownEndpointConfig holds the value of the service_well_known_endpoint_config edge.
+	ServiceWellKnownEndpointConfig *WellKnownEndpointConfig `json:"service_well_known_endpoint_config,omitempty"`
 	// Applications holds the value of the applications edge.
 	Applications []*Application `json:"applications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 }
 
 // KeySetOrErr returns the KeySet value or an error if the edge
@@ -132,10 +135,21 @@ func (e ServiceEdges) ServiceJwksEndpointConfigOrErr() (*ServiceJWKSEndpointConf
 	return nil, &NotLoadedError{edge: "service_jwks_endpoint_config"}
 }
 
+// ServiceWellKnownEndpointConfigOrErr returns the ServiceWellKnownEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceWellKnownEndpointConfigOrErr() (*WellKnownEndpointConfig, error) {
+	if e.ServiceWellKnownEndpointConfig != nil {
+		return e.ServiceWellKnownEndpointConfig, nil
+	} else if e.loadedTypes[6] {
+		return nil, &NotFoundError{label: wellknownendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_well_known_endpoint_config"}
+}
+
 // ApplicationsOrErr returns the Applications value or an error if the edge
 // was not loaded in eager-loading.
 func (e ServiceEdges) ApplicationsOrErr() ([]*Application, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.Applications, nil
 	}
 	return nil, &NotLoadedError{edge: "applications"}
@@ -268,6 +282,11 @@ func (s *Service) QueryServiceUserInfoEndpointConfig() *ServiceUserInfoEndpointC
 // QueryServiceJwksEndpointConfig queries the "service_jwks_endpoint_config" edge of the Service entity.
 func (s *Service) QueryServiceJwksEndpointConfig() *ServiceJWKSEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceJwksEndpointConfig(s)
+}
+
+// QueryServiceWellKnownEndpointConfig queries the "service_well_known_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceWellKnownEndpointConfig() *WellKnownEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceWellKnownEndpointConfig(s)
 }
 
 // QueryApplications queries the "applications" edge of the Service entity.

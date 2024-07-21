@@ -2,9 +2,11 @@ package config
 
 import (
 	"crypto"
-	"github.com/stretchr/testify/require"
-	abcrypto "go.authbricks.com/bricks/crypto"
 	"testing"
+
+	abcrypto "go.authbricks.com/bricks/crypto"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestServiceValidate(t *testing.T) {
@@ -229,6 +231,36 @@ func TestServiceValidate(t *testing.T) {
 			ExpectedError: true,
 		},
 		{
+			Name: "empty well-known endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				Keys: []crypto.PrivateKey{key},
+			},
+			ExpectedError: true,
+		},
+		{
 			Name: "no keys",
 			Service: Service{
 				Name:       "test",
@@ -250,6 +282,12 @@ func TestServiceValidate(t *testing.T) {
 				},
 				UserInfoEndpoint: UserInfoEndpoint{
 					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				WellKnownEndpoint: WellKnownEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/.well-known",
 				},
 				Keys: []crypto.PrivateKey{},
 			},
@@ -280,6 +318,9 @@ func TestServiceValidate(t *testing.T) {
 				},
 				JWKSEndpoint: JWKSEndpoint{
 					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				WellKnownEndpoint: WellKnownEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/.well-known",
 				},
 				Keys: []crypto.PrivateKey{key},
 			},

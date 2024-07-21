@@ -30,6 +30,7 @@ import (
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userpool"
+	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
 const (
@@ -59,6 +60,7 @@ const (
 	TypeStandardClaims                     = "StandardClaims"
 	TypeUser                               = "User"
 	TypeUserPool                           = "UserPool"
+	TypeWellKnownEndpointConfig            = "WellKnownEndpointConfig"
 )
 
 // ApplicationMutation represents an operation that mutates the Application nodes in the graph.
@@ -4993,6 +4995,8 @@ type ServiceMutation struct {
 	clearedservice_user_info_endpoint_config     bool
 	service_jwks_endpoint_config                 *string
 	clearedservice_jwks_endpoint_config          bool
+	service_well_known_endpoint_config           *string
+	clearedservice_well_known_endpoint_config    bool
 	applications                                 map[string]struct{}
 	removedapplications                          map[string]struct{}
 	clearedapplications                          bool
@@ -5687,6 +5691,45 @@ func (m *ServiceMutation) ResetServiceJwksEndpointConfig() {
 	m.clearedservice_jwks_endpoint_config = false
 }
 
+// SetServiceWellKnownEndpointConfigID sets the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity by id.
+func (m *ServiceMutation) SetServiceWellKnownEndpointConfigID(id string) {
+	m.service_well_known_endpoint_config = &id
+}
+
+// ClearServiceWellKnownEndpointConfig clears the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity.
+func (m *ServiceMutation) ClearServiceWellKnownEndpointConfig() {
+	m.clearedservice_well_known_endpoint_config = true
+}
+
+// ServiceWellKnownEndpointConfigCleared reports if the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity was cleared.
+func (m *ServiceMutation) ServiceWellKnownEndpointConfigCleared() bool {
+	return m.clearedservice_well_known_endpoint_config
+}
+
+// ServiceWellKnownEndpointConfigID returns the "service_well_known_endpoint_config" edge ID in the mutation.
+func (m *ServiceMutation) ServiceWellKnownEndpointConfigID() (id string, exists bool) {
+	if m.service_well_known_endpoint_config != nil {
+		return *m.service_well_known_endpoint_config, true
+	}
+	return
+}
+
+// ServiceWellKnownEndpointConfigIDs returns the "service_well_known_endpoint_config" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceWellKnownEndpointConfigID instead. It exists only for internal usage by the builders.
+func (m *ServiceMutation) ServiceWellKnownEndpointConfigIDs() (ids []string) {
+	if id := m.service_well_known_endpoint_config; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServiceWellKnownEndpointConfig resets all changes to the "service_well_known_endpoint_config" edge.
+func (m *ServiceMutation) ResetServiceWellKnownEndpointConfig() {
+	m.service_well_known_endpoint_config = nil
+	m.clearedservice_well_known_endpoint_config = false
+}
+
 // AddApplicationIDs adds the "applications" edge to the Application entity by ids.
 func (m *ServiceMutation) AddApplicationIDs(ids ...string) {
 	if m.applications == nil {
@@ -5993,7 +6036,7 @@ func (m *ServiceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ServiceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.key_set != nil {
 		edges = append(edges, service.EdgeKeySet)
 	}
@@ -6011,6 +6054,9 @@ func (m *ServiceMutation) AddedEdges() []string {
 	}
 	if m.service_jwks_endpoint_config != nil {
 		edges = append(edges, service.EdgeServiceJwksEndpointConfig)
+	}
+	if m.service_well_known_endpoint_config != nil {
+		edges = append(edges, service.EdgeServiceWellKnownEndpointConfig)
 	}
 	if m.applications != nil {
 		edges = append(edges, service.EdgeApplications)
@@ -6046,6 +6092,10 @@ func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.service_jwks_endpoint_config; id != nil {
 			return []ent.Value{*id}
 		}
+	case service.EdgeServiceWellKnownEndpointConfig:
+		if id := m.service_well_known_endpoint_config; id != nil {
+			return []ent.Value{*id}
+		}
 	case service.EdgeApplications:
 		ids := make([]ent.Value, 0, len(m.applications))
 		for id := range m.applications {
@@ -6058,7 +6108,7 @@ func (m *ServiceMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ServiceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.removedapplications != nil {
 		edges = append(edges, service.EdgeApplications)
 	}
@@ -6081,7 +6131,7 @@ func (m *ServiceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ServiceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.clearedkey_set {
 		edges = append(edges, service.EdgeKeySet)
 	}
@@ -6099,6 +6149,9 @@ func (m *ServiceMutation) ClearedEdges() []string {
 	}
 	if m.clearedservice_jwks_endpoint_config {
 		edges = append(edges, service.EdgeServiceJwksEndpointConfig)
+	}
+	if m.clearedservice_well_known_endpoint_config {
+		edges = append(edges, service.EdgeServiceWellKnownEndpointConfig)
 	}
 	if m.clearedapplications {
 		edges = append(edges, service.EdgeApplications)
@@ -6122,6 +6175,8 @@ func (m *ServiceMutation) EdgeCleared(name string) bool {
 		return m.clearedservice_user_info_endpoint_config
 	case service.EdgeServiceJwksEndpointConfig:
 		return m.clearedservice_jwks_endpoint_config
+	case service.EdgeServiceWellKnownEndpointConfig:
+		return m.clearedservice_well_known_endpoint_config
 	case service.EdgeApplications:
 		return m.clearedapplications
 	}
@@ -6150,6 +6205,9 @@ func (m *ServiceMutation) ClearEdge(name string) error {
 	case service.EdgeServiceJwksEndpointConfig:
 		m.ClearServiceJwksEndpointConfig()
 		return nil
+	case service.EdgeServiceWellKnownEndpointConfig:
+		m.ClearServiceWellKnownEndpointConfig()
+		return nil
 	}
 	return fmt.Errorf("unknown Service unique edge %s", name)
 }
@@ -6175,6 +6233,9 @@ func (m *ServiceMutation) ResetEdge(name string) error {
 		return nil
 	case service.EdgeServiceJwksEndpointConfig:
 		m.ResetServiceJwksEndpointConfig()
+		return nil
+	case service.EdgeServiceWellKnownEndpointConfig:
+		m.ResetServiceWellKnownEndpointConfig()
 		return nil
 	case service.EdgeApplications:
 		m.ResetApplications()
@@ -11937,4 +11998,403 @@ func (m *UserPoolMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown UserPool edge %s", name)
+}
+
+// WellKnownEndpointConfigMutation represents an operation that mutates the WellKnownEndpointConfig nodes in the graph.
+type WellKnownEndpointConfigMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *string
+	endpoint       *string
+	clearedFields  map[string]struct{}
+	service        *string
+	clearedservice bool
+	done           bool
+	oldValue       func(context.Context) (*WellKnownEndpointConfig, error)
+	predicates     []predicate.WellKnownEndpointConfig
+}
+
+var _ ent.Mutation = (*WellKnownEndpointConfigMutation)(nil)
+
+// wellknownendpointconfigOption allows management of the mutation configuration using functional options.
+type wellknownendpointconfigOption func(*WellKnownEndpointConfigMutation)
+
+// newWellKnownEndpointConfigMutation creates new mutation for the WellKnownEndpointConfig entity.
+func newWellKnownEndpointConfigMutation(c config, op Op, opts ...wellknownendpointconfigOption) *WellKnownEndpointConfigMutation {
+	m := &WellKnownEndpointConfigMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeWellKnownEndpointConfig,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withWellKnownEndpointConfigID sets the ID field of the mutation.
+func withWellKnownEndpointConfigID(id string) wellknownendpointconfigOption {
+	return func(m *WellKnownEndpointConfigMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *WellKnownEndpointConfig
+		)
+		m.oldValue = func(ctx context.Context) (*WellKnownEndpointConfig, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().WellKnownEndpointConfig.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWellKnownEndpointConfig sets the old WellKnownEndpointConfig of the mutation.
+func withWellKnownEndpointConfig(node *WellKnownEndpointConfig) wellknownendpointconfigOption {
+	return func(m *WellKnownEndpointConfigMutation) {
+		m.oldValue = func(context.Context) (*WellKnownEndpointConfig, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m WellKnownEndpointConfigMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m WellKnownEndpointConfigMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of WellKnownEndpointConfig entities.
+func (m *WellKnownEndpointConfigMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WellKnownEndpointConfigMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *WellKnownEndpointConfigMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().WellKnownEndpointConfig.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetEndpoint sets the "endpoint" field.
+func (m *WellKnownEndpointConfigMutation) SetEndpoint(s string) {
+	m.endpoint = &s
+}
+
+// Endpoint returns the value of the "endpoint" field in the mutation.
+func (m *WellKnownEndpointConfigMutation) Endpoint() (r string, exists bool) {
+	v := m.endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpoint returns the old "endpoint" field's value of the WellKnownEndpointConfig entity.
+// If the WellKnownEndpointConfig object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WellKnownEndpointConfigMutation) OldEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpoint: %w", err)
+	}
+	return oldValue.Endpoint, nil
+}
+
+// ResetEndpoint resets all changes to the "endpoint" field.
+func (m *WellKnownEndpointConfigMutation) ResetEndpoint() {
+	m.endpoint = nil
+}
+
+// SetServiceID sets the "service" edge to the Service entity by id.
+func (m *WellKnownEndpointConfigMutation) SetServiceID(id string) {
+	m.service = &id
+}
+
+// ClearService clears the "service" edge to the Service entity.
+func (m *WellKnownEndpointConfigMutation) ClearService() {
+	m.clearedservice = true
+}
+
+// ServiceCleared reports if the "service" edge to the Service entity was cleared.
+func (m *WellKnownEndpointConfigMutation) ServiceCleared() bool {
+	return m.clearedservice
+}
+
+// ServiceID returns the "service" edge ID in the mutation.
+func (m *WellKnownEndpointConfigMutation) ServiceID() (id string, exists bool) {
+	if m.service != nil {
+		return *m.service, true
+	}
+	return
+}
+
+// ServiceIDs returns the "service" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServiceID instead. It exists only for internal usage by the builders.
+func (m *WellKnownEndpointConfigMutation) ServiceIDs() (ids []string) {
+	if id := m.service; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetService resets all changes to the "service" edge.
+func (m *WellKnownEndpointConfigMutation) ResetService() {
+	m.service = nil
+	m.clearedservice = false
+}
+
+// Where appends a list predicates to the WellKnownEndpointConfigMutation builder.
+func (m *WellKnownEndpointConfigMutation) Where(ps ...predicate.WellKnownEndpointConfig) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the WellKnownEndpointConfigMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WellKnownEndpointConfigMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.WellKnownEndpointConfig, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *WellKnownEndpointConfigMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WellKnownEndpointConfigMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (WellKnownEndpointConfig).
+func (m *WellKnownEndpointConfigMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *WellKnownEndpointConfigMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.endpoint != nil {
+		fields = append(fields, wellknownendpointconfig.FieldEndpoint)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *WellKnownEndpointConfigMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case wellknownendpointconfig.FieldEndpoint:
+		return m.Endpoint()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *WellKnownEndpointConfigMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case wellknownendpointconfig.FieldEndpoint:
+		return m.OldEndpoint(ctx)
+	}
+	return nil, fmt.Errorf("unknown WellKnownEndpointConfig field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WellKnownEndpointConfigMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case wellknownendpointconfig.FieldEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpoint(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WellKnownEndpointConfig field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *WellKnownEndpointConfigMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *WellKnownEndpointConfigMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WellKnownEndpointConfigMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown WellKnownEndpointConfig numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *WellKnownEndpointConfigMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *WellKnownEndpointConfigMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *WellKnownEndpointConfigMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown WellKnownEndpointConfig nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *WellKnownEndpointConfigMutation) ResetField(name string) error {
+	switch name {
+	case wellknownendpointconfig.FieldEndpoint:
+		m.ResetEndpoint()
+		return nil
+	}
+	return fmt.Errorf("unknown WellKnownEndpointConfig field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *WellKnownEndpointConfigMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.service != nil {
+		edges = append(edges, wellknownendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *WellKnownEndpointConfigMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case wellknownendpointconfig.EdgeService:
+		if id := m.service; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *WellKnownEndpointConfigMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *WellKnownEndpointConfigMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *WellKnownEndpointConfigMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedservice {
+		edges = append(edges, wellknownendpointconfig.EdgeService)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *WellKnownEndpointConfigMutation) EdgeCleared(name string) bool {
+	switch name {
+	case wellknownendpointconfig.EdgeService:
+		return m.clearedservice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *WellKnownEndpointConfigMutation) ClearEdge(name string) error {
+	switch name {
+	case wellknownendpointconfig.EdgeService:
+		m.ClearService()
+		return nil
+	}
+	return fmt.Errorf("unknown WellKnownEndpointConfig unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *WellKnownEndpointConfigMutation) ResetEdge(name string) error {
+	switch name {
+	case wellknownendpointconfig.EdgeService:
+		m.ResetService()
+		return nil
+	}
+	return fmt.Errorf("unknown WellKnownEndpointConfig edge %s", name)
 }

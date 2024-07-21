@@ -40,6 +40,8 @@ const (
 	EdgeServiceUserInfoEndpointConfig = "service_user_info_endpoint_config"
 	// EdgeServiceJwksEndpointConfig holds the string denoting the service_jwks_endpoint_config edge name in mutations.
 	EdgeServiceJwksEndpointConfig = "service_jwks_endpoint_config"
+	// EdgeServiceWellKnownEndpointConfig holds the string denoting the service_well_known_endpoint_config edge name in mutations.
+	EdgeServiceWellKnownEndpointConfig = "service_well_known_endpoint_config"
 	// EdgeApplications holds the string denoting the applications edge name in mutations.
 	EdgeApplications = "applications"
 	// Table holds the table name of the service in the database.
@@ -86,6 +88,13 @@ const (
 	ServiceJwksEndpointConfigInverseTable = "service_jwks_endpoint_configs"
 	// ServiceJwksEndpointConfigColumn is the table column denoting the service_jwks_endpoint_config relation/edge.
 	ServiceJwksEndpointConfigColumn = "service_service_jwks_endpoint_config"
+	// ServiceWellKnownEndpointConfigTable is the table that holds the service_well_known_endpoint_config relation/edge.
+	ServiceWellKnownEndpointConfigTable = "well_known_endpoint_configs"
+	// ServiceWellKnownEndpointConfigInverseTable is the table name for the WellKnownEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "wellknownendpointconfig" package.
+	ServiceWellKnownEndpointConfigInverseTable = "well_known_endpoint_configs"
+	// ServiceWellKnownEndpointConfigColumn is the table column denoting the service_well_known_endpoint_config relation/edge.
+	ServiceWellKnownEndpointConfigColumn = "service_service_well_known_endpoint_config"
 	// ApplicationsTable is the table that holds the applications relation/edge.
 	ApplicationsTable = "applications"
 	// ApplicationsInverseTable is the table name for the Application entity.
@@ -197,6 +206,13 @@ func ByServiceJwksEndpointConfigField(field string, opts ...sql.OrderTermOption)
 	}
 }
 
+// ByServiceWellKnownEndpointConfigField orders the results by service_well_known_endpoint_config field.
+func ByServiceWellKnownEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceWellKnownEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByApplicationsCount orders the results by applications count.
 func ByApplicationsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -250,6 +266,13 @@ func newServiceJwksEndpointConfigStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ServiceJwksEndpointConfigInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ServiceJwksEndpointConfigTable, ServiceJwksEndpointConfigColumn),
+	)
+}
+func newServiceWellKnownEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceWellKnownEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceWellKnownEndpointConfigTable, ServiceWellKnownEndpointConfigColumn),
 	)
 }
 func newApplicationsStep() *sqlgraph.Step {

@@ -52,6 +52,9 @@ func TestKeySet(t *testing.T) {
 		JWKSEndpoint: config.JWKSEndpoint{
 			Endpoint: "https://example.com/oauth2/jwks",
 		},
+		WellKnownEndpoint: config.WellKnownEndpoint{
+			Endpoint: "https://example.com/oauth2/.well-known/openid-configuration",
+		},
 		Keys: []crypto.PrivateKey{key},
 	}
 

@@ -225,6 +225,18 @@ func (f UserPoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserPoolMutation", m)
 }
 
+// The WellKnownEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as WellKnownEndpointConfig mutator.
+type WellKnownEndpointConfigFunc func(context.Context, *ent.WellKnownEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WellKnownEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WellKnownEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WellKnownEndpointConfigMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

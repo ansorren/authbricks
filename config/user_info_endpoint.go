@@ -2,6 +2,7 @@ package config
 
 import "fmt"
 
+// UserInfoEndpoint is used to configure the user info endpoint.
 type UserInfoEndpoint struct {
 	// Endpoint is the URL of the user info endpoint.
 	Endpoint string

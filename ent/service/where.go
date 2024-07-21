@@ -481,6 +481,29 @@ func HasServiceJwksEndpointConfigWith(preds ...predicate.ServiceJWKSEndpointConf
 	})
 }
 
+// HasServiceWellKnownEndpointConfig applies the HasEdge predicate on the "service_well_known_endpoint_config" edge.
+func HasServiceWellKnownEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceWellKnownEndpointConfigTable, ServiceWellKnownEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceWellKnownEndpointConfigWith applies the HasEdge predicate on the "service_well_known_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceWellKnownEndpointConfigWith(preds ...predicate.WellKnownEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceWellKnownEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasApplications applies the HasEdge predicate on the "applications" edge.
 func HasApplications() predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {

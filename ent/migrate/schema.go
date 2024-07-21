@@ -388,6 +388,26 @@ var (
 		Columns:    UserPoolsColumns,
 		PrimaryKey: []*schema.Column{UserPoolsColumns[0]},
 	}
+	// WellKnownEndpointConfigsColumns holds the columns for the "well_known_endpoint_configs" table.
+	WellKnownEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "service_service_well_known_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// WellKnownEndpointConfigsTable holds the schema information for the "well_known_endpoint_configs" table.
+	WellKnownEndpointConfigsTable = &schema.Table{
+		Name:       "well_known_endpoint_configs",
+		Columns:    WellKnownEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{WellKnownEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "well_known_endpoint_configs_services_service_well_known_endpoint_config",
+				Columns:    []*schema.Column{WellKnownEndpointConfigsColumns[2]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ApplicationsTable,
@@ -408,6 +428,7 @@ var (
 		StandardClaimsTable,
 		UsersTable,
 		UserPoolsTable,
+		WellKnownEndpointConfigsTable,
 	}
 )
 
@@ -424,4 +445,5 @@ func init() {
 	SigningKeysTable.ForeignKeys[0].RefTable = KeySetsTable
 	StandardClaimsTable.ForeignKeys[0].RefTable = UsersTable
 	UsersTable.ForeignKeys[0].RefTable = UserPoolsTable
+	WellKnownEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 }
