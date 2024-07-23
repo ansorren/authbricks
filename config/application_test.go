@@ -33,14 +33,6 @@ func TestApplication_Validate(t *testing.T) {
 			ErrorExpected: true,
 		},
 		{
-			Name: "empty redirect URIs",
-			Application: Application{
-				Name:    "app",
-				Service: "service",
-			},
-			ErrorExpected: true,
-		},
-		{
 			Name: "redirect URIs with empty string",
 			Application: Application{
 				Name:         "app",
@@ -58,6 +50,16 @@ func TestApplication_Validate(t *testing.T) {
 				ResponseTypes: []string{},
 			},
 			ErrorExpected: true,
+		},
+		{
+			Name: "empty response types with client credentials",
+			Application: Application{
+				Name:          "app",
+				Service:       "service",
+				ResponseTypes: []string{},
+				GrantTypes:    []string{GrantTypeClientCredentials},
+			},
+			ErrorExpected: false,
 		},
 		{
 			Name: "invalid response type",
@@ -90,6 +92,16 @@ func TestApplication_Validate(t *testing.T) {
 				GrantTypes:    []string{"invalid"},
 			},
 			ErrorExpected: true,
+		},
+		{
+			Name: "valid with no redirect URIs",
+			Application: Application{
+				Name:          "app",
+				Service:       "service",
+				ResponseTypes: []string{ResponseTypeCode},
+				GrantTypes:    []string{GrantTypeAuthorizationCode},
+			},
+			ErrorExpected: false,
 		},
 		{
 			Name: "valid",

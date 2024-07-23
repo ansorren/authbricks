@@ -1,9 +1,11 @@
 package crypto
 
 import (
+	"context"
 	"crypto/rand"
 	"strings"
 
+	"github.com/hashicorp/cap/jwt"
 	"github.com/pkg/errors"
 )
 
@@ -38,4 +40,14 @@ func randomString(n int, dictionary string) string {
 // generateHexString generates a cryptographically secure string of n characters.
 func generateHexString(n int) string {
 	return randomString(n, Hex)
+}
+
+// GetKeySetFromJWKSEndpoint returns a keyset that can be used to verify JWT signatures using
+// the keys found at the given JWKS endpoint.
+func GetKeySetFromJWKSEndpoint(ctx context.Context, jwksEndpoint string) (jwt.KeySet, error) {
+	keySet, err := jwt.NewJSONWebKeySet(ctx, jwksEndpoint, "")
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to get new JSON web key set from %s", jwksEndpoint)
+	}
+	return keySet, nil
 }
