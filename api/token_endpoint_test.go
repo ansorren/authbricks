@@ -18,5 +18,5 @@ func TestAPI_TokenHandler(t *testing.T) {
 
 	resp, err := http.DefaultClient.Post(endpoint, "application/x-www-form-urlencoded", nil)
 	require.Nil(t, err)
-	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	require.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

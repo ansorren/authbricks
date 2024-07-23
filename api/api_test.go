@@ -24,15 +24,23 @@ func NewTestAPI(t *testing.T) (TestAPI, func(t *testing.T)) {
 
 	c := client.New(db)
 
-	svc := testutils.TestService(t)
-	_, err := c.CreateService(context.Background(), svc)
-	require.Nil(t, err)
-	_, err = c.CreateApplication(context.Background(), testutils.TestApplication(t, svc))
-	require.Nil(t, err)
+	address := testutils.LocalhostAddress()
+	testCfg := testutils.NewTestConfig(t, address)
+	for _, svc := range testCfg.Services {
+		_, err := c.CreateService(context.Background(), svc)
+		require.Nil(t, err)
+	}
+	for _, app := range testCfg.Applications {
+		_, err := c.CreateApplication(context.Background(), app)
+		require.Nil(t, err)
+	}
+	for _, cred := range testCfg.Credentials {
+		_, err := c.CreateCredentials(context.Background(), cred)
+		require.Nil(t, err)
+	}
 
 	logger := hclog.Default().Named("test")
 
-	address := testutils.LocalhostAddress()
 	a, err := New(db, address,
 		WithLogger(logger),
 		WithBaseURL(fmt.Sprintf("http://%s", address)),

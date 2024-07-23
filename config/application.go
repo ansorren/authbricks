@@ -54,14 +54,25 @@ type Application struct {
 	Scopes []string
 }
 
-// responseTypesAreAllowed checks if the given response types are allowed.
-func responseTypesAreAllowed(responseTypes []string) bool {
+func onlyClientCredentialsAllowed(grantTypes []string) bool {
+	return len(grantTypes) == 1 && grantTypes[0] == GrantTypeClientCredentials
+}
+
+// validateResponseTypes checks if the given response types are allowed.
+func validateResponseTypes(responseTypes []string, grantTypes []string) error {
+	if len(responseTypes) == 0 && !onlyClientCredentialsAllowed(grantTypes) {
+		return fmt.Errorf("empty response types")
+	}
+	if len(responseTypes) == 0 && onlyClientCredentialsAllowed(grantTypes) {
+		return nil
+	}
+
 	for _, rt := range responseTypes {
 		if !contains(AllowedResponseTypes, rt) {
-			return false
+			return fmt.Errorf("invalid response type: %s", rt)
 		}
 	}
-	return true
+	return nil
 }
 
 // Validate validates the application configuration.
@@ -82,10 +93,7 @@ func (a Application) Validate() error {
 		return err
 	}
 
-	if len(a.ResponseTypes) == 0 {
-		return fmt.Errorf("at least one response type is required")
-	}
-	if !responseTypesAreAllowed(a.ResponseTypes) {
+	if err := validateResponseTypes(a.ResponseTypes, a.GrantTypes); err != nil {
 		return fmt.Errorf("invalid response type")
 	}
 
@@ -100,8 +108,11 @@ func (a Application) Validate() error {
 
 // validateRedirectURIs validates the redirect URIs.
 func validateRedirectURIs(redirectURIs []string) error {
+	// we consider an empty list of redirect URIs as valid
+	// as some clients might not have any redirect URIs.
+	// On the other hand, an empty URI is invalid.
 	if len(redirectURIs) == 0 {
-		return fmt.Errorf("at least one redirect URI is required")
+		return nil
 	}
 	for _, uri := range redirectURIs {
 		if uri == "" {
