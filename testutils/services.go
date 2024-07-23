@@ -20,7 +20,8 @@ func privateKey(t *testing.T) crypto.PrivateKey {
 // TestService generates a new service for testing.
 func TestService(t *testing.T) config.Service {
 	t.Helper()
-	key := privateKey(t)
+	firstKey := privateKey(t)
+	secondKey := privateKey(t)
 	return config.Service{
 		Name:        "test-service",
 		Identifier:  "test-identifier",
@@ -53,7 +54,7 @@ func TestService(t *testing.T) config.Service {
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "/oauth2/.well-known/openid-configuration",
 		},
-		Keys: []crypto.PrivateKey{key},
+		Keys: []crypto.PrivateKey{firstKey, secondKey},
 	}
 }
 

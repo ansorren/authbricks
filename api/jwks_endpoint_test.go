@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func TestAPI_JWKSHandler(t *testing.T) {
@@ -18,5 +19,12 @@ func TestAPI_JWKSHandler(t *testing.T) {
 
 	resp, err := http.DefaultClient.Get(endpoint)
 	require.Nil(t, err)
-	require.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	// unmarshal the response, assert that the keys are public
+	u := NewUnmarshaler[jose.JSONWebKeySet](resp.Body)
+	require.Nil(t, err)
+	jwks, err := u.Unmarshal()
+	require.Nil(t, err)
+	require.Len(t, jwks.Keys, 2)
 }
