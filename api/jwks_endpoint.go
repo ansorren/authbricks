@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type JEKSErrorResponse struct {
+type JWKSErrorResponse struct {
 	Error string `json:"error"`
 }
 
@@ -20,7 +20,7 @@ func (a *API) JWKSHandler(service *ent.Service) func(echo.Context) error {
 		ks, err := service.QueryKeySet().Only(c.Request().Context())
 		if err != nil {
 			a.Logger.Error("Failed to query key set", "error", err.Error(), "service", service.Name)
-			return c.JSON(http.StatusInternalServerError, JEKSErrorResponse{
+			return c.JSON(http.StatusInternalServerError, JWKSErrorResponse{
 				Error: "Failed to query key set",
 			})
 		}
@@ -28,14 +28,14 @@ func (a *API) JWKSHandler(service *ent.Service) func(echo.Context) error {
 		signingKeys, err := ks.QuerySigningKeys().All(c.Request().Context())
 		if err != nil {
 			a.Logger.Error("Failed to query signing keys", "error", err.Error(), "service", service.Name)
-			return c.JSON(http.StatusInternalServerError, JEKSErrorResponse{
+			return c.JSON(http.StatusInternalServerError, JWKSErrorResponse{
 				Error: "Failed to query signing keys",
 			})
 		}
 		publicKeys, err := convertToPublicKeys(signingKeys)
 		if err != nil {
 			a.Logger.Error("Failed to convert to public keys", "error", err.Error(), "service", service.Name)
-			return c.JSON(http.StatusInternalServerError, JEKSErrorResponse{
+			return c.JSON(http.StatusInternalServerError, JWKSErrorResponse{
 				Error: "Failed to convert to public keys",
 			})
 		}
@@ -43,7 +43,7 @@ func (a *API) JWKSHandler(service *ent.Service) func(echo.Context) error {
 		jwks, err := abcrypto.NewKeySet(publicKeys)
 		if err != nil {
 			a.Logger.Error("Failed to instantiate key set", "error", err.Error(), "service", service.Name)
-			return c.JSON(http.StatusInternalServerError, JEKSErrorResponse{
+			return c.JSON(http.StatusInternalServerError, JWKSErrorResponse{
 				Error: "Failed to create key set",
 			})
 		}
