@@ -28,16 +28,16 @@ func (acu *AuthorizationCodeUpdate) Where(ps ...predicate.AuthorizationCode) *Au
 	return acu
 }
 
-// SetClientName sets the "client_name" field.
-func (acu *AuthorizationCodeUpdate) SetClientName(s string) *AuthorizationCodeUpdate {
-	acu.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (acu *AuthorizationCodeUpdate) SetApplication(s string) *AuthorizationCodeUpdate {
+	acu.mutation.SetApplication(s)
 	return acu
 }
 
-// SetNillableClientName sets the "client_name" field if the given value is not nil.
-func (acu *AuthorizationCodeUpdate) SetNillableClientName(s *string) *AuthorizationCodeUpdate {
+// SetNillableApplication sets the "application" field if the given value is not nil.
+func (acu *AuthorizationCodeUpdate) SetNillableApplication(s *string) *AuthorizationCodeUpdate {
 	if s != nil {
-		acu.SetClientName(*s)
+		acu.SetApplication(*s)
 	}
 	return acu
 }
@@ -126,16 +126,16 @@ func (acu *AuthorizationCodeUpdate) SetNillableNonce(s *string) *AuthorizationCo
 	return acu
 }
 
-// SetServerName sets the "server_name" field.
-func (acu *AuthorizationCodeUpdate) SetServerName(s string) *AuthorizationCodeUpdate {
-	acu.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (acu *AuthorizationCodeUpdate) SetService(s string) *AuthorizationCodeUpdate {
+	acu.mutation.SetService(s)
 	return acu
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (acu *AuthorizationCodeUpdate) SetNillableServerName(s *string) *AuthorizationCodeUpdate {
+// SetNillableService sets the "service" field if the given value is not nil.
+func (acu *AuthorizationCodeUpdate) SetNillableService(s *string) *AuthorizationCodeUpdate {
 	if s != nil {
-		acu.SetServerName(*s)
+		acu.SetService(*s)
 	}
 	return acu
 }
@@ -223,8 +223,8 @@ func (acu *AuthorizationCodeUpdate) sqlSave(ctx context.Context) (n int, err err
 			}
 		}
 	}
-	if value, ok := acu.mutation.ClientName(); ok {
-		_spec.SetField(authorizationcode.FieldClientName, field.TypeString, value)
+	if value, ok := acu.mutation.Application(); ok {
+		_spec.SetField(authorizationcode.FieldApplication, field.TypeString, value)
 	}
 	if value, ok := acu.mutation.CodeChallenge(); ok {
 		_spec.SetField(authorizationcode.FieldCodeChallenge, field.TypeString, value)
@@ -244,8 +244,8 @@ func (acu *AuthorizationCodeUpdate) sqlSave(ctx context.Context) (n int, err err
 	if value, ok := acu.mutation.Nonce(); ok {
 		_spec.SetField(authorizationcode.FieldNonce, field.TypeString, value)
 	}
-	if value, ok := acu.mutation.ServerName(); ok {
-		_spec.SetField(authorizationcode.FieldServerName, field.TypeString, value)
+	if value, ok := acu.mutation.Service(); ok {
+		_spec.SetField(authorizationcode.FieldService, field.TypeString, value)
 	}
 	if value, ok := acu.mutation.State(); ok {
 		_spec.SetField(authorizationcode.FieldState, field.TypeString, value)
@@ -276,16 +276,16 @@ type AuthorizationCodeUpdateOne struct {
 	mutation *AuthorizationCodeMutation
 }
 
-// SetClientName sets the "client_name" field.
-func (acuo *AuthorizationCodeUpdateOne) SetClientName(s string) *AuthorizationCodeUpdateOne {
-	acuo.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (acuo *AuthorizationCodeUpdateOne) SetApplication(s string) *AuthorizationCodeUpdateOne {
+	acuo.mutation.SetApplication(s)
 	return acuo
 }
 
-// SetNillableClientName sets the "client_name" field if the given value is not nil.
-func (acuo *AuthorizationCodeUpdateOne) SetNillableClientName(s *string) *AuthorizationCodeUpdateOne {
+// SetNillableApplication sets the "application" field if the given value is not nil.
+func (acuo *AuthorizationCodeUpdateOne) SetNillableApplication(s *string) *AuthorizationCodeUpdateOne {
 	if s != nil {
-		acuo.SetClientName(*s)
+		acuo.SetApplication(*s)
 	}
 	return acuo
 }
@@ -374,16 +374,16 @@ func (acuo *AuthorizationCodeUpdateOne) SetNillableNonce(s *string) *Authorizati
 	return acuo
 }
 
-// SetServerName sets the "server_name" field.
-func (acuo *AuthorizationCodeUpdateOne) SetServerName(s string) *AuthorizationCodeUpdateOne {
-	acuo.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (acuo *AuthorizationCodeUpdateOne) SetService(s string) *AuthorizationCodeUpdateOne {
+	acuo.mutation.SetService(s)
 	return acuo
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (acuo *AuthorizationCodeUpdateOne) SetNillableServerName(s *string) *AuthorizationCodeUpdateOne {
+// SetNillableService sets the "service" field if the given value is not nil.
+func (acuo *AuthorizationCodeUpdateOne) SetNillableService(s *string) *AuthorizationCodeUpdateOne {
 	if s != nil {
-		acuo.SetServerName(*s)
+		acuo.SetService(*s)
 	}
 	return acuo
 }
@@ -501,8 +501,8 @@ func (acuo *AuthorizationCodeUpdateOne) sqlSave(ctx context.Context) (_node *Aut
 			}
 		}
 	}
-	if value, ok := acuo.mutation.ClientName(); ok {
-		_spec.SetField(authorizationcode.FieldClientName, field.TypeString, value)
+	if value, ok := acuo.mutation.Application(); ok {
+		_spec.SetField(authorizationcode.FieldApplication, field.TypeString, value)
 	}
 	if value, ok := acuo.mutation.CodeChallenge(); ok {
 		_spec.SetField(authorizationcode.FieldCodeChallenge, field.TypeString, value)
@@ -522,8 +522,8 @@ func (acuo *AuthorizationCodeUpdateOne) sqlSave(ctx context.Context) (_node *Aut
 	if value, ok := acuo.mutation.Nonce(); ok {
 		_spec.SetField(authorizationcode.FieldNonce, field.TypeString, value)
 	}
-	if value, ok := acuo.mutation.ServerName(); ok {
-		_spec.SetField(authorizationcode.FieldServerName, field.TypeString, value)
+	if value, ok := acuo.mutation.Service(); ok {
+		_spec.SetField(authorizationcode.FieldService, field.TypeString, value)
 	}
 	if value, ok := acuo.mutation.State(); ok {
 		_spec.SetField(authorizationcode.FieldState, field.TypeString, value)

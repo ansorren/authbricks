@@ -28,30 +28,30 @@ func (rtu *RefreshTokenUpdate) Where(ps ...predicate.RefreshToken) *RefreshToken
 	return rtu
 }
 
-// SetClientName sets the "client_name" field.
-func (rtu *RefreshTokenUpdate) SetClientName(s string) *RefreshTokenUpdate {
-	rtu.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (rtu *RefreshTokenUpdate) SetApplication(s string) *RefreshTokenUpdate {
+	rtu.mutation.SetApplication(s)
 	return rtu
 }
 
-// SetNillableClientName sets the "client_name" field if the given value is not nil.
-func (rtu *RefreshTokenUpdate) SetNillableClientName(s *string) *RefreshTokenUpdate {
+// SetNillableApplication sets the "application" field if the given value is not nil.
+func (rtu *RefreshTokenUpdate) SetNillableApplication(s *string) *RefreshTokenUpdate {
 	if s != nil {
-		rtu.SetClientName(*s)
+		rtu.SetApplication(*s)
 	}
 	return rtu
 }
 
-// SetServerName sets the "server_name" field.
-func (rtu *RefreshTokenUpdate) SetServerName(s string) *RefreshTokenUpdate {
-	rtu.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (rtu *RefreshTokenUpdate) SetService(s string) *RefreshTokenUpdate {
+	rtu.mutation.SetService(s)
 	return rtu
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (rtu *RefreshTokenUpdate) SetNillableServerName(s *string) *RefreshTokenUpdate {
+// SetNillableService sets the "service" field if the given value is not nil.
+func (rtu *RefreshTokenUpdate) SetNillableService(s *string) *RefreshTokenUpdate {
 	if s != nil {
-		rtu.SetServerName(*s)
+		rtu.SetService(*s)
 	}
 	return rtu
 }
@@ -227,11 +227,11 @@ func (rtu *RefreshTokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := rtu.mutation.ClientName(); ok {
-		_spec.SetField(refreshtoken.FieldClientName, field.TypeString, value)
+	if value, ok := rtu.mutation.Application(); ok {
+		_spec.SetField(refreshtoken.FieldApplication, field.TypeString, value)
 	}
-	if value, ok := rtu.mutation.ServerName(); ok {
-		_spec.SetField(refreshtoken.FieldServerName, field.TypeString, value)
+	if value, ok := rtu.mutation.Service(); ok {
+		_spec.SetField(refreshtoken.FieldService, field.TypeString, value)
 	}
 	if value, ok := rtu.mutation.Scopes(); ok {
 		_spec.SetField(refreshtoken.FieldScopes, field.TypeString, value)
@@ -280,30 +280,30 @@ type RefreshTokenUpdateOne struct {
 	mutation *RefreshTokenMutation
 }
 
-// SetClientName sets the "client_name" field.
-func (rtuo *RefreshTokenUpdateOne) SetClientName(s string) *RefreshTokenUpdateOne {
-	rtuo.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (rtuo *RefreshTokenUpdateOne) SetApplication(s string) *RefreshTokenUpdateOne {
+	rtuo.mutation.SetApplication(s)
 	return rtuo
 }
 
-// SetNillableClientName sets the "client_name" field if the given value is not nil.
-func (rtuo *RefreshTokenUpdateOne) SetNillableClientName(s *string) *RefreshTokenUpdateOne {
+// SetNillableApplication sets the "application" field if the given value is not nil.
+func (rtuo *RefreshTokenUpdateOne) SetNillableApplication(s *string) *RefreshTokenUpdateOne {
 	if s != nil {
-		rtuo.SetClientName(*s)
+		rtuo.SetApplication(*s)
 	}
 	return rtuo
 }
 
-// SetServerName sets the "server_name" field.
-func (rtuo *RefreshTokenUpdateOne) SetServerName(s string) *RefreshTokenUpdateOne {
-	rtuo.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (rtuo *RefreshTokenUpdateOne) SetService(s string) *RefreshTokenUpdateOne {
+	rtuo.mutation.SetService(s)
 	return rtuo
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (rtuo *RefreshTokenUpdateOne) SetNillableServerName(s *string) *RefreshTokenUpdateOne {
+// SetNillableService sets the "service" field if the given value is not nil.
+func (rtuo *RefreshTokenUpdateOne) SetNillableService(s *string) *RefreshTokenUpdateOne {
 	if s != nil {
-		rtuo.SetServerName(*s)
+		rtuo.SetService(*s)
 	}
 	return rtuo
 }
@@ -509,11 +509,11 @@ func (rtuo *RefreshTokenUpdateOne) sqlSave(ctx context.Context) (_node *RefreshT
 			}
 		}
 	}
-	if value, ok := rtuo.mutation.ClientName(); ok {
-		_spec.SetField(refreshtoken.FieldClientName, field.TypeString, value)
+	if value, ok := rtuo.mutation.Application(); ok {
+		_spec.SetField(refreshtoken.FieldApplication, field.TypeString, value)
 	}
-	if value, ok := rtuo.mutation.ServerName(); ok {
-		_spec.SetField(refreshtoken.FieldServerName, field.TypeString, value)
+	if value, ok := rtuo.mutation.Service(); ok {
+		_spec.SetField(refreshtoken.FieldService, field.TypeString, value)
 	}
 	if value, ok := rtuo.mutation.Scopes(); ok {
 		_spec.SetField(refreshtoken.FieldScopes, field.TypeString, value)

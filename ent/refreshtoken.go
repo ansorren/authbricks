@@ -17,10 +17,10 @@ type RefreshToken struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id"`
-	// ClientName holds the value of the "client_name" field.
-	ClientName string `json:"client_name"`
-	// ServerName holds the value of the "server_name" field.
-	ServerName string `json:"server_name"`
+	// Application holds the value of the "application" field.
+	Application string `json:"application"`
+	// Service holds the value of the "service" field.
+	Service string `json:"service"`
 	// Scopes holds the value of the "scopes" field.
 	Scopes string `json:"scopes"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -45,7 +45,7 @@ func (*RefreshToken) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case refreshtoken.FieldCreatedAt, refreshtoken.FieldLifetime:
 			values[i] = new(sql.NullInt64)
-		case refreshtoken.FieldID, refreshtoken.FieldClientName, refreshtoken.FieldServerName, refreshtoken.FieldScopes, refreshtoken.FieldAccessTokenID, refreshtoken.FieldSubject, refreshtoken.FieldKeyID:
+		case refreshtoken.FieldID, refreshtoken.FieldApplication, refreshtoken.FieldService, refreshtoken.FieldScopes, refreshtoken.FieldAccessTokenID, refreshtoken.FieldSubject, refreshtoken.FieldKeyID:
 			values[i] = new(sql.NullString)
 		case refreshtoken.FieldAuthTime:
 			values[i] = new(sql.NullTime)
@@ -70,17 +70,17 @@ func (rt *RefreshToken) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				rt.ID = value.String
 			}
-		case refreshtoken.FieldClientName:
+		case refreshtoken.FieldApplication:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field client_name", values[i])
+				return fmt.Errorf("unexpected type %T for field application", values[i])
 			} else if value.Valid {
-				rt.ClientName = value.String
+				rt.Application = value.String
 			}
-		case refreshtoken.FieldServerName:
+		case refreshtoken.FieldService:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field server_name", values[i])
+				return fmt.Errorf("unexpected type %T for field service", values[i])
 			} else if value.Valid {
-				rt.ServerName = value.String
+				rt.Service = value.String
 			}
 		case refreshtoken.FieldScopes:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -160,11 +160,11 @@ func (rt *RefreshToken) String() string {
 	var builder strings.Builder
 	builder.WriteString("RefreshToken(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", rt.ID))
-	builder.WriteString("client_name=")
-	builder.WriteString(rt.ClientName)
+	builder.WriteString("application=")
+	builder.WriteString(rt.Application)
 	builder.WriteString(", ")
-	builder.WriteString("server_name=")
-	builder.WriteString(rt.ServerName)
+	builder.WriteString("service=")
+	builder.WriteString(rt.Service)
 	builder.WriteString(", ")
 	builder.WriteString("scopes=")
 	builder.WriteString(rt.Scopes)

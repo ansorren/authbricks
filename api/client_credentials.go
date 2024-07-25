@@ -43,7 +43,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	// compare the client credentials
 	err := a.compareCredentials(c.Request().Context(), payload.ClientID, payload.ClientSecret)
 	if ent.IsNotFound(err) {
-		msg := "client not found"
+		msg := "invalid client: application not found"
 		a.Logger.Error(msg, "error", ErrInvalidClient, "op", op)
 		return c.JSON(http.StatusBadRequest, TokenErrorResponse{
 			Error:            ErrInvalidClient,
@@ -59,7 +59,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 		})
 	}
 	if err != nil {
-		msg := "invalid client secret"
+		msg := "invalid client: invalid client secret"
 		a.Logger.Error(msg, "error", ErrInvalidClient, "service", service.Name, "op", op)
 		return c.JSON(http.StatusBadRequest, TokenErrorResponse{
 			Error:            ErrInvalidClient,
@@ -72,7 +72,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	// at this point, however if there's a race condition where the application is deleted
 	// after the check we should return an error.
 	if ent.IsNotFound(err) {
-		msg := "application not found"
+		msg := "invalid client: application not found"
 		a.Logger.Error(msg, "error", ErrInvalidClient, "service", service.Name, "op", op)
 		return c.JSON(http.StatusBadRequest, TokenErrorResponse{
 			Error:            ErrInvalidClient,
@@ -88,7 +88,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 		})
 	}
 	if err != nil {
-		msg := "unable to get application"
+		msg := "server error: unable to get application"
 		a.Logger.Error(msg, "error", err, "service", service.Name, "op", op)
 		return c.JSON(http.StatusInternalServerError, TokenErrorResponse{
 			Error:            ErrServerError,
@@ -98,7 +98,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	// check if the application is allowed to request a token against the given service
 	err = a.isAllowedToRequestToken(c.Request().Context(), app, service)
 	if ent.IsConstraintError(err) {
-		msg := "server error while checking if the application is allowed to request a token"
+		msg := "server error: cannot check if application is allowed to request a token"
 		a.Logger.Error(msg, "error", ErrServerError, "service", service.Name, "op", op)
 		return c.JSON(http.StatusInternalServerError, TokenErrorResponse{
 			Error:            ErrServerError,
@@ -107,7 +107,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	}
 	if err != nil {
 		msg := "unauthorized client"
-		a.Logger.Error(msg, "error", ErrInvalidClient, "error_details", err.Error(), "service", service.Name, "op", op)
+		a.Logger.Error(msg, "error", ErrUnauthorizedClient, "error_details", err.Error(), "service", service.Name, "op", op)
 		return c.JSON(http.StatusBadRequest, TokenErrorResponse{
 			Error:            ErrUnauthorizedClient,
 			ErrorDescription: msg,
@@ -136,7 +136,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	// generate the token
 	privKey, keyID, err := a.lastPrivateKeyAndKeyID(c.Request().Context(), service)
 	if err != nil {
-		msg := "server error while getting signing key"
+		msg := "server error: cannot get signing key"
 		a.Logger.Error(msg, "error", err, "service", service.Name, "op", op)
 		return c.JSON(http.StatusInternalServerError, TokenErrorResponse{
 			Error:            ErrServerError,
@@ -174,6 +174,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 		})
 	}
 
+	// headers required by RFC6749
 	c.Response().Header().Set(echo.HeaderCacheControl, "no-store")
 	c.Response().Header().Set("Pragma", "no-cache")
 	return c.JSON(http.StatusOK, TokenSuccessResponse{

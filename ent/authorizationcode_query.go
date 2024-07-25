@@ -261,12 +261,12 @@ func (acq *AuthorizationCodeQuery) Clone() *AuthorizationCodeQuery {
 // Example:
 //
 //	var v []struct {
-//		ClientName string `json:"client_name"`
+//		Application string `json:"application"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.AuthorizationCode.Query().
-//		GroupBy(authorizationcode.FieldClientName).
+//		GroupBy(authorizationcode.FieldApplication).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (acq *AuthorizationCodeQuery) GroupBy(field string, fields ...string) *AuthorizationCodeGroupBy {
@@ -284,11 +284,11 @@ func (acq *AuthorizationCodeQuery) GroupBy(field string, fields ...string) *Auth
 // Example:
 //
 //	var v []struct {
-//		ClientName string `json:"client_name"`
+//		Application string `json:"application"`
 //	}
 //
 //	client.AuthorizationCode.Query().
-//		Select(authorizationcode.FieldClientName).
+//		Select(authorizationcode.FieldApplication).
 //		Scan(ctx, &v)
 func (acq *AuthorizationCodeQuery) Select(fields ...string) *AuthorizationCodeSelect {
 	acq.ctx.Fields = append(acq.ctx.Fields, fields...)

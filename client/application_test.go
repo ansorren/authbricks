@@ -82,7 +82,7 @@ func TestApplication(t *testing.T) {
 	require.Equal(t, cfg.ResponseTypes, app.ResponseTypes)
 	require.Equal(t, cfg.GrantTypes, app.GrantTypes)
 	require.Equal(t, cfg.Scopes, app.Scopes)
-	require.Equal(t, cfg.PKCERequired, app.PkceRequired)
+	require.Equal(t, cfg.PKCERequired, app.PKCERequired)
 
 	// Get application
 	app, err = client.GetApplication(context.Background(), cfg.Name)

@@ -64,9 +64,9 @@ func IDContainsFold(id string) predicate.AuthorizationCode {
 	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldID, id))
 }
 
-// ClientName applies equality check predicate on the "client_name" field. It's identical to ClientNameEQ.
-func ClientName(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEQ(FieldClientName, v))
+// Application applies equality check predicate on the "application" field. It's identical to ApplicationEQ.
+func Application(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEQ(FieldApplication, v))
 }
 
 // CodeChallenge applies equality check predicate on the "code_challenge" field. It's identical to CodeChallengeEQ.
@@ -99,9 +99,9 @@ func Nonce(v string) predicate.AuthorizationCode {
 	return predicate.AuthorizationCode(sql.FieldEQ(FieldNonce, v))
 }
 
-// ServerName applies equality check predicate on the "server_name" field. It's identical to ServerNameEQ.
-func ServerName(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEQ(FieldServerName, v))
+// Service applies equality check predicate on the "service" field. It's identical to ServiceEQ.
+func Service(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEQ(FieldService, v))
 }
 
 // State applies equality check predicate on the "state" field. It's identical to StateEQ.
@@ -119,69 +119,69 @@ func GrantedScopes(v string) predicate.AuthorizationCode {
 	return predicate.AuthorizationCode(sql.FieldEQ(FieldGrantedScopes, v))
 }
 
-// ClientNameEQ applies the EQ predicate on the "client_name" field.
-func ClientNameEQ(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEQ(FieldClientName, v))
+// ApplicationEQ applies the EQ predicate on the "application" field.
+func ApplicationEQ(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEQ(FieldApplication, v))
 }
 
-// ClientNameNEQ applies the NEQ predicate on the "client_name" field.
-func ClientNameNEQ(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldNEQ(FieldClientName, v))
+// ApplicationNEQ applies the NEQ predicate on the "application" field.
+func ApplicationNEQ(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldNEQ(FieldApplication, v))
 }
 
-// ClientNameIn applies the In predicate on the "client_name" field.
-func ClientNameIn(vs ...string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldIn(FieldClientName, vs...))
+// ApplicationIn applies the In predicate on the "application" field.
+func ApplicationIn(vs ...string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldIn(FieldApplication, vs...))
 }
 
-// ClientNameNotIn applies the NotIn predicate on the "client_name" field.
-func ClientNameNotIn(vs ...string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldNotIn(FieldClientName, vs...))
+// ApplicationNotIn applies the NotIn predicate on the "application" field.
+func ApplicationNotIn(vs ...string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldNotIn(FieldApplication, vs...))
 }
 
-// ClientNameGT applies the GT predicate on the "client_name" field.
-func ClientNameGT(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldGT(FieldClientName, v))
+// ApplicationGT applies the GT predicate on the "application" field.
+func ApplicationGT(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldGT(FieldApplication, v))
 }
 
-// ClientNameGTE applies the GTE predicate on the "client_name" field.
-func ClientNameGTE(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldGTE(FieldClientName, v))
+// ApplicationGTE applies the GTE predicate on the "application" field.
+func ApplicationGTE(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldGTE(FieldApplication, v))
 }
 
-// ClientNameLT applies the LT predicate on the "client_name" field.
-func ClientNameLT(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldLT(FieldClientName, v))
+// ApplicationLT applies the LT predicate on the "application" field.
+func ApplicationLT(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldLT(FieldApplication, v))
 }
 
-// ClientNameLTE applies the LTE predicate on the "client_name" field.
-func ClientNameLTE(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldLTE(FieldClientName, v))
+// ApplicationLTE applies the LTE predicate on the "application" field.
+func ApplicationLTE(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldLTE(FieldApplication, v))
 }
 
-// ClientNameContains applies the Contains predicate on the "client_name" field.
-func ClientNameContains(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldContains(FieldClientName, v))
+// ApplicationContains applies the Contains predicate on the "application" field.
+func ApplicationContains(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldContains(FieldApplication, v))
 }
 
-// ClientNameHasPrefix applies the HasPrefix predicate on the "client_name" field.
-func ClientNameHasPrefix(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldHasPrefix(FieldClientName, v))
+// ApplicationHasPrefix applies the HasPrefix predicate on the "application" field.
+func ApplicationHasPrefix(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldHasPrefix(FieldApplication, v))
 }
 
-// ClientNameHasSuffix applies the HasSuffix predicate on the "client_name" field.
-func ClientNameHasSuffix(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldHasSuffix(FieldClientName, v))
+// ApplicationHasSuffix applies the HasSuffix predicate on the "application" field.
+func ApplicationHasSuffix(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldHasSuffix(FieldApplication, v))
 }
 
-// ClientNameEqualFold applies the EqualFold predicate on the "client_name" field.
-func ClientNameEqualFold(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEqualFold(FieldClientName, v))
+// ApplicationEqualFold applies the EqualFold predicate on the "application" field.
+func ApplicationEqualFold(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEqualFold(FieldApplication, v))
 }
 
-// ClientNameContainsFold applies the ContainsFold predicate on the "client_name" field.
-func ClientNameContainsFold(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldClientName, v))
+// ApplicationContainsFold applies the ContainsFold predicate on the "application" field.
+func ApplicationContainsFold(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldApplication, v))
 }
 
 // CodeChallengeEQ applies the EQ predicate on the "code_challenge" field.
@@ -524,69 +524,69 @@ func NonceContainsFold(v string) predicate.AuthorizationCode {
 	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldNonce, v))
 }
 
-// ServerNameEQ applies the EQ predicate on the "server_name" field.
-func ServerNameEQ(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEQ(FieldServerName, v))
+// ServiceEQ applies the EQ predicate on the "service" field.
+func ServiceEQ(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEQ(FieldService, v))
 }
 
-// ServerNameNEQ applies the NEQ predicate on the "server_name" field.
-func ServerNameNEQ(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldNEQ(FieldServerName, v))
+// ServiceNEQ applies the NEQ predicate on the "service" field.
+func ServiceNEQ(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldNEQ(FieldService, v))
 }
 
-// ServerNameIn applies the In predicate on the "server_name" field.
-func ServerNameIn(vs ...string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldIn(FieldServerName, vs...))
+// ServiceIn applies the In predicate on the "service" field.
+func ServiceIn(vs ...string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldIn(FieldService, vs...))
 }
 
-// ServerNameNotIn applies the NotIn predicate on the "server_name" field.
-func ServerNameNotIn(vs ...string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldNotIn(FieldServerName, vs...))
+// ServiceNotIn applies the NotIn predicate on the "service" field.
+func ServiceNotIn(vs ...string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldNotIn(FieldService, vs...))
 }
 
-// ServerNameGT applies the GT predicate on the "server_name" field.
-func ServerNameGT(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldGT(FieldServerName, v))
+// ServiceGT applies the GT predicate on the "service" field.
+func ServiceGT(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldGT(FieldService, v))
 }
 
-// ServerNameGTE applies the GTE predicate on the "server_name" field.
-func ServerNameGTE(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldGTE(FieldServerName, v))
+// ServiceGTE applies the GTE predicate on the "service" field.
+func ServiceGTE(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldGTE(FieldService, v))
 }
 
-// ServerNameLT applies the LT predicate on the "server_name" field.
-func ServerNameLT(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldLT(FieldServerName, v))
+// ServiceLT applies the LT predicate on the "service" field.
+func ServiceLT(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldLT(FieldService, v))
 }
 
-// ServerNameLTE applies the LTE predicate on the "server_name" field.
-func ServerNameLTE(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldLTE(FieldServerName, v))
+// ServiceLTE applies the LTE predicate on the "service" field.
+func ServiceLTE(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldLTE(FieldService, v))
 }
 
-// ServerNameContains applies the Contains predicate on the "server_name" field.
-func ServerNameContains(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldContains(FieldServerName, v))
+// ServiceContains applies the Contains predicate on the "service" field.
+func ServiceContains(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldContains(FieldService, v))
 }
 
-// ServerNameHasPrefix applies the HasPrefix predicate on the "server_name" field.
-func ServerNameHasPrefix(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldHasPrefix(FieldServerName, v))
+// ServiceHasPrefix applies the HasPrefix predicate on the "service" field.
+func ServiceHasPrefix(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldHasPrefix(FieldService, v))
 }
 
-// ServerNameHasSuffix applies the HasSuffix predicate on the "server_name" field.
-func ServerNameHasSuffix(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldHasSuffix(FieldServerName, v))
+// ServiceHasSuffix applies the HasSuffix predicate on the "service" field.
+func ServiceHasSuffix(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldHasSuffix(FieldService, v))
 }
 
-// ServerNameEqualFold applies the EqualFold predicate on the "server_name" field.
-func ServerNameEqualFold(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldEqualFold(FieldServerName, v))
+// ServiceEqualFold applies the EqualFold predicate on the "service" field.
+func ServiceEqualFold(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldEqualFold(FieldService, v))
 }
 
-// ServerNameContainsFold applies the ContainsFold predicate on the "server_name" field.
-func ServerNameContainsFold(v string) predicate.AuthorizationCode {
-	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldServerName, v))
+// ServiceContainsFold applies the ContainsFold predicate on the "service" field.
+func ServiceContainsFold(v string) predicate.AuthorizationCode {
+	return predicate.AuthorizationCode(sql.FieldContainsFold(FieldService, v))
 }
 
 // StateEQ applies the EQ predicate on the "state" field.

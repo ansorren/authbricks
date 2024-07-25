@@ -39,10 +39,10 @@ func init() {
 	applicationDescPublic := applicationFields[2].Descriptor()
 	// application.DefaultPublic holds the default value on creation for the public field.
 	application.DefaultPublic = applicationDescPublic.Default.(bool)
-	// applicationDescPkceRequired is the schema descriptor for pkce_required field.
-	applicationDescPkceRequired := applicationFields[8].Descriptor()
-	// application.DefaultPkceRequired holds the default value on creation for the pkce_required field.
-	application.DefaultPkceRequired = applicationDescPkceRequired.Default.(bool)
+	// applicationDescPKCERequired is the schema descriptor for PKCE_required field.
+	applicationDescPKCERequired := applicationFields[8].Descriptor()
+	// application.DefaultPKCERequired holds the default value on creation for the PKCE_required field.
+	application.DefaultPKCERequired = applicationDescPKCERequired.Default.(bool)
 	// applicationDescS256CodeChallengeMethodRequired is the schema descriptor for s256_code_challenge_method_required field.
 	applicationDescS256CodeChallengeMethodRequired := applicationFields[9].Descriptor()
 	// application.DefaultS256CodeChallengeMethodRequired holds the default value on creation for the s256_code_challenge_method_required field.

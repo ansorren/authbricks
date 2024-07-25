@@ -64,14 +64,14 @@ func IDContainsFold(id string) predicate.RefreshToken {
 	return predicate.RefreshToken(sql.FieldContainsFold(FieldID, id))
 }
 
-// ClientName applies equality check predicate on the "client_name" field. It's identical to ClientNameEQ.
-func ClientName(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEQ(FieldClientName, v))
+// Application applies equality check predicate on the "application" field. It's identical to ApplicationEQ.
+func Application(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEQ(FieldApplication, v))
 }
 
-// ServerName applies equality check predicate on the "server_name" field. It's identical to ServerNameEQ.
-func ServerName(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEQ(FieldServerName, v))
+// Service applies equality check predicate on the "service" field. It's identical to ServiceEQ.
+func Service(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEQ(FieldService, v))
 }
 
 // Scopes applies equality check predicate on the "scopes" field. It's identical to ScopesEQ.
@@ -109,134 +109,134 @@ func AuthTime(v time.Time) predicate.RefreshToken {
 	return predicate.RefreshToken(sql.FieldEQ(FieldAuthTime, v))
 }
 
-// ClientNameEQ applies the EQ predicate on the "client_name" field.
-func ClientNameEQ(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEQ(FieldClientName, v))
+// ApplicationEQ applies the EQ predicate on the "application" field.
+func ApplicationEQ(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEQ(FieldApplication, v))
 }
 
-// ClientNameNEQ applies the NEQ predicate on the "client_name" field.
-func ClientNameNEQ(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldNEQ(FieldClientName, v))
+// ApplicationNEQ applies the NEQ predicate on the "application" field.
+func ApplicationNEQ(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldNEQ(FieldApplication, v))
 }
 
-// ClientNameIn applies the In predicate on the "client_name" field.
-func ClientNameIn(vs ...string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldIn(FieldClientName, vs...))
+// ApplicationIn applies the In predicate on the "application" field.
+func ApplicationIn(vs ...string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldIn(FieldApplication, vs...))
 }
 
-// ClientNameNotIn applies the NotIn predicate on the "client_name" field.
-func ClientNameNotIn(vs ...string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldNotIn(FieldClientName, vs...))
+// ApplicationNotIn applies the NotIn predicate on the "application" field.
+func ApplicationNotIn(vs ...string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldNotIn(FieldApplication, vs...))
 }
 
-// ClientNameGT applies the GT predicate on the "client_name" field.
-func ClientNameGT(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldGT(FieldClientName, v))
+// ApplicationGT applies the GT predicate on the "application" field.
+func ApplicationGT(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldGT(FieldApplication, v))
 }
 
-// ClientNameGTE applies the GTE predicate on the "client_name" field.
-func ClientNameGTE(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldGTE(FieldClientName, v))
+// ApplicationGTE applies the GTE predicate on the "application" field.
+func ApplicationGTE(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldGTE(FieldApplication, v))
 }
 
-// ClientNameLT applies the LT predicate on the "client_name" field.
-func ClientNameLT(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldLT(FieldClientName, v))
+// ApplicationLT applies the LT predicate on the "application" field.
+func ApplicationLT(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldLT(FieldApplication, v))
 }
 
-// ClientNameLTE applies the LTE predicate on the "client_name" field.
-func ClientNameLTE(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldLTE(FieldClientName, v))
+// ApplicationLTE applies the LTE predicate on the "application" field.
+func ApplicationLTE(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldLTE(FieldApplication, v))
 }
 
-// ClientNameContains applies the Contains predicate on the "client_name" field.
-func ClientNameContains(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldContains(FieldClientName, v))
+// ApplicationContains applies the Contains predicate on the "application" field.
+func ApplicationContains(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldContains(FieldApplication, v))
 }
 
-// ClientNameHasPrefix applies the HasPrefix predicate on the "client_name" field.
-func ClientNameHasPrefix(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldHasPrefix(FieldClientName, v))
+// ApplicationHasPrefix applies the HasPrefix predicate on the "application" field.
+func ApplicationHasPrefix(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldHasPrefix(FieldApplication, v))
 }
 
-// ClientNameHasSuffix applies the HasSuffix predicate on the "client_name" field.
-func ClientNameHasSuffix(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldHasSuffix(FieldClientName, v))
+// ApplicationHasSuffix applies the HasSuffix predicate on the "application" field.
+func ApplicationHasSuffix(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldHasSuffix(FieldApplication, v))
 }
 
-// ClientNameEqualFold applies the EqualFold predicate on the "client_name" field.
-func ClientNameEqualFold(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEqualFold(FieldClientName, v))
+// ApplicationEqualFold applies the EqualFold predicate on the "application" field.
+func ApplicationEqualFold(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEqualFold(FieldApplication, v))
 }
 
-// ClientNameContainsFold applies the ContainsFold predicate on the "client_name" field.
-func ClientNameContainsFold(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldContainsFold(FieldClientName, v))
+// ApplicationContainsFold applies the ContainsFold predicate on the "application" field.
+func ApplicationContainsFold(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldContainsFold(FieldApplication, v))
 }
 
-// ServerNameEQ applies the EQ predicate on the "server_name" field.
-func ServerNameEQ(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEQ(FieldServerName, v))
+// ServiceEQ applies the EQ predicate on the "service" field.
+func ServiceEQ(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEQ(FieldService, v))
 }
 
-// ServerNameNEQ applies the NEQ predicate on the "server_name" field.
-func ServerNameNEQ(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldNEQ(FieldServerName, v))
+// ServiceNEQ applies the NEQ predicate on the "service" field.
+func ServiceNEQ(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldNEQ(FieldService, v))
 }
 
-// ServerNameIn applies the In predicate on the "server_name" field.
-func ServerNameIn(vs ...string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldIn(FieldServerName, vs...))
+// ServiceIn applies the In predicate on the "service" field.
+func ServiceIn(vs ...string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldIn(FieldService, vs...))
 }
 
-// ServerNameNotIn applies the NotIn predicate on the "server_name" field.
-func ServerNameNotIn(vs ...string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldNotIn(FieldServerName, vs...))
+// ServiceNotIn applies the NotIn predicate on the "service" field.
+func ServiceNotIn(vs ...string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldNotIn(FieldService, vs...))
 }
 
-// ServerNameGT applies the GT predicate on the "server_name" field.
-func ServerNameGT(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldGT(FieldServerName, v))
+// ServiceGT applies the GT predicate on the "service" field.
+func ServiceGT(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldGT(FieldService, v))
 }
 
-// ServerNameGTE applies the GTE predicate on the "server_name" field.
-func ServerNameGTE(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldGTE(FieldServerName, v))
+// ServiceGTE applies the GTE predicate on the "service" field.
+func ServiceGTE(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldGTE(FieldService, v))
 }
 
-// ServerNameLT applies the LT predicate on the "server_name" field.
-func ServerNameLT(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldLT(FieldServerName, v))
+// ServiceLT applies the LT predicate on the "service" field.
+func ServiceLT(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldLT(FieldService, v))
 }
 
-// ServerNameLTE applies the LTE predicate on the "server_name" field.
-func ServerNameLTE(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldLTE(FieldServerName, v))
+// ServiceLTE applies the LTE predicate on the "service" field.
+func ServiceLTE(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldLTE(FieldService, v))
 }
 
-// ServerNameContains applies the Contains predicate on the "server_name" field.
-func ServerNameContains(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldContains(FieldServerName, v))
+// ServiceContains applies the Contains predicate on the "service" field.
+func ServiceContains(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldContains(FieldService, v))
 }
 
-// ServerNameHasPrefix applies the HasPrefix predicate on the "server_name" field.
-func ServerNameHasPrefix(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldHasPrefix(FieldServerName, v))
+// ServiceHasPrefix applies the HasPrefix predicate on the "service" field.
+func ServiceHasPrefix(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldHasPrefix(FieldService, v))
 }
 
-// ServerNameHasSuffix applies the HasSuffix predicate on the "server_name" field.
-func ServerNameHasSuffix(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldHasSuffix(FieldServerName, v))
+// ServiceHasSuffix applies the HasSuffix predicate on the "service" field.
+func ServiceHasSuffix(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldHasSuffix(FieldService, v))
 }
 
-// ServerNameEqualFold applies the EqualFold predicate on the "server_name" field.
-func ServerNameEqualFold(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldEqualFold(FieldServerName, v))
+// ServiceEqualFold applies the EqualFold predicate on the "service" field.
+func ServiceEqualFold(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldEqualFold(FieldService, v))
 }
 
-// ServerNameContainsFold applies the ContainsFold predicate on the "server_name" field.
-func ServerNameContainsFold(v string) predicate.RefreshToken {
-	return predicate.RefreshToken(sql.FieldContainsFold(FieldServerName, v))
+// ServiceContainsFold applies the ContainsFold predicate on the "service" field.
+func ServiceContainsFold(v string) predicate.RefreshToken {
+	return predicate.RefreshToken(sql.FieldContainsFold(FieldService, v))
 }
 
 // ScopesEQ applies the EQ predicate on the "scopes" field.

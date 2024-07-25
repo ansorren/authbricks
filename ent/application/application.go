@@ -26,8 +26,8 @@ const (
 	FieldGrantTypes = "grant_types"
 	// FieldScopes holds the string denoting the scopes field in the database.
 	FieldScopes = "scopes"
-	// FieldPkceRequired holds the string denoting the pkce_required field in the database.
-	FieldPkceRequired = "pkce_required"
+	// FieldPKCERequired holds the string denoting the pkce_required field in the database.
+	FieldPKCERequired = "pkce_required"
 	// FieldS256CodeChallengeMethodRequired holds the string denoting the s256_code_challenge_method_required field in the database.
 	FieldS256CodeChallengeMethodRequired = "s256_code_challenge_method_required"
 	// FieldAllowedAuthenticationMethods holds the string denoting the allowed_authentication_methods field in the database.
@@ -64,7 +64,7 @@ var Columns = []string{
 	FieldResponseTypes,
 	FieldGrantTypes,
 	FieldScopes,
-	FieldPkceRequired,
+	FieldPKCERequired,
 	FieldS256CodeChallengeMethodRequired,
 	FieldAllowedAuthenticationMethods,
 }
@@ -95,8 +95,8 @@ var (
 	NameValidator func(string) error
 	// DefaultPublic holds the default value on creation for the "public" field.
 	DefaultPublic bool
-	// DefaultPkceRequired holds the default value on creation for the "pkce_required" field.
-	DefaultPkceRequired bool
+	// DefaultPKCERequired holds the default value on creation for the "PKCE_required" field.
+	DefaultPKCERequired bool
 	// DefaultS256CodeChallengeMethodRequired holds the default value on creation for the "s256_code_challenge_method_required" field.
 	DefaultS256CodeChallengeMethodRequired bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -126,9 +126,9 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
-// ByPkceRequired orders the results by the pkce_required field.
-func ByPkceRequired(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPkceRequired, opts...).ToFunc()
+// ByPKCERequired orders the results by the PKCE_required field.
+func ByPKCERequired(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPKCERequired, opts...).ToFunc()
 }
 
 // ByS256CodeChallengeMethodRequired orders the results by the s256_code_challenge_method_required field.

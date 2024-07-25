@@ -2,12 +2,20 @@ package api
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"strings"
+	"time"
 
 	"go.authbricks.com/bricks/ent"
 
 	"github.com/pkg/errors"
+)
+
+const (
+	AlphaNumericCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	// AuthorizationCodeExpiration is the valid duration for an authorization code.
+	AuthorizationCodeExpiration = 10 * time.Minute
 )
 
 // contains checks if the given string is in the given slice of strings.
@@ -59,4 +67,31 @@ func validateScopes(grantedScopes string, serviceScopes []string) error {
 		}
 	}
 	return nil
+}
+
+// randomString generates a random string of n characters using the given charset.
+func randomString(n int, charset string) (string, error) {
+	data := make([]byte, n)
+	_, err := rand.Read(data)
+	if err != nil {
+		return "", errors.Wrapf(err, "unable to read data")
+	}
+	for k, v := range data {
+		data[k] = charset[v%byte(len(charset))]
+	}
+	return string(data), nil
+}
+
+// randomAlphanumericString generates a secure string of n characters using the alphabetic charset.
+func randomAlphanumericString(n int) (string, error) {
+	return randomString(n, AlphaNumericCharset)
+}
+
+// codeIsExpired returns true if the authorization code expired.
+func codeIsExpired(code *ent.AuthorizationCode, now time.Time) bool {
+	elapsed := now.Sub(code.CreatedAt)
+	if elapsed > AuthorizationCodeExpiration {
+		return true
+	}
+	return false
 }

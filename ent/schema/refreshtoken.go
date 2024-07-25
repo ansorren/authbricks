@@ -15,8 +15,8 @@ type RefreshToken struct {
 func (RefreshToken) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Unique().NotEmpty().StructTag(`json:"id"`),
-		field.String("client_name").StructTag(`json:"client_name"`),
-		field.String("server_name").StructTag(`json:"server_name"`),
+		field.String("application").StructTag(`json:"application"`),
+		field.String("service").StructTag(`json:"service"`),
 		field.String("scopes").StructTag(`json:"scopes"`),
 		field.Int64("created_at").Positive().StructTag(`json:"created_at"`),
 		field.String("access_token_id").StructTag(`json:"access_token_id"`),

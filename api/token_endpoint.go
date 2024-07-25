@@ -171,9 +171,18 @@ func (a *API) TokenHandler(service *ent.Service) func(echo.Context) error {
 			})
 		}
 
+		if payload.ClientID == "" {
+			msg := "invalid request: client ID not provided"
+			a.Logger.Error(msg, "error", ErrInvalidRequest, "service", service.Name, "op", op)
+			return c.JSON(http.StatusBadRequest, TokenErrorResponse{
+				Error:            ErrInvalidRequest,
+				ErrorDescription: msg,
+			})
+		}
+
 		allowedAuthMethods, err := a.allowedAuthMethods(c.Request().Context(), serviceAuthMethods, payload.ClientID)
 		if ent.IsNotFound(err) {
-			msg := "client not found"
+			msg := "invalid client: not found"
 			a.Logger.Error(msg, "error", ErrInvalidClient, "service", service.Name, "op", op)
 			return c.JSON(http.StatusBadRequest, TokenErrorResponse{
 				Error:            ErrInvalidClient,

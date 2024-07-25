@@ -120,16 +120,16 @@ func (au *ApplicationUpdate) AppendScopes(s []string) *ApplicationUpdate {
 	return au
 }
 
-// SetPkceRequired sets the "pkce_required" field.
-func (au *ApplicationUpdate) SetPkceRequired(b bool) *ApplicationUpdate {
-	au.mutation.SetPkceRequired(b)
+// SetPKCERequired sets the "PKCE_required" field.
+func (au *ApplicationUpdate) SetPKCERequired(b bool) *ApplicationUpdate {
+	au.mutation.SetPKCERequired(b)
 	return au
 }
 
-// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
-func (au *ApplicationUpdate) SetNillablePkceRequired(b *bool) *ApplicationUpdate {
+// SetNillablePKCERequired sets the "PKCE_required" field if the given value is not nil.
+func (au *ApplicationUpdate) SetNillablePKCERequired(b *bool) *ApplicationUpdate {
 	if b != nil {
-		au.SetPkceRequired(*b)
+		au.SetPKCERequired(*b)
 	}
 	return au
 }
@@ -316,8 +316,8 @@ func (au *ApplicationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, application.FieldScopes, value)
 		})
 	}
-	if value, ok := au.mutation.PkceRequired(); ok {
-		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
+	if value, ok := au.mutation.PKCERequired(); ok {
+		_spec.SetField(application.FieldPKCERequired, field.TypeBool, value)
 	}
 	if value, ok := au.mutation.S256CodeChallengeMethodRequired(); ok {
 		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)
@@ -514,16 +514,16 @@ func (auo *ApplicationUpdateOne) AppendScopes(s []string) *ApplicationUpdateOne 
 	return auo
 }
 
-// SetPkceRequired sets the "pkce_required" field.
-func (auo *ApplicationUpdateOne) SetPkceRequired(b bool) *ApplicationUpdateOne {
-	auo.mutation.SetPkceRequired(b)
+// SetPKCERequired sets the "PKCE_required" field.
+func (auo *ApplicationUpdateOne) SetPKCERequired(b bool) *ApplicationUpdateOne {
+	auo.mutation.SetPKCERequired(b)
 	return auo
 }
 
-// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
-func (auo *ApplicationUpdateOne) SetNillablePkceRequired(b *bool) *ApplicationUpdateOne {
+// SetNillablePKCERequired sets the "PKCE_required" field if the given value is not nil.
+func (auo *ApplicationUpdateOne) SetNillablePKCERequired(b *bool) *ApplicationUpdateOne {
 	if b != nil {
-		auo.SetPkceRequired(*b)
+		auo.SetPKCERequired(*b)
 	}
 	return auo
 }
@@ -740,8 +740,8 @@ func (auo *ApplicationUpdateOne) sqlSave(ctx context.Context) (_node *Applicatio
 			sqljson.Append(u, application.FieldScopes, value)
 		})
 	}
-	if value, ok := auo.mutation.PkceRequired(); ok {
-		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
+	if value, ok := auo.mutation.PKCERequired(); ok {
+		_spec.SetField(application.FieldPKCERequired, field.TypeBool, value)
 	}
 	if value, ok := auo.mutation.S256CodeChallengeMethodRequired(); ok {
 		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)
