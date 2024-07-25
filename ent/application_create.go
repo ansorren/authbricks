@@ -71,16 +71,16 @@ func (ac *ApplicationCreate) SetScopes(s []string) *ApplicationCreate {
 	return ac
 }
 
-// SetPkceRequired sets the "pkce_required" field.
-func (ac *ApplicationCreate) SetPkceRequired(b bool) *ApplicationCreate {
-	ac.mutation.SetPkceRequired(b)
+// SetPKCERequired sets the "PKCE_required" field.
+func (ac *ApplicationCreate) SetPKCERequired(b bool) *ApplicationCreate {
+	ac.mutation.SetPKCERequired(b)
 	return ac
 }
 
-// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
-func (ac *ApplicationCreate) SetNillablePkceRequired(b *bool) *ApplicationCreate {
+// SetNillablePKCERequired sets the "PKCE_required" field if the given value is not nil.
+func (ac *ApplicationCreate) SetNillablePKCERequired(b *bool) *ApplicationCreate {
 	if b != nil {
-		ac.SetPkceRequired(*b)
+		ac.SetPKCERequired(*b)
 	}
 	return ac
 }
@@ -184,9 +184,9 @@ func (ac *ApplicationCreate) defaults() {
 		v := application.DefaultPublic
 		ac.mutation.SetPublic(v)
 	}
-	if _, ok := ac.mutation.PkceRequired(); !ok {
-		v := application.DefaultPkceRequired
-		ac.mutation.SetPkceRequired(v)
+	if _, ok := ac.mutation.PKCERequired(); !ok {
+		v := application.DefaultPKCERequired
+		ac.mutation.SetPKCERequired(v)
 	}
 	if _, ok := ac.mutation.S256CodeChallengeMethodRequired(); !ok {
 		v := application.DefaultS256CodeChallengeMethodRequired
@@ -222,8 +222,8 @@ func (ac *ApplicationCreate) check() error {
 	if _, ok := ac.mutation.Scopes(); !ok {
 		return &ValidationError{Name: "scopes", err: errors.New(`ent: missing required field "Application.scopes"`)}
 	}
-	if _, ok := ac.mutation.PkceRequired(); !ok {
-		return &ValidationError{Name: "pkce_required", err: errors.New(`ent: missing required field "Application.pkce_required"`)}
+	if _, ok := ac.mutation.PKCERequired(); !ok {
+		return &ValidationError{Name: "PKCE_required", err: errors.New(`ent: missing required field "Application.PKCE_required"`)}
 	}
 	if _, ok := ac.mutation.S256CodeChallengeMethodRequired(); !ok {
 		return &ValidationError{Name: "s256_code_challenge_method_required", err: errors.New(`ent: missing required field "Application.s256_code_challenge_method_required"`)}
@@ -299,9 +299,9 @@ func (ac *ApplicationCreate) createSpec() (*Application, *sqlgraph.CreateSpec) {
 		_spec.SetField(application.FieldScopes, field.TypeJSON, value)
 		_node.Scopes = value
 	}
-	if value, ok := ac.mutation.PkceRequired(); ok {
-		_spec.SetField(application.FieldPkceRequired, field.TypeBool, value)
-		_node.PkceRequired = value
+	if value, ok := ac.mutation.PKCERequired(); ok {
+		_spec.SetField(application.FieldPKCERequired, field.TypeBool, value)
+		_node.PKCERequired = value
 	}
 	if value, ok := ac.mutation.S256CodeChallengeMethodRequired(); ok {
 		_spec.SetField(application.FieldS256CodeChallengeMethodRequired, field.TypeBool, value)

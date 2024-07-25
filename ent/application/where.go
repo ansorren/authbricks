@@ -78,9 +78,9 @@ func Description(v string) predicate.Application {
 	return predicate.Application(sql.FieldEQ(FieldDescription, v))
 }
 
-// PkceRequired applies equality check predicate on the "pkce_required" field. It's identical to PkceRequiredEQ.
-func PkceRequired(v bool) predicate.Application {
-	return predicate.Application(sql.FieldEQ(FieldPkceRequired, v))
+// PKCERequired applies equality check predicate on the "PKCE_required" field. It's identical to PKCERequiredEQ.
+func PKCERequired(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldPKCERequired, v))
 }
 
 // S256CodeChallengeMethodRequired applies equality check predicate on the "s256_code_challenge_method_required" field. It's identical to S256CodeChallengeMethodRequiredEQ.
@@ -228,14 +228,14 @@ func DescriptionContainsFold(v string) predicate.Application {
 	return predicate.Application(sql.FieldContainsFold(FieldDescription, v))
 }
 
-// PkceRequiredEQ applies the EQ predicate on the "pkce_required" field.
-func PkceRequiredEQ(v bool) predicate.Application {
-	return predicate.Application(sql.FieldEQ(FieldPkceRequired, v))
+// PKCERequiredEQ applies the EQ predicate on the "PKCE_required" field.
+func PKCERequiredEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldEQ(FieldPKCERequired, v))
 }
 
-// PkceRequiredNEQ applies the NEQ predicate on the "pkce_required" field.
-func PkceRequiredNEQ(v bool) predicate.Application {
-	return predicate.Application(sql.FieldNEQ(FieldPkceRequired, v))
+// PKCERequiredNEQ applies the NEQ predicate on the "PKCE_required" field.
+func PKCERequiredNEQ(v bool) predicate.Application {
+	return predicate.Application(sql.FieldNEQ(FieldPKCERequired, v))
 }
 
 // S256CodeChallengeMethodRequiredEQ applies the EQ predicate on the "s256_code_challenge_method_required" field.

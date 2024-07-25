@@ -154,6 +154,26 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		ClientSecret: "",
 	}
 
+	s256RequiredApplication := config.Application{
+		Name:                            "s256-required",
+		Description:                     "S256 Required",
+		Public:                          true,
+		Service:                         customersService.Name,
+		RedirectURIs:                    []string{"http://localhost:8080/callback"},
+		ResponseTypes:                   []string{config.ResponseTypeCode},
+		GrantTypes:                      []string{config.GrantTypeAuthorizationCode},
+		Scopes:                          []string{"openid", "profile", "offline_access"},
+		PKCERequired:                    true,
+		S256CodeChallengeMethodRequired: true,
+		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
+	}
+
+	s256RequiredCredentials := config.Credentials{
+		Application:  s256RequiredApplication.Name,
+		ClientID:     "s256-required-client-id",
+		ClientSecret: "",
+	}
+
 	helpdeskApplication := config.Application{
 		Name:                            "helpdesk-application",
 		Description:                     "Helpdesk Application",
@@ -309,7 +329,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 
 	return TestConfig{
 		Services:     []config.Service{firstService, customersService, employeesService, m2mService},
-		Applications: []config.Application{firstApplication, loginApplication, publicApplication, helpdeskApplication, employeesLoginApplication, notificationsApplication, onlyClientSecretBasic, onlyClientSecretPost},
-		Credentials:  []config.Credentials{firstCredentials, loginApplicationCredentials, publicCredentials, helpdeskCredentials, employeesLoginApplicationCredentials, notificationsCredentials, onlyClientSecretBasicCredentials, onlyClientSecretPostCredentials},
+		Applications: []config.Application{firstApplication, loginApplication, publicApplication, s256RequiredApplication, helpdeskApplication, employeesLoginApplication, notificationsApplication, onlyClientSecretBasic, onlyClientSecretPost},
+		Credentials:  []config.Credentials{firstCredentials, loginApplicationCredentials, publicCredentials, s256RequiredCredentials, helpdeskCredentials, employeesLoginApplicationCredentials, notificationsCredentials, onlyClientSecretBasicCredentials, onlyClientSecretPostCredentials},
 	}
 }

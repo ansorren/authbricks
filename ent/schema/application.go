@@ -22,7 +22,7 @@ func (Application) Fields() []ent.Field {
 		field.Strings("response_types").StructTag(`json:"response_types" hcl:"response_types"`),
 		field.Strings("grant_types").StructTag(`json:"grant_types" hcl:"grant_types"`),
 		field.Strings("scopes").StructTag(`json:"scopes" hcl:"scopes"`),
-		field.Bool("pkce_required").Default(false).StructTag(`json:"pkce_required" hcl:"pkce_required"`),
+		field.Bool("PKCE_required").Default(false).StructTag(`json:"PKCE_required" hcl:"PKCE_required"`),
 		field.Bool("s256_code_challenge_method_required").Default(false).StructTag(`json:"s256_code_challenge_method_required" hcl:"s256_code_challenge_method_required"`),
 		field.Strings("allowed_authentication_methods").StructTag(`json:"allowed_authentication_methods" hcl:"allowed_authentication_methods"`),
 	}

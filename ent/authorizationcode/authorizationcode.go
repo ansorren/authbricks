@@ -11,8 +11,8 @@ const (
 	Label = "authorization_code"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldClientName holds the string denoting the client_name field in the database.
-	FieldClientName = "client_name"
+	// FieldApplication holds the string denoting the application field in the database.
+	FieldApplication = "application"
 	// FieldCodeChallenge holds the string denoting the code_challenge field in the database.
 	FieldCodeChallenge = "code_challenge"
 	// FieldCodeChallengeMethod holds the string denoting the code_challenge_method field in the database.
@@ -25,8 +25,8 @@ const (
 	FieldRedirectURI = "redirect_uri"
 	// FieldNonce holds the string denoting the nonce field in the database.
 	FieldNonce = "nonce"
-	// FieldServerName holds the string denoting the server_name field in the database.
-	FieldServerName = "server_name"
+	// FieldService holds the string denoting the service field in the database.
+	FieldService = "service"
 	// FieldState holds the string denoting the state field in the database.
 	FieldState = "state"
 	// FieldSubject holds the string denoting the subject field in the database.
@@ -40,14 +40,14 @@ const (
 // Columns holds all SQL columns for authorizationcode fields.
 var Columns = []string{
 	FieldID,
-	FieldClientName,
+	FieldApplication,
 	FieldCodeChallenge,
 	FieldCodeChallengeMethod,
 	FieldCreatedAt,
 	FieldAuthTime,
 	FieldRedirectURI,
 	FieldNonce,
-	FieldServerName,
+	FieldService,
 	FieldState,
 	FieldSubject,
 	FieldGrantedScopes,
@@ -76,9 +76,9 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByClientName orders the results by the client_name field.
-func ByClientName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldClientName, opts...).ToFunc()
+// ByApplication orders the results by the application field.
+func ByApplication(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldApplication, opts...).ToFunc()
 }
 
 // ByCodeChallenge orders the results by the code_challenge field.
@@ -111,9 +111,9 @@ func ByNonce(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNonce, opts...).ToFunc()
 }
 
-// ByServerName orders the results by the server_name field.
-func ByServerName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServerName, opts...).ToFunc()
+// ByService orders the results by the service field.
+func ByService(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldService, opts...).ToFunc()
 }
 
 // ByState orders the results by the state field.

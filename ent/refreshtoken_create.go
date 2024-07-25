@@ -20,15 +20,15 @@ type RefreshTokenCreate struct {
 	hooks    []Hook
 }
 
-// SetClientName sets the "client_name" field.
-func (rtc *RefreshTokenCreate) SetClientName(s string) *RefreshTokenCreate {
-	rtc.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (rtc *RefreshTokenCreate) SetApplication(s string) *RefreshTokenCreate {
+	rtc.mutation.SetApplication(s)
 	return rtc
 }
 
-// SetServerName sets the "server_name" field.
-func (rtc *RefreshTokenCreate) SetServerName(s string) *RefreshTokenCreate {
-	rtc.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (rtc *RefreshTokenCreate) SetService(s string) *RefreshTokenCreate {
+	rtc.mutation.SetService(s)
 	return rtc
 }
 
@@ -114,11 +114,11 @@ func (rtc *RefreshTokenCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rtc *RefreshTokenCreate) check() error {
-	if _, ok := rtc.mutation.ClientName(); !ok {
-		return &ValidationError{Name: "client_name", err: errors.New(`ent: missing required field "RefreshToken.client_name"`)}
+	if _, ok := rtc.mutation.Application(); !ok {
+		return &ValidationError{Name: "application", err: errors.New(`ent: missing required field "RefreshToken.application"`)}
 	}
-	if _, ok := rtc.mutation.ServerName(); !ok {
-		return &ValidationError{Name: "server_name", err: errors.New(`ent: missing required field "RefreshToken.server_name"`)}
+	if _, ok := rtc.mutation.Service(); !ok {
+		return &ValidationError{Name: "service", err: errors.New(`ent: missing required field "RefreshToken.service"`)}
 	}
 	if _, ok := rtc.mutation.Scopes(); !ok {
 		return &ValidationError{Name: "scopes", err: errors.New(`ent: missing required field "RefreshToken.scopes"`)}
@@ -191,13 +191,13 @@ func (rtc *RefreshTokenCreate) createSpec() (*RefreshToken, *sqlgraph.CreateSpec
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := rtc.mutation.ClientName(); ok {
-		_spec.SetField(refreshtoken.FieldClientName, field.TypeString, value)
-		_node.ClientName = value
+	if value, ok := rtc.mutation.Application(); ok {
+		_spec.SetField(refreshtoken.FieldApplication, field.TypeString, value)
+		_node.Application = value
 	}
-	if value, ok := rtc.mutation.ServerName(); ok {
-		_spec.SetField(refreshtoken.FieldServerName, field.TypeString, value)
-		_node.ServerName = value
+	if value, ok := rtc.mutation.Service(); ok {
+		_spec.SetField(refreshtoken.FieldService, field.TypeString, value)
+		_node.Service = value
 	}
 	if value, ok := rtc.mutation.Scopes(); ok {
 		_spec.SetField(refreshtoken.FieldScopes, field.TypeString, value)

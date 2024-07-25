@@ -32,8 +32,8 @@ type Application struct {
 	GrantTypes []string `json:"grant_types" hcl:"grant_types"`
 	// Scopes holds the value of the "scopes" field.
 	Scopes []string `json:"scopes" hcl:"scopes"`
-	// PkceRequired holds the value of the "pkce_required" field.
-	PkceRequired bool `json:"pkce_required" hcl:"pkce_required"`
+	// PKCERequired holds the value of the "PKCE_required" field.
+	PKCERequired bool `json:"PKCE_required" hcl:"PKCE_required"`
 	// S256CodeChallengeMethodRequired holds the value of the "s256_code_challenge_method_required" field.
 	S256CodeChallengeMethodRequired bool `json:"s256_code_challenge_method_required" hcl:"s256_code_challenge_method_required"`
 	// AllowedAuthenticationMethods holds the value of the "allowed_authentication_methods" field.
@@ -83,7 +83,7 @@ func (*Application) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case application.FieldRedirectUris, application.FieldResponseTypes, application.FieldGrantTypes, application.FieldScopes, application.FieldAllowedAuthenticationMethods:
 			values[i] = new([]byte)
-		case application.FieldPublic, application.FieldPkceRequired, application.FieldS256CodeChallengeMethodRequired:
+		case application.FieldPublic, application.FieldPKCERequired, application.FieldS256CodeChallengeMethodRequired:
 			values[i] = new(sql.NullBool)
 		case application.FieldID, application.FieldName, application.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -160,11 +160,11 @@ func (a *Application) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field scopes: %w", err)
 				}
 			}
-		case application.FieldPkceRequired:
+		case application.FieldPKCERequired:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field pkce_required", values[i])
+				return fmt.Errorf("unexpected type %T for field PKCE_required", values[i])
 			} else if value.Valid {
-				a.PkceRequired = value.Bool
+				a.PKCERequired = value.Bool
 			}
 		case application.FieldS256CodeChallengeMethodRequired:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -254,8 +254,8 @@ func (a *Application) String() string {
 	builder.WriteString("scopes=")
 	builder.WriteString(fmt.Sprintf("%v", a.Scopes))
 	builder.WriteString(", ")
-	builder.WriteString("pkce_required=")
-	builder.WriteString(fmt.Sprintf("%v", a.PkceRequired))
+	builder.WriteString("PKCE_required=")
+	builder.WriteString(fmt.Sprintf("%v", a.PKCERequired))
 	builder.WriteString(", ")
 	builder.WriteString("s256_code_challenge_method_required=")
 	builder.WriteString(fmt.Sprintf("%v", a.S256CodeChallengeMethodRequired))

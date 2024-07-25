@@ -17,8 +17,8 @@ type AuthorizationCode struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"id"`
-	// ClientName holds the value of the "client_name" field.
-	ClientName string `json:"client_name"`
+	// Application holds the value of the "application" field.
+	Application string `json:"application"`
 	// CodeChallenge holds the value of the "code_challenge" field.
 	CodeChallenge string `json:"code_challenge"`
 	// CodeChallengeMethod holds the value of the "code_challenge_method" field.
@@ -31,8 +31,8 @@ type AuthorizationCode struct {
 	RedirectURI string `json:"redirect_uri"`
 	// Nonce holds the value of the "nonce" field.
 	Nonce string `json:"nonce"`
-	// ServerName holds the value of the "server_name" field.
-	ServerName string `json:"server_name"`
+	// Service holds the value of the "service" field.
+	Service string `json:"service"`
 	// State holds the value of the "state" field.
 	State string `json:"state"`
 	// Subject holds the value of the "subject" field.
@@ -47,7 +47,7 @@ func (*AuthorizationCode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case authorizationcode.FieldID, authorizationcode.FieldClientName, authorizationcode.FieldCodeChallenge, authorizationcode.FieldCodeChallengeMethod, authorizationcode.FieldRedirectURI, authorizationcode.FieldNonce, authorizationcode.FieldServerName, authorizationcode.FieldState, authorizationcode.FieldSubject, authorizationcode.FieldGrantedScopes:
+		case authorizationcode.FieldID, authorizationcode.FieldApplication, authorizationcode.FieldCodeChallenge, authorizationcode.FieldCodeChallengeMethod, authorizationcode.FieldRedirectURI, authorizationcode.FieldNonce, authorizationcode.FieldService, authorizationcode.FieldState, authorizationcode.FieldSubject, authorizationcode.FieldGrantedScopes:
 			values[i] = new(sql.NullString)
 		case authorizationcode.FieldCreatedAt, authorizationcode.FieldAuthTime:
 			values[i] = new(sql.NullTime)
@@ -72,11 +72,11 @@ func (ac *AuthorizationCode) assignValues(columns []string, values []any) error 
 			} else if value.Valid {
 				ac.ID = value.String
 			}
-		case authorizationcode.FieldClientName:
+		case authorizationcode.FieldApplication:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field client_name", values[i])
+				return fmt.Errorf("unexpected type %T for field application", values[i])
 			} else if value.Valid {
-				ac.ClientName = value.String
+				ac.Application = value.String
 			}
 		case authorizationcode.FieldCodeChallenge:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -114,11 +114,11 @@ func (ac *AuthorizationCode) assignValues(columns []string, values []any) error 
 			} else if value.Valid {
 				ac.Nonce = value.String
 			}
-		case authorizationcode.FieldServerName:
+		case authorizationcode.FieldService:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field server_name", values[i])
+				return fmt.Errorf("unexpected type %T for field service", values[i])
 			} else if value.Valid {
-				ac.ServerName = value.String
+				ac.Service = value.String
 			}
 		case authorizationcode.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -174,8 +174,8 @@ func (ac *AuthorizationCode) String() string {
 	var builder strings.Builder
 	builder.WriteString("AuthorizationCode(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ac.ID))
-	builder.WriteString("client_name=")
-	builder.WriteString(ac.ClientName)
+	builder.WriteString("application=")
+	builder.WriteString(ac.Application)
 	builder.WriteString(", ")
 	builder.WriteString("code_challenge=")
 	builder.WriteString(ac.CodeChallenge)
@@ -195,8 +195,8 @@ func (ac *AuthorizationCode) String() string {
 	builder.WriteString("nonce=")
 	builder.WriteString(ac.Nonce)
 	builder.WriteString(", ")
-	builder.WriteString("server_name=")
-	builder.WriteString(ac.ServerName)
+	builder.WriteString("service=")
+	builder.WriteString(ac.Service)
 	builder.WriteString(", ")
 	builder.WriteString("state=")
 	builder.WriteString(ac.State)

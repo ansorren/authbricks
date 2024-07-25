@@ -11,10 +11,10 @@ const (
 	Label = "refresh_token"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldClientName holds the string denoting the client_name field in the database.
-	FieldClientName = "client_name"
-	// FieldServerName holds the string denoting the server_name field in the database.
-	FieldServerName = "server_name"
+	// FieldApplication holds the string denoting the application field in the database.
+	FieldApplication = "application"
+	// FieldService holds the string denoting the service field in the database.
+	FieldService = "service"
 	// FieldScopes holds the string denoting the scopes field in the database.
 	FieldScopes = "scopes"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -36,8 +36,8 @@ const (
 // Columns holds all SQL columns for refreshtoken fields.
 var Columns = []string{
 	FieldID,
-	FieldClientName,
-	FieldServerName,
+	FieldApplication,
+	FieldService,
 	FieldScopes,
 	FieldCreatedAt,
 	FieldAccessTokenID,
@@ -74,14 +74,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByClientName orders the results by the client_name field.
-func ByClientName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldClientName, opts...).ToFunc()
+// ByApplication orders the results by the application field.
+func ByApplication(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldApplication, opts...).ToFunc()
 }
 
-// ByServerName orders the results by the server_name field.
-func ByServerName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServerName, opts...).ToFunc()
+// ByService orders the results by the service field.
+func ByService(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldService, opts...).ToFunc()
 }
 
 // ByScopes orders the results by the scopes field.

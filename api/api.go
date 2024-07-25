@@ -13,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// API is the data structure used to represent the AuthBricks API.
 type API struct {
 	Address    string
 	DB         *database.DB

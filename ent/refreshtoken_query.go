@@ -261,12 +261,12 @@ func (rtq *RefreshTokenQuery) Clone() *RefreshTokenQuery {
 // Example:
 //
 //	var v []struct {
-//		ClientName string `json:"client_name"`
+//		Application string `json:"application"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.RefreshToken.Query().
-//		GroupBy(refreshtoken.FieldClientName).
+//		GroupBy(refreshtoken.FieldApplication).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rtq *RefreshTokenQuery) GroupBy(field string, fields ...string) *RefreshTokenGroupBy {
@@ -284,11 +284,11 @@ func (rtq *RefreshTokenQuery) GroupBy(field string, fields ...string) *RefreshTo
 // Example:
 //
 //	var v []struct {
-//		ClientName string `json:"client_name"`
+//		Application string `json:"application"`
 //	}
 //
 //	client.RefreshToken.Query().
-//		Select(refreshtoken.FieldClientName).
+//		Select(refreshtoken.FieldApplication).
 //		Scan(ctx, &v)
 func (rtq *RefreshTokenQuery) Select(fields ...string) *RefreshTokenSelect {
 	rtq.ctx.Fields = append(rtq.ctx.Fields, fields...)

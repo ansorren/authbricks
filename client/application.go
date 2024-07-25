@@ -31,7 +31,7 @@ func (c *Client) CreateApplication(ctx context.Context, cfg config.Application) 
 		SetResponseTypes(cfg.ResponseTypes).
 		SetGrantTypes(cfg.GrantTypes).
 		SetScopes(cfg.Scopes).
-		SetPkceRequired(cfg.PKCERequired).
+		SetPKCERequired(cfg.PKCERequired).
 		SetS256CodeChallengeMethodRequired(cfg.S256CodeChallengeMethodRequired).
 		SetAllowedAuthenticationMethods(cfg.AllowedAuthenticationMethods).
 		Save(ctx)

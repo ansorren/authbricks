@@ -20,9 +20,9 @@ type AuthorizationCodeCreate struct {
 	hooks    []Hook
 }
 
-// SetClientName sets the "client_name" field.
-func (acc *AuthorizationCodeCreate) SetClientName(s string) *AuthorizationCodeCreate {
-	acc.mutation.SetClientName(s)
+// SetApplication sets the "application" field.
+func (acc *AuthorizationCodeCreate) SetApplication(s string) *AuthorizationCodeCreate {
+	acc.mutation.SetApplication(s)
 	return acc
 }
 
@@ -62,9 +62,9 @@ func (acc *AuthorizationCodeCreate) SetNonce(s string) *AuthorizationCodeCreate 
 	return acc
 }
 
-// SetServerName sets the "server_name" field.
-func (acc *AuthorizationCodeCreate) SetServerName(s string) *AuthorizationCodeCreate {
-	acc.mutation.SetServerName(s)
+// SetService sets the "service" field.
+func (acc *AuthorizationCodeCreate) SetService(s string) *AuthorizationCodeCreate {
+	acc.mutation.SetService(s)
 	return acc
 }
 
@@ -126,8 +126,8 @@ func (acc *AuthorizationCodeCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (acc *AuthorizationCodeCreate) check() error {
-	if _, ok := acc.mutation.ClientName(); !ok {
-		return &ValidationError{Name: "client_name", err: errors.New(`ent: missing required field "AuthorizationCode.client_name"`)}
+	if _, ok := acc.mutation.Application(); !ok {
+		return &ValidationError{Name: "application", err: errors.New(`ent: missing required field "AuthorizationCode.application"`)}
 	}
 	if _, ok := acc.mutation.CodeChallenge(); !ok {
 		return &ValidationError{Name: "code_challenge", err: errors.New(`ent: missing required field "AuthorizationCode.code_challenge"`)}
@@ -147,8 +147,8 @@ func (acc *AuthorizationCodeCreate) check() error {
 	if _, ok := acc.mutation.Nonce(); !ok {
 		return &ValidationError{Name: "nonce", err: errors.New(`ent: missing required field "AuthorizationCode.nonce"`)}
 	}
-	if _, ok := acc.mutation.ServerName(); !ok {
-		return &ValidationError{Name: "server_name", err: errors.New(`ent: missing required field "AuthorizationCode.server_name"`)}
+	if _, ok := acc.mutation.Service(); !ok {
+		return &ValidationError{Name: "service", err: errors.New(`ent: missing required field "AuthorizationCode.service"`)}
 	}
 	if _, ok := acc.mutation.State(); !ok {
 		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "AuthorizationCode.state"`)}
@@ -199,9 +199,9 @@ func (acc *AuthorizationCodeCreate) createSpec() (*AuthorizationCode, *sqlgraph.
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := acc.mutation.ClientName(); ok {
-		_spec.SetField(authorizationcode.FieldClientName, field.TypeString, value)
-		_node.ClientName = value
+	if value, ok := acc.mutation.Application(); ok {
+		_spec.SetField(authorizationcode.FieldApplication, field.TypeString, value)
+		_node.Application = value
 	}
 	if value, ok := acc.mutation.CodeChallenge(); ok {
 		_spec.SetField(authorizationcode.FieldCodeChallenge, field.TypeString, value)
@@ -227,9 +227,9 @@ func (acc *AuthorizationCodeCreate) createSpec() (*AuthorizationCode, *sqlgraph.
 		_spec.SetField(authorizationcode.FieldNonce, field.TypeString, value)
 		_node.Nonce = value
 	}
-	if value, ok := acc.mutation.ServerName(); ok {
-		_spec.SetField(authorizationcode.FieldServerName, field.TypeString, value)
-		_node.ServerName = value
+	if value, ok := acc.mutation.Service(); ok {
+		_spec.SetField(authorizationcode.FieldService, field.TypeString, value)
+		_node.Service = value
 	}
 	if value, ok := acc.mutation.State(); ok {
 		_spec.SetField(authorizationcode.FieldState, field.TypeString, value)

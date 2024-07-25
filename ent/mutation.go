@@ -80,7 +80,7 @@ type ApplicationMutation struct {
 	appendgrant_types                    []string
 	scopes                               *[]string
 	appendscopes                         []string
-	pkce_required                        *bool
+	_PKCE_required                       *bool
 	s256_code_challenge_method_required  *bool
 	allowed_authentication_methods       *[]string
 	appendallowed_authentication_methods []string
@@ -511,40 +511,40 @@ func (m *ApplicationMutation) ResetScopes() {
 	m.appendscopes = nil
 }
 
-// SetPkceRequired sets the "pkce_required" field.
-func (m *ApplicationMutation) SetPkceRequired(b bool) {
-	m.pkce_required = &b
+// SetPKCERequired sets the "PKCE_required" field.
+func (m *ApplicationMutation) SetPKCERequired(b bool) {
+	m._PKCE_required = &b
 }
 
-// PkceRequired returns the value of the "pkce_required" field in the mutation.
-func (m *ApplicationMutation) PkceRequired() (r bool, exists bool) {
-	v := m.pkce_required
+// PKCERequired returns the value of the "PKCE_required" field in the mutation.
+func (m *ApplicationMutation) PKCERequired() (r bool, exists bool) {
+	v := m._PKCE_required
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPkceRequired returns the old "pkce_required" field's value of the Application entity.
+// OldPKCERequired returns the old "PKCE_required" field's value of the Application entity.
 // If the Application object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ApplicationMutation) OldPkceRequired(ctx context.Context) (v bool, err error) {
+func (m *ApplicationMutation) OldPKCERequired(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPkceRequired is only allowed on UpdateOne operations")
+		return v, errors.New("OldPKCERequired is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPkceRequired requires an ID field in the mutation")
+		return v, errors.New("OldPKCERequired requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPkceRequired: %w", err)
+		return v, fmt.Errorf("querying old value for OldPKCERequired: %w", err)
 	}
-	return oldValue.PkceRequired, nil
+	return oldValue.PKCERequired, nil
 }
 
-// ResetPkceRequired resets all changes to the "pkce_required" field.
-func (m *ApplicationMutation) ResetPkceRequired() {
-	m.pkce_required = nil
+// ResetPKCERequired resets all changes to the "PKCE_required" field.
+func (m *ApplicationMutation) ResetPKCERequired() {
+	m._PKCE_required = nil
 }
 
 // SetS256CodeChallengeMethodRequired sets the "s256_code_challenge_method_required" field.
@@ -783,8 +783,8 @@ func (m *ApplicationMutation) Fields() []string {
 	if m.scopes != nil {
 		fields = append(fields, application.FieldScopes)
 	}
-	if m.pkce_required != nil {
-		fields = append(fields, application.FieldPkceRequired)
+	if m._PKCE_required != nil {
+		fields = append(fields, application.FieldPKCERequired)
 	}
 	if m.s256_code_challenge_method_required != nil {
 		fields = append(fields, application.FieldS256CodeChallengeMethodRequired)
@@ -814,8 +814,8 @@ func (m *ApplicationMutation) Field(name string) (ent.Value, bool) {
 		return m.GrantTypes()
 	case application.FieldScopes:
 		return m.Scopes()
-	case application.FieldPkceRequired:
-		return m.PkceRequired()
+	case application.FieldPKCERequired:
+		return m.PKCERequired()
 	case application.FieldS256CodeChallengeMethodRequired:
 		return m.S256CodeChallengeMethodRequired()
 	case application.FieldAllowedAuthenticationMethods:
@@ -843,8 +843,8 @@ func (m *ApplicationMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldGrantTypes(ctx)
 	case application.FieldScopes:
 		return m.OldScopes(ctx)
-	case application.FieldPkceRequired:
-		return m.OldPkceRequired(ctx)
+	case application.FieldPKCERequired:
+		return m.OldPKCERequired(ctx)
 	case application.FieldS256CodeChallengeMethodRequired:
 		return m.OldS256CodeChallengeMethodRequired(ctx)
 	case application.FieldAllowedAuthenticationMethods:
@@ -907,12 +907,12 @@ func (m *ApplicationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetScopes(v)
 		return nil
-	case application.FieldPkceRequired:
+	case application.FieldPKCERequired:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPkceRequired(v)
+		m.SetPKCERequired(v)
 		return nil
 	case application.FieldS256CodeChallengeMethodRequired:
 		v, ok := value.(bool)
@@ -998,8 +998,8 @@ func (m *ApplicationMutation) ResetField(name string) error {
 	case application.FieldScopes:
 		m.ResetScopes()
 		return nil
-	case application.FieldPkceRequired:
-		m.ResetPkceRequired()
+	case application.FieldPKCERequired:
+		m.ResetPKCERequired()
 		return nil
 	case application.FieldS256CodeChallengeMethodRequired:
 		m.ResetS256CodeChallengeMethodRequired()
@@ -1119,14 +1119,14 @@ type AuthorizationCodeMutation struct {
 	op                    Op
 	typ                   string
 	id                    *string
-	client_name           *string
+	application           *string
 	code_challenge        *string
 	code_challenge_method *string
 	created_at            *time.Time
 	auth_time             *time.Time
 	redirect_uri          *string
 	nonce                 *string
-	server_name           *string
+	service               *string
 	state                 *string
 	subject               *string
 	granted_scopes        *string
@@ -1240,40 +1240,40 @@ func (m *AuthorizationCodeMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetClientName sets the "client_name" field.
-func (m *AuthorizationCodeMutation) SetClientName(s string) {
-	m.client_name = &s
+// SetApplication sets the "application" field.
+func (m *AuthorizationCodeMutation) SetApplication(s string) {
+	m.application = &s
 }
 
-// ClientName returns the value of the "client_name" field in the mutation.
-func (m *AuthorizationCodeMutation) ClientName() (r string, exists bool) {
-	v := m.client_name
+// Application returns the value of the "application" field in the mutation.
+func (m *AuthorizationCodeMutation) Application() (r string, exists bool) {
+	v := m.application
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldClientName returns the old "client_name" field's value of the AuthorizationCode entity.
+// OldApplication returns the old "application" field's value of the AuthorizationCode entity.
 // If the AuthorizationCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AuthorizationCodeMutation) OldClientName(ctx context.Context) (v string, err error) {
+func (m *AuthorizationCodeMutation) OldApplication(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldClientName is only allowed on UpdateOne operations")
+		return v, errors.New("OldApplication is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldClientName requires an ID field in the mutation")
+		return v, errors.New("OldApplication requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldClientName: %w", err)
+		return v, fmt.Errorf("querying old value for OldApplication: %w", err)
 	}
-	return oldValue.ClientName, nil
+	return oldValue.Application, nil
 }
 
-// ResetClientName resets all changes to the "client_name" field.
-func (m *AuthorizationCodeMutation) ResetClientName() {
-	m.client_name = nil
+// ResetApplication resets all changes to the "application" field.
+func (m *AuthorizationCodeMutation) ResetApplication() {
+	m.application = nil
 }
 
 // SetCodeChallenge sets the "code_challenge" field.
@@ -1492,40 +1492,40 @@ func (m *AuthorizationCodeMutation) ResetNonce() {
 	m.nonce = nil
 }
 
-// SetServerName sets the "server_name" field.
-func (m *AuthorizationCodeMutation) SetServerName(s string) {
-	m.server_name = &s
+// SetService sets the "service" field.
+func (m *AuthorizationCodeMutation) SetService(s string) {
+	m.service = &s
 }
 
-// ServerName returns the value of the "server_name" field in the mutation.
-func (m *AuthorizationCodeMutation) ServerName() (r string, exists bool) {
-	v := m.server_name
+// Service returns the value of the "service" field in the mutation.
+func (m *AuthorizationCodeMutation) Service() (r string, exists bool) {
+	v := m.service
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldServerName returns the old "server_name" field's value of the AuthorizationCode entity.
+// OldService returns the old "service" field's value of the AuthorizationCode entity.
 // If the AuthorizationCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AuthorizationCodeMutation) OldServerName(ctx context.Context) (v string, err error) {
+func (m *AuthorizationCodeMutation) OldService(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServerName is only allowed on UpdateOne operations")
+		return v, errors.New("OldService is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServerName requires an ID field in the mutation")
+		return v, errors.New("OldService requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServerName: %w", err)
+		return v, fmt.Errorf("querying old value for OldService: %w", err)
 	}
-	return oldValue.ServerName, nil
+	return oldValue.Service, nil
 }
 
-// ResetServerName resets all changes to the "server_name" field.
-func (m *AuthorizationCodeMutation) ResetServerName() {
-	m.server_name = nil
+// ResetService resets all changes to the "service" field.
+func (m *AuthorizationCodeMutation) ResetService() {
+	m.service = nil
 }
 
 // SetState sets the "state" field.
@@ -1671,8 +1671,8 @@ func (m *AuthorizationCodeMutation) Type() string {
 // AddedFields().
 func (m *AuthorizationCodeMutation) Fields() []string {
 	fields := make([]string, 0, 11)
-	if m.client_name != nil {
-		fields = append(fields, authorizationcode.FieldClientName)
+	if m.application != nil {
+		fields = append(fields, authorizationcode.FieldApplication)
 	}
 	if m.code_challenge != nil {
 		fields = append(fields, authorizationcode.FieldCodeChallenge)
@@ -1692,8 +1692,8 @@ func (m *AuthorizationCodeMutation) Fields() []string {
 	if m.nonce != nil {
 		fields = append(fields, authorizationcode.FieldNonce)
 	}
-	if m.server_name != nil {
-		fields = append(fields, authorizationcode.FieldServerName)
+	if m.service != nil {
+		fields = append(fields, authorizationcode.FieldService)
 	}
 	if m.state != nil {
 		fields = append(fields, authorizationcode.FieldState)
@@ -1712,8 +1712,8 @@ func (m *AuthorizationCodeMutation) Fields() []string {
 // schema.
 func (m *AuthorizationCodeMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case authorizationcode.FieldClientName:
-		return m.ClientName()
+	case authorizationcode.FieldApplication:
+		return m.Application()
 	case authorizationcode.FieldCodeChallenge:
 		return m.CodeChallenge()
 	case authorizationcode.FieldCodeChallengeMethod:
@@ -1726,8 +1726,8 @@ func (m *AuthorizationCodeMutation) Field(name string) (ent.Value, bool) {
 		return m.RedirectURI()
 	case authorizationcode.FieldNonce:
 		return m.Nonce()
-	case authorizationcode.FieldServerName:
-		return m.ServerName()
+	case authorizationcode.FieldService:
+		return m.Service()
 	case authorizationcode.FieldState:
 		return m.State()
 	case authorizationcode.FieldSubject:
@@ -1743,8 +1743,8 @@ func (m *AuthorizationCodeMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *AuthorizationCodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case authorizationcode.FieldClientName:
-		return m.OldClientName(ctx)
+	case authorizationcode.FieldApplication:
+		return m.OldApplication(ctx)
 	case authorizationcode.FieldCodeChallenge:
 		return m.OldCodeChallenge(ctx)
 	case authorizationcode.FieldCodeChallengeMethod:
@@ -1757,8 +1757,8 @@ func (m *AuthorizationCodeMutation) OldField(ctx context.Context, name string) (
 		return m.OldRedirectURI(ctx)
 	case authorizationcode.FieldNonce:
 		return m.OldNonce(ctx)
-	case authorizationcode.FieldServerName:
-		return m.OldServerName(ctx)
+	case authorizationcode.FieldService:
+		return m.OldService(ctx)
 	case authorizationcode.FieldState:
 		return m.OldState(ctx)
 	case authorizationcode.FieldSubject:
@@ -1774,12 +1774,12 @@ func (m *AuthorizationCodeMutation) OldField(ctx context.Context, name string) (
 // type.
 func (m *AuthorizationCodeMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case authorizationcode.FieldClientName:
+	case authorizationcode.FieldApplication:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetClientName(v)
+		m.SetApplication(v)
 		return nil
 	case authorizationcode.FieldCodeChallenge:
 		v, ok := value.(string)
@@ -1823,12 +1823,12 @@ func (m *AuthorizationCodeMutation) SetField(name string, value ent.Value) error
 		}
 		m.SetNonce(v)
 		return nil
-	case authorizationcode.FieldServerName:
+	case authorizationcode.FieldService:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetServerName(v)
+		m.SetService(v)
 		return nil
 	case authorizationcode.FieldState:
 		v, ok := value.(string)
@@ -1900,8 +1900,8 @@ func (m *AuthorizationCodeMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *AuthorizationCodeMutation) ResetField(name string) error {
 	switch name {
-	case authorizationcode.FieldClientName:
-		m.ResetClientName()
+	case authorizationcode.FieldApplication:
+		m.ResetApplication()
 		return nil
 	case authorizationcode.FieldCodeChallenge:
 		m.ResetCodeChallenge()
@@ -1921,8 +1921,8 @@ func (m *AuthorizationCodeMutation) ResetField(name string) error {
 	case authorizationcode.FieldNonce:
 		m.ResetNonce()
 		return nil
-	case authorizationcode.FieldServerName:
-		m.ResetServerName()
+	case authorizationcode.FieldService:
+		m.ResetService()
 		return nil
 	case authorizationcode.FieldState:
 		m.ResetState()
@@ -5442,8 +5442,8 @@ type RefreshTokenMutation struct {
 	op              Op
 	typ             string
 	id              *string
-	client_name     *string
-	server_name     *string
+	application     *string
+	service         *string
 	scopes          *string
 	created_at      *int64
 	addcreated_at   *int64
@@ -5563,76 +5563,76 @@ func (m *RefreshTokenMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetClientName sets the "client_name" field.
-func (m *RefreshTokenMutation) SetClientName(s string) {
-	m.client_name = &s
+// SetApplication sets the "application" field.
+func (m *RefreshTokenMutation) SetApplication(s string) {
+	m.application = &s
 }
 
-// ClientName returns the value of the "client_name" field in the mutation.
-func (m *RefreshTokenMutation) ClientName() (r string, exists bool) {
-	v := m.client_name
+// Application returns the value of the "application" field in the mutation.
+func (m *RefreshTokenMutation) Application() (r string, exists bool) {
+	v := m.application
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldClientName returns the old "client_name" field's value of the RefreshToken entity.
+// OldApplication returns the old "application" field's value of the RefreshToken entity.
 // If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RefreshTokenMutation) OldClientName(ctx context.Context) (v string, err error) {
+func (m *RefreshTokenMutation) OldApplication(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldClientName is only allowed on UpdateOne operations")
+		return v, errors.New("OldApplication is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldClientName requires an ID field in the mutation")
+		return v, errors.New("OldApplication requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldClientName: %w", err)
+		return v, fmt.Errorf("querying old value for OldApplication: %w", err)
 	}
-	return oldValue.ClientName, nil
+	return oldValue.Application, nil
 }
 
-// ResetClientName resets all changes to the "client_name" field.
-func (m *RefreshTokenMutation) ResetClientName() {
-	m.client_name = nil
+// ResetApplication resets all changes to the "application" field.
+func (m *RefreshTokenMutation) ResetApplication() {
+	m.application = nil
 }
 
-// SetServerName sets the "server_name" field.
-func (m *RefreshTokenMutation) SetServerName(s string) {
-	m.server_name = &s
+// SetService sets the "service" field.
+func (m *RefreshTokenMutation) SetService(s string) {
+	m.service = &s
 }
 
-// ServerName returns the value of the "server_name" field in the mutation.
-func (m *RefreshTokenMutation) ServerName() (r string, exists bool) {
-	v := m.server_name
+// Service returns the value of the "service" field in the mutation.
+func (m *RefreshTokenMutation) Service() (r string, exists bool) {
+	v := m.service
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldServerName returns the old "server_name" field's value of the RefreshToken entity.
+// OldService returns the old "service" field's value of the RefreshToken entity.
 // If the RefreshToken object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RefreshTokenMutation) OldServerName(ctx context.Context) (v string, err error) {
+func (m *RefreshTokenMutation) OldService(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServerName is only allowed on UpdateOne operations")
+		return v, errors.New("OldService is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServerName requires an ID field in the mutation")
+		return v, errors.New("OldService requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServerName: %w", err)
+		return v, fmt.Errorf("querying old value for OldService: %w", err)
 	}
-	return oldValue.ServerName, nil
+	return oldValue.Service, nil
 }
 
-// ResetServerName resets all changes to the "server_name" field.
-func (m *RefreshTokenMutation) ResetServerName() {
-	m.server_name = nil
+// ResetService resets all changes to the "service" field.
+func (m *RefreshTokenMutation) ResetService() {
+	m.service = nil
 }
 
 // SetScopes sets the "scopes" field.
@@ -5962,11 +5962,11 @@ func (m *RefreshTokenMutation) Type() string {
 // AddedFields().
 func (m *RefreshTokenMutation) Fields() []string {
 	fields := make([]string, 0, 9)
-	if m.client_name != nil {
-		fields = append(fields, refreshtoken.FieldClientName)
+	if m.application != nil {
+		fields = append(fields, refreshtoken.FieldApplication)
 	}
-	if m.server_name != nil {
-		fields = append(fields, refreshtoken.FieldServerName)
+	if m.service != nil {
+		fields = append(fields, refreshtoken.FieldService)
 	}
 	if m.scopes != nil {
 		fields = append(fields, refreshtoken.FieldScopes)
@@ -5997,10 +5997,10 @@ func (m *RefreshTokenMutation) Fields() []string {
 // schema.
 func (m *RefreshTokenMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case refreshtoken.FieldClientName:
-		return m.ClientName()
-	case refreshtoken.FieldServerName:
-		return m.ServerName()
+	case refreshtoken.FieldApplication:
+		return m.Application()
+	case refreshtoken.FieldService:
+		return m.Service()
 	case refreshtoken.FieldScopes:
 		return m.Scopes()
 	case refreshtoken.FieldCreatedAt:
@@ -6024,10 +6024,10 @@ func (m *RefreshTokenMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *RefreshTokenMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case refreshtoken.FieldClientName:
-		return m.OldClientName(ctx)
-	case refreshtoken.FieldServerName:
-		return m.OldServerName(ctx)
+	case refreshtoken.FieldApplication:
+		return m.OldApplication(ctx)
+	case refreshtoken.FieldService:
+		return m.OldService(ctx)
 	case refreshtoken.FieldScopes:
 		return m.OldScopes(ctx)
 	case refreshtoken.FieldCreatedAt:
@@ -6051,19 +6051,19 @@ func (m *RefreshTokenMutation) OldField(ctx context.Context, name string) (ent.V
 // type.
 func (m *RefreshTokenMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case refreshtoken.FieldClientName:
+	case refreshtoken.FieldApplication:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetClientName(v)
+		m.SetApplication(v)
 		return nil
-	case refreshtoken.FieldServerName:
+	case refreshtoken.FieldService:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetServerName(v)
+		m.SetService(v)
 		return nil
 	case refreshtoken.FieldScopes:
 		v, ok := value.(string)
@@ -6190,11 +6190,11 @@ func (m *RefreshTokenMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *RefreshTokenMutation) ResetField(name string) error {
 	switch name {
-	case refreshtoken.FieldClientName:
-		m.ResetClientName()
+	case refreshtoken.FieldApplication:
+		m.ResetApplication()
 		return nil
-	case refreshtoken.FieldServerName:
-		m.ResetServerName()
+	case refreshtoken.FieldService:
+		m.ResetService()
 		return nil
 	case refreshtoken.FieldScopes:
 		m.ResetScopes()
