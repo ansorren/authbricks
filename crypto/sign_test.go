@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2/jwt"
+	"gopkg.in/go-jose/go-jose.v2/jwt"
 )
 
 func TestSignAccessToken(t *testing.T) {
