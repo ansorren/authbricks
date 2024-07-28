@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"go.authbricks.com/bricks/config"
 	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/ent"
 
@@ -118,4 +119,18 @@ func (a *API) getRefreshToken(ctx context.Context, id string) (*ent.RefreshToken
 // deleteRefreshToken deletes the refresh token with the given ID.
 func (a *API) deleteRefreshToken(ctx context.Context, id string) error {
 	return a.DB.EntClient.RefreshToken.DeleteOneID(id).Exec(ctx)
+}
+
+// refreshTokenIsExpired checks if the refresh token is expired.
+func refreshTokenIsExpired(token *ent.RefreshToken, now time.Time) bool {
+	// Calculate the expiration time of the token
+	expirationTime := time.Unix(token.CreatedAt, 0).Add(time.Duration(token.Lifetime) * time.Second)
+
+	// Compare the current time with the expiration time
+	return now.After(expirationTime)
+}
+
+// validateRefreshTokenGrant validates if both the application and service are allowed to issue a refresh token.
+func validateRefreshTokenGrant(app *ent.Application, service *ent.Service) error {
+	return validateGrant(app, service, config.GrantTypeRefreshToken)
 }

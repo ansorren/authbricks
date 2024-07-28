@@ -66,7 +66,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		Keys: []crypto.PrivateKey{firstKey, secondKey},
 	}
 
-	firstApplication := config.Application{
+	testApp := config.Application{
 		Name:                         "test-application",
 		Description:                  "test-description",
 		Service:                      firstService.Name,
@@ -74,13 +74,13 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
 		RedirectURIs:                 []string{"https://example.com/oauth2/callback"},
 		ResponseTypes:                []string{config.ResponseTypeCode},
-		GrantTypes:                   []string{config.GrantTypeAuthorizationCode},
+		GrantTypes:                   []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
 		Scopes:                       []string{"calendar:read"},
 		PKCERequired:                 true,
 	}
 
 	firstCredentials := config.Credentials{
-		Application:  firstApplication.Name,
+		Application:  testApp.Name,
 		ClientID:     "test-client-id",
 		ClientSecret: "test-client-secret",
 	}
@@ -121,7 +121,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		Public:                          false,
 		RedirectURIs:                    []string{"http://localhost:8080/callback"},
 		ResponseTypes:                   []string{config.ResponseTypeCode},
-		GrantTypes:                      []string{config.GrantTypeAuthorizationCode},
+		GrantTypes:                      []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
 		Scopes:                          []string{"openid", "profile", "offline_access"},
 		PKCERequired:                    false,
 		S256CodeChallengeMethodRequired: false,
@@ -329,7 +329,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 
 	return TestConfig{
 		Services:     []config.Service{firstService, customersService, employeesService, m2mService},
-		Applications: []config.Application{firstApplication, loginApplication, publicApplication, s256RequiredApplication, helpdeskApplication, employeesLoginApplication, notificationsApplication, onlyClientSecretBasic, onlyClientSecretPost},
+		Applications: []config.Application{testApp, loginApplication, publicApplication, s256RequiredApplication, helpdeskApplication, employeesLoginApplication, notificationsApplication, onlyClientSecretBasic, onlyClientSecretPost},
 		Credentials:  []config.Credentials{firstCredentials, loginApplicationCredentials, publicCredentials, s256RequiredCredentials, helpdeskCredentials, employeesLoginApplicationCredentials, notificationsCredentials, onlyClientSecretBasicCredentials, onlyClientSecretPostCredentials},
 	}
 }

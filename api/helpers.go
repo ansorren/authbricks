@@ -95,3 +95,15 @@ func codeIsExpired(code *ent.AuthorizationCode, now time.Time) bool {
 	}
 	return false
 }
+
+// validateGrant returns an error if the application or the service are not allowed
+// to use the given grant type.
+func validateGrant(app *ent.Application, service *ent.Service, grantType string) error {
+	if !contains(app.GrantTypes, grantType) {
+		return fmt.Errorf("application %s is not allowed to use grant type: %s", app.Name, grantType)
+	}
+	if !contains(service.GrantTypes, grantType) {
+		return fmt.Errorf("service %s is not allowed to use grant type: %s", service.Name, grantType)
+	}
+	return nil
+}
