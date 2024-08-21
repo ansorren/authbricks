@@ -15,14 +15,17 @@ import (
 
 // API is the data structure used to represent the AuthBricks API.
 type API struct {
-	Address    string
-	DB         *database.DB
-	Echo       *echo.Echo
-	Logger     hclog.Logger
-	TLSEnabled bool
-	Cert       []byte
-	Key        []byte
-	BaseURL    string
+	Address string
+	DB      *database.DB
+	Echo    *echo.Echo
+	Logger  hclog.Logger
+	BaseURL string
+	// TLS config
+	TLSEnabled          bool
+	Cert                []byte
+	Key                 []byte
+	CertificateFilePath string
+	KeyFilePath         string
 }
 
 // Option is used to configure the API.
@@ -61,6 +64,20 @@ func WithKey(key []byte) Option {
 	}
 }
 
+// WithCertificateFilePath sets the certificate file path on the API.
+func WithCertificateFilePath(certFilePath string) Option {
+	return func(a *API) {
+		a.CertificateFilePath = certFilePath
+	}
+}
+
+// WithKeyFilePath sets the key file path on the API.
+func WithKeyFilePath(keyFilePath string) Option {
+	return func(a *API) {
+		a.KeyFilePath = keyFilePath
+	}
+}
+
 // New returns a new API, which will be ready to run at the given address.
 // It is the caller's responsibility to run the API by calling API.Run.
 func New(db *database.DB, address string, opts ...Option) (*API, error) {
@@ -81,12 +98,35 @@ func New(db *database.DB, address string, opts ...Option) (*API, error) {
 		opt(a)
 	}
 
+	err := a.Validate()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to validate API configuration")
+	}
+
 	return a, nil
 }
 
 // Close closes the database connection.
 func (a *API) Close() error {
 	return a.DB.Close()
+}
+
+// Validate validates the API configuration.
+func (a *API) Validate() error {
+	if a.TLSEnabled {
+		certProvided := len(a.Cert) > 0 && len(a.Key) > 0
+		filePathProvided := a.CertificateFilePath != "" && a.KeyFilePath != ""
+
+		if !certProvided && !filePathProvided {
+			return errors.New("either the certificate and key or the certificate file path and key file path must be provided when TLS is enabled")
+		}
+
+		if certProvided && !filePathProvided && (a.CertificateFilePath != "" || a.KeyFilePath != "") {
+			return errors.New("do not mix direct certificates and file paths; provide either both certificates or both file paths")
+		}
+	}
+
+	return nil
 }
 
 // Run runs the API server.
@@ -147,7 +187,15 @@ func (a *API) Run(ctx context.Context) error {
 	}
 
 	if a.TLSEnabled {
-		return a.Echo.StartTLS(a.Address, string(a.Cert), string(a.Key))
+		// prioritise reading the cert / key directly,
+		// if provided
+		certProvided := len(a.Cert) > 0 && len(a.Key) > 0
+		if certProvided {
+			return a.Echo.StartTLS(a.Address, a.Cert, a.Key)
+		}
+		// read the file at the given path
+		return a.Echo.StartTLS(a.Address, a.CertificateFilePath, a.KeyFilePath)
+
 	}
 
 	return a.Echo.Start(a.Address)
