@@ -2,8 +2,12 @@ package api
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 	"testing"
@@ -181,7 +185,27 @@ func TestAPI_TLS(t *testing.T) {
 	rsaKey, err := crypto.GetRSAKeyFromPEM(pemKey)
 	require.Nil(t, err)
 
-	cert, key, err := rsaKey.Certificate("ACME", "UK", "authbricks.com", 365*24*time.Hour)
+	oneYear := 365 * 24 * time.Hour
+
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	require.Nil(t, err)
+
+	template := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{"ACME"},
+			Country:      []string{"UK"},
+			CommonName:   "authbricks.com",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(oneYear),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  false,
+	}
+
+	cert, key, err := rsaKey.Certificate(template)
 	require.Nil(t, err)
 
 	a, err := New(db, address,
@@ -242,7 +266,27 @@ func TestAPI_TLS_FilePath(t *testing.T) {
 	rsaKey, err := crypto.GetRSAKeyFromPEM(pemKey)
 	require.Nil(t, err)
 
-	cert, key, err := rsaKey.Certificate("ACME", "UK", "authbricks.com", 365*24*time.Hour)
+	oneYear := 365 * 24 * time.Hour
+
+	serialNumber, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	require.Nil(t, err)
+
+	template := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization: []string{"ACME"},
+			Country:      []string{"UK"},
+			CommonName:   "authbricks.com",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(oneYear),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  false,
+	}
+
+	cert, key, err := rsaKey.Certificate(template)
 	require.Nil(t, err)
 
 	certFilePath := fmt.Sprintf("%s%s", os.TempDir(), "cert.pem")
