@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"fmt"
 	"testing"
+	"time"
 
 	"go.authbricks.com/bricks/config"
 	abcrypto "go.authbricks.com/bricks/crypto"
@@ -39,7 +40,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 			"key": "value",
 		},
 		AllowedClientMetadata: []string{"key"},
-		Scopes:                []string{"calendar:read"},
+		Scopes:                []string{"openid"},
 		GrantTypes:            []string{config.GrantTypeAuthorizationCode, config.GrantTypeClientCredentials},
 		ResponseTypes:         []string{config.ResponseTypeCode},
 		AuthorizationEndpoint: config.AuthorizationEndpoint{
@@ -63,6 +64,35 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "/oauth2/.well-known/openid-configuration",
 		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "/login",
+			SessionTimeout: 24 * time.Hour,
+		},
+		Connection: config.Connection{
+			EmailPassword: &config.EmailPasswordConnection{
+				Enabled: true,
+			},
+			OIDC: []config.OIDCConnection{
+				{
+					Enabled:           true,
+					Name:              "oidc-connection-1",
+					ClientID:          "test-client-id",
+					ClientSecret:      "test-client-secret",
+					RedirectURI:       fmt.Sprintf("http://%s/oauth2/callback", addr),
+					Scopes:            []string{"openid", "profile", "email", "offline_access"},
+					WellKnownEndpoint: fmt.Sprintf("http://127.0.0.1:3000/oauth2/.well-known/openid-configuration"),
+				},
+				{
+					Enabled:           true,
+					Name:              "oidc-connection-2",
+					ClientID:          "test-client-id-2",
+					ClientSecret:      "test-client-secret-2",
+					RedirectURI:       fmt.Sprintf("http://%s/oauth2/callback", addr),
+					Scopes:            []string{"openid", "profile", "email", "offline_access"},
+					WellKnownEndpoint: fmt.Sprintf("http://127.0.0.1:3001/oauth2/.well-known/openid-configuration"),
+				},
+			},
+		},
 		Keys: []crypto.PrivateKey{firstKey, secondKey},
 	}
 
@@ -72,10 +102,10 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		Service:                      firstService.Name,
 		Public:                       false,
 		AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		RedirectURIs:                 []string{"https://example.com/oauth2/callback"},
+		RedirectURIs:                 []string{"http://localhost:8080/callback"},
 		ResponseTypes:                []string{config.ResponseTypeCode},
 		GrantTypes:                   []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
-		Scopes:                       []string{"calendar:read"},
+		Scopes:                       []string{"openid"},
 		PKCERequired:                 true,
 	}
 
@@ -91,7 +121,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		Identifier:    fmt.Sprintf("https://%s/customers", addr),
 		Scopes:        []string{"openid", "profile", "email", "offline_access", "customers:read"},
 		GrantTypes:    []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken, config.GrantTypeClientCredentials},
-		ResponseTypes: []string{config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeIDToken},
+		ResponseTypes: []string{config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeCodeIDToken},
 		AuthorizationEndpoint: config.AuthorizationEndpoint{
 			Endpoint: "customers/oauth2/authorize",
 		},
@@ -111,6 +141,10 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "customers/oauth2/.well-known/openid-configuration",
 		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "customers/login",
+			SessionTimeout: 24 * time.Hour,
+		},
 		Keys: []crypto.PrivateKey{customersKey},
 	}
 
@@ -120,7 +154,7 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		Service:                         customersService.Name,
 		Public:                          false,
 		RedirectURIs:                    []string{"http://localhost:8080/callback"},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
+		ResponseTypes:                   []string{config.ResponseTypeCode, config.ResponseTypeIDToken},
 		GrantTypes:                      []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
 		Scopes:                          []string{"openid", "profile", "offline_access"},
 		PKCERequired:                    false,
@@ -219,6 +253,10 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "employees/oauth2/.well-known/openid-configuration",
 		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "employees/login",
+			SessionTimeout: 24 * time.Hour,
+		},
 		Keys: []crypto.PrivateKey{employeesKey},
 	}
 
@@ -269,6 +307,10 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 		},
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "m2m/oauth2/.well-known/openid-configuration",
+		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "m2m/login",
+			SessionTimeout: 24 * time.Hour,
 		},
 		Keys: []crypto.PrivateKey{m2mFirstKey, m2mSecondKey},
 	}

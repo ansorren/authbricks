@@ -2,12 +2,15 @@ package api
 
 import (
 	"context"
+	"encoding/gob"
 	"fmt"
 
 	"go.authbricks.com/bricks/database"
 	"go.authbricks.com/bricks/ent"
 
+	"github.com/gorilla/sessions"
 	"github.com/hashicorp/go-hclog"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -133,6 +136,10 @@ func (a *API) Validate() error {
 func (a *API) Run(ctx context.Context) error {
 	a.Echo.Use(middleware.Recover())
 	a.Echo.Use(middleware.Logger())
+	csrfMiddleware := middleware.CSRF()
+	a.Echo.Use(session.Middleware(sessions.NewCookieStore([]byte("secret"))))
+	// register the user context, so that the sessions middleware can use it as a custom type.
+	gob.Register(UserContext{})
 
 	a.Echo.GET("/health", a.HealthHandler())
 
@@ -148,42 +155,58 @@ func (a *API) Run(ctx context.Context) error {
 		if err != nil {
 			return errors.Wrap(err, "failed to get service authorization endpoint config")
 		}
-		a.Echo.GET(auth.Endpoint, a.AuthorizationHandler(service))
+		au := sanitiseEndpoint(auth.Endpoint, a.BaseURL)
+		a.Echo.GET(au, a.AuthorizationHandler(service))
+		a.Echo.GET(fmt.Sprintf("%s/resume", au), a.ResumeAuthorizationHandler(service))
 
 		// token endpoint
 		token, err := service.QueryServiceTokenEndpointConfig().Only(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get service token endpoint config")
 		}
-		a.Echo.POST(token.Endpoint, a.TokenHandler(service))
+		t := sanitiseEndpoint(token.Endpoint, a.BaseURL)
+		a.Echo.POST(t, a.TokenHandler(service))
 
 		// introspection endpoint
 		introspection, err := service.QueryServiceIntrospectionEndpointConfig().Only(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get service introspection endpoint config")
 		}
-		a.Echo.POST(introspection.Endpoint, a.IntrospectionHandler(service))
+		i := sanitiseEndpoint(introspection.Endpoint, a.BaseURL)
+		a.Echo.POST(i, a.IntrospectionHandler(service))
 
 		// userinfo endpoint
 		userinfo, err := service.QueryServiceUserInfoEndpointConfig().Only(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get service userinfo endpoint config")
 		}
-		a.Echo.GET(userinfo.Endpoint, a.UserInfoHandler(service))
+		u := sanitiseEndpoint(userinfo.Endpoint, a.BaseURL)
+		a.Echo.GET(u, a.UserInfoHandler(service))
 
 		// jwks endpoint
 		jwks, err := service.QueryServiceJwksEndpointConfig().Only(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get service jwks endpoint config")
 		}
-		a.Echo.GET(jwks.Endpoint, a.JWKSHandler(service))
+		j := sanitiseEndpoint(jwks.Endpoint, a.BaseURL)
+		a.Echo.GET(j, a.JWKSHandler(service))
 
 		// well known endpoint config
 		wk, err := service.QueryServiceWellKnownEndpointConfig().Only(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get service well-known endpoint config")
 		}
-		a.Echo.GET(wk.Endpoint, a.WellKnownHandler(service))
+		w := sanitiseEndpoint(wk.Endpoint, a.BaseURL)
+		a.Echo.GET(w, a.WellKnownHandler(service))
+
+		// login endpoint
+		login, err := service.QueryServiceLoginEndpointConfig().Only(ctx)
+		if err != nil {
+			return errors.Wrap(err, "failed to get service login endpoint config")
+		}
+		l := sanitiseEndpoint(login.Endpoint, a.BaseURL)
+		a.Echo.GET(l, a.GETLoginHandler(service), csrfMiddleware)
+		a.Echo.POST(l, a.POSTLoginHandler(service), csrfMiddleware)
 	}
 
 	if a.TLSEnabled {
@@ -195,7 +218,6 @@ func (a *API) Run(ctx context.Context) error {
 		}
 		// read the file at the given path
 		return a.Echo.StartTLS(a.Address, a.CertificateFilePath, a.KeyFilePath)
-
 	}
 
 	return a.Echo.Start(a.Address)

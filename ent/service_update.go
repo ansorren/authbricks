@@ -13,9 +13,11 @@ import (
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
@@ -273,6 +275,44 @@ func (su *ServiceUpdate) SetServiceWellKnownEndpointConfig(w *WellKnownEndpointC
 	return su.SetServiceWellKnownEndpointConfigID(w.ID)
 }
 
+// SetServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID.
+func (su *ServiceUpdate) SetServiceLoginEndpointConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceLoginEndpointConfigID(id)
+	return su
+}
+
+// SetNillableServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceLoginEndpointConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceLoginEndpointConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceLoginEndpointConfig sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity.
+func (su *ServiceUpdate) SetServiceLoginEndpointConfig(l *LoginEndpointConfig) *ServiceUpdate {
+	return su.SetServiceLoginEndpointConfigID(l.ID)
+}
+
+// SetServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID.
+func (su *ServiceUpdate) SetServiceConnectionConfigID(id string) *ServiceUpdate {
+	su.mutation.SetServiceConnectionConfigID(id)
+	return su
+}
+
+// SetNillableServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID if the given value is not nil.
+func (su *ServiceUpdate) SetNillableServiceConnectionConfigID(id *string) *ServiceUpdate {
+	if id != nil {
+		su = su.SetServiceConnectionConfigID(*id)
+	}
+	return su
+}
+
+// SetServiceConnectionConfig sets the "service_connection_config" edge to the ConnectionConfig entity.
+func (su *ServiceUpdate) SetServiceConnectionConfig(c *ConnectionConfig) *ServiceUpdate {
+	return su.SetServiceConnectionConfigID(c.ID)
+}
+
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
 func (su *ServiceUpdate) AddApplicationIDs(ids ...string) *ServiceUpdate {
 	su.mutation.AddApplicationIDs(ids...)
@@ -332,6 +372,18 @@ func (su *ServiceUpdate) ClearServiceJwksEndpointConfig() *ServiceUpdate {
 // ClearServiceWellKnownEndpointConfig clears the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity.
 func (su *ServiceUpdate) ClearServiceWellKnownEndpointConfig() *ServiceUpdate {
 	su.mutation.ClearServiceWellKnownEndpointConfig()
+	return su
+}
+
+// ClearServiceLoginEndpointConfig clears the "service_login_endpoint_config" edge to the LoginEndpointConfig entity.
+func (su *ServiceUpdate) ClearServiceLoginEndpointConfig() *ServiceUpdate {
+	su.mutation.ClearServiceLoginEndpointConfig()
+	return su
+}
+
+// ClearServiceConnectionConfig clears the "service_connection_config" edge to the ConnectionConfig entity.
+func (su *ServiceUpdate) ClearServiceConnectionConfig() *ServiceUpdate {
+	su.mutation.ClearServiceConnectionConfig()
 	return su
 }
 
@@ -657,6 +709,64 @@ func (su *ServiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.ServiceLoginEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceLoginEndpointConfigTable,
+			Columns: []string{service.ServiceLoginEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(loginendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceLoginEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceLoginEndpointConfigTable,
+			Columns: []string{service.ServiceLoginEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(loginendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.ServiceConnectionConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceConnectionConfigTable,
+			Columns: []string{service.ServiceConnectionConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(connectionconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.ServiceConnectionConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceConnectionConfigTable,
+			Columns: []string{service.ServiceConnectionConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(connectionconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if su.mutation.ApplicationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -959,6 +1069,44 @@ func (suo *ServiceUpdateOne) SetServiceWellKnownEndpointConfig(w *WellKnownEndpo
 	return suo.SetServiceWellKnownEndpointConfigID(w.ID)
 }
 
+// SetServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceLoginEndpointConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceLoginEndpointConfigID(id)
+	return suo
+}
+
+// SetNillableServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceLoginEndpointConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceLoginEndpointConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceLoginEndpointConfig sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity.
+func (suo *ServiceUpdateOne) SetServiceLoginEndpointConfig(l *LoginEndpointConfig) *ServiceUpdateOne {
+	return suo.SetServiceLoginEndpointConfigID(l.ID)
+}
+
+// SetServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID.
+func (suo *ServiceUpdateOne) SetServiceConnectionConfigID(id string) *ServiceUpdateOne {
+	suo.mutation.SetServiceConnectionConfigID(id)
+	return suo
+}
+
+// SetNillableServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID if the given value is not nil.
+func (suo *ServiceUpdateOne) SetNillableServiceConnectionConfigID(id *string) *ServiceUpdateOne {
+	if id != nil {
+		suo = suo.SetServiceConnectionConfigID(*id)
+	}
+	return suo
+}
+
+// SetServiceConnectionConfig sets the "service_connection_config" edge to the ConnectionConfig entity.
+func (suo *ServiceUpdateOne) SetServiceConnectionConfig(c *ConnectionConfig) *ServiceUpdateOne {
+	return suo.SetServiceConnectionConfigID(c.ID)
+}
+
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
 func (suo *ServiceUpdateOne) AddApplicationIDs(ids ...string) *ServiceUpdateOne {
 	suo.mutation.AddApplicationIDs(ids...)
@@ -1018,6 +1166,18 @@ func (suo *ServiceUpdateOne) ClearServiceJwksEndpointConfig() *ServiceUpdateOne 
 // ClearServiceWellKnownEndpointConfig clears the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity.
 func (suo *ServiceUpdateOne) ClearServiceWellKnownEndpointConfig() *ServiceUpdateOne {
 	suo.mutation.ClearServiceWellKnownEndpointConfig()
+	return suo
+}
+
+// ClearServiceLoginEndpointConfig clears the "service_login_endpoint_config" edge to the LoginEndpointConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceLoginEndpointConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceLoginEndpointConfig()
+	return suo
+}
+
+// ClearServiceConnectionConfig clears the "service_connection_config" edge to the ConnectionConfig entity.
+func (suo *ServiceUpdateOne) ClearServiceConnectionConfig() *ServiceUpdateOne {
+	suo.mutation.ClearServiceConnectionConfig()
 	return suo
 }
 
@@ -1366,6 +1526,64 @@ func (suo *ServiceUpdateOne) sqlSave(ctx context.Context) (_node *Service, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(wellknownendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceLoginEndpointConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceLoginEndpointConfigTable,
+			Columns: []string{service.ServiceLoginEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(loginendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceLoginEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceLoginEndpointConfigTable,
+			Columns: []string{service.ServiceLoginEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(loginendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.ServiceConnectionConfigCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceConnectionConfigTable,
+			Columns: []string{service.ServiceConnectionConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(connectionconfig.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.ServiceConnectionConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceConnectionConfigTable,
+			Columns: []string{service.ServiceConnectionConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(connectionconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -20,16 +20,24 @@ type Tx struct {
 	AuthorizationEndpointConfig *AuthorizationEndpointConfigClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
 	AuthorizationPayload *AuthorizationPayloadClient
+	// ConnectionConfig is the client for interacting with the ConnectionConfig builders.
+	ConnectionConfig *ConnectionConfigClient
 	// CookieStore is the client for interacting with the CookieStore builders.
 	CookieStore *CookieStoreClient
 	// Credentials is the client for interacting with the Credentials builders.
 	Credentials *CredentialsClient
+	// EmailPasswordConnection is the client for interacting with the EmailPasswordConnection builders.
+	EmailPasswordConnection *EmailPasswordConnectionClient
 	// IntrospectionEndpointConfig is the client for interacting with the IntrospectionEndpointConfig builders.
 	IntrospectionEndpointConfig *IntrospectionEndpointConfigClient
 	// JwksEndpointConfig is the client for interacting with the JwksEndpointConfig builders.
 	JwksEndpointConfig *JwksEndpointConfigClient
 	// KeySet is the client for interacting with the KeySet builders.
 	KeySet *KeySetClient
+	// LoginEndpointConfig is the client for interacting with the LoginEndpointConfig builders.
+	LoginEndpointConfig *LoginEndpointConfigClient
+	// OIDCConnection is the client for interacting with the OIDCConnection builders.
+	OIDCConnection *OIDCConnectionClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
 	// Service is the client for interacting with the Service builders.
@@ -46,8 +54,6 @@ type Tx struct {
 	User *UserClient
 	// UserInfoEndpointConfig is the client for interacting with the UserInfoEndpointConfig builders.
 	UserInfoEndpointConfig *UserInfoEndpointConfigClient
-	// UserPool is the client for interacting with the UserPool builders.
-	UserPool *UserPoolClient
 	// WellKnownEndpointConfig is the client for interacting with the WellKnownEndpointConfig builders.
 	WellKnownEndpointConfig *WellKnownEndpointConfigClient
 
@@ -185,11 +191,15 @@ func (tx *Tx) init() {
 	tx.AuthorizationCode = NewAuthorizationCodeClient(tx.config)
 	tx.AuthorizationEndpointConfig = NewAuthorizationEndpointConfigClient(tx.config)
 	tx.AuthorizationPayload = NewAuthorizationPayloadClient(tx.config)
+	tx.ConnectionConfig = NewConnectionConfigClient(tx.config)
 	tx.CookieStore = NewCookieStoreClient(tx.config)
 	tx.Credentials = NewCredentialsClient(tx.config)
+	tx.EmailPasswordConnection = NewEmailPasswordConnectionClient(tx.config)
 	tx.IntrospectionEndpointConfig = NewIntrospectionEndpointConfigClient(tx.config)
 	tx.JwksEndpointConfig = NewJwksEndpointConfigClient(tx.config)
 	tx.KeySet = NewKeySetClient(tx.config)
+	tx.LoginEndpointConfig = NewLoginEndpointConfigClient(tx.config)
+	tx.OIDCConnection = NewOIDCConnectionClient(tx.config)
 	tx.RefreshToken = NewRefreshTokenClient(tx.config)
 	tx.Service = NewServiceClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
@@ -198,7 +208,6 @@ func (tx *Tx) init() {
 	tx.TokenEndpointConfig = NewTokenEndpointConfigClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserInfoEndpointConfig = NewUserInfoEndpointConfigClient(tx.config)
-	tx.UserPool = NewUserPoolClient(tx.config)
 	tx.WellKnownEndpointConfig = NewWellKnownEndpointConfigClient(tx.config)
 }
 

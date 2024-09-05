@@ -504,6 +504,52 @@ func HasServiceWellKnownEndpointConfigWith(preds ...predicate.WellKnownEndpointC
 	})
 }
 
+// HasServiceLoginEndpointConfig applies the HasEdge predicate on the "service_login_endpoint_config" edge.
+func HasServiceLoginEndpointConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceLoginEndpointConfigTable, ServiceLoginEndpointConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceLoginEndpointConfigWith applies the HasEdge predicate on the "service_login_endpoint_config" edge with a given conditions (other predicates).
+func HasServiceLoginEndpointConfigWith(preds ...predicate.LoginEndpointConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceLoginEndpointConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasServiceConnectionConfig applies the HasEdge predicate on the "service_connection_config" edge.
+func HasServiceConnectionConfig() predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ServiceConnectionConfigTable, ServiceConnectionConfigColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasServiceConnectionConfigWith applies the HasEdge predicate on the "service_connection_config" edge with a given conditions (other predicates).
+func HasServiceConnectionConfigWith(preds ...predicate.ConnectionConfig) predicate.Service {
+	return predicate.Service(func(s *sql.Selector) {
+		step := newServiceConnectionConfigStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasApplications applies the HasEdge predicate on the "applications" edge.
 func HasApplications() predicate.Service {
 	return predicate.Service(func(s *sql.Selector) {

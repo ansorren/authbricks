@@ -26,8 +26,8 @@ const (
 	FieldResponseType = "response_type"
 	// FieldScope holds the string denoting the scope field in the database.
 	FieldScope = "scope"
-	// FieldServerName holds the string denoting the server_name field in the database.
-	FieldServerName = "server_name"
+	// FieldServiceName holds the string denoting the service_name field in the database.
+	FieldServiceName = "service_name"
 	// FieldState holds the string denoting the state field in the database.
 	FieldState = "state"
 	// FieldResponseMode holds the string denoting the response_mode field in the database.
@@ -55,7 +55,7 @@ var Columns = []string{
 	FieldRedirectURI,
 	FieldResponseType,
 	FieldScope,
-	FieldServerName,
+	FieldServiceName,
 	FieldState,
 	FieldResponseMode,
 }
@@ -129,9 +129,9 @@ func ByScope(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScope, opts...).ToFunc()
 }
 
-// ByServerName orders the results by the server_name field.
-func ByServerName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServerName, opts...).ToFunc()
+// ByServiceName orders the results by the service_name field.
+func ByServiceName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldServiceName, opts...).ToFunc()
 }
 
 // ByState orders the results by the state field.

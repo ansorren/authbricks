@@ -19,11 +19,15 @@ import (
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/session"
@@ -32,7 +36,6 @@ import (
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
-	"go.authbricks.com/bricks/ent/userpool"
 	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
@@ -49,16 +52,24 @@ type Client struct {
 	AuthorizationEndpointConfig *AuthorizationEndpointConfigClient
 	// AuthorizationPayload is the client for interacting with the AuthorizationPayload builders.
 	AuthorizationPayload *AuthorizationPayloadClient
+	// ConnectionConfig is the client for interacting with the ConnectionConfig builders.
+	ConnectionConfig *ConnectionConfigClient
 	// CookieStore is the client for interacting with the CookieStore builders.
 	CookieStore *CookieStoreClient
 	// Credentials is the client for interacting with the Credentials builders.
 	Credentials *CredentialsClient
+	// EmailPasswordConnection is the client for interacting with the EmailPasswordConnection builders.
+	EmailPasswordConnection *EmailPasswordConnectionClient
 	// IntrospectionEndpointConfig is the client for interacting with the IntrospectionEndpointConfig builders.
 	IntrospectionEndpointConfig *IntrospectionEndpointConfigClient
 	// JwksEndpointConfig is the client for interacting with the JwksEndpointConfig builders.
 	JwksEndpointConfig *JwksEndpointConfigClient
 	// KeySet is the client for interacting with the KeySet builders.
 	KeySet *KeySetClient
+	// LoginEndpointConfig is the client for interacting with the LoginEndpointConfig builders.
+	LoginEndpointConfig *LoginEndpointConfigClient
+	// OIDCConnection is the client for interacting with the OIDCConnection builders.
+	OIDCConnection *OIDCConnectionClient
 	// RefreshToken is the client for interacting with the RefreshToken builders.
 	RefreshToken *RefreshTokenClient
 	// Service is the client for interacting with the Service builders.
@@ -75,8 +86,6 @@ type Client struct {
 	User *UserClient
 	// UserInfoEndpointConfig is the client for interacting with the UserInfoEndpointConfig builders.
 	UserInfoEndpointConfig *UserInfoEndpointConfigClient
-	// UserPool is the client for interacting with the UserPool builders.
-	UserPool *UserPoolClient
 	// WellKnownEndpointConfig is the client for interacting with the WellKnownEndpointConfig builders.
 	WellKnownEndpointConfig *WellKnownEndpointConfigClient
 }
@@ -94,11 +103,15 @@ func (c *Client) init() {
 	c.AuthorizationCode = NewAuthorizationCodeClient(c.config)
 	c.AuthorizationEndpointConfig = NewAuthorizationEndpointConfigClient(c.config)
 	c.AuthorizationPayload = NewAuthorizationPayloadClient(c.config)
+	c.ConnectionConfig = NewConnectionConfigClient(c.config)
 	c.CookieStore = NewCookieStoreClient(c.config)
 	c.Credentials = NewCredentialsClient(c.config)
+	c.EmailPasswordConnection = NewEmailPasswordConnectionClient(c.config)
 	c.IntrospectionEndpointConfig = NewIntrospectionEndpointConfigClient(c.config)
 	c.JwksEndpointConfig = NewJwksEndpointConfigClient(c.config)
 	c.KeySet = NewKeySetClient(c.config)
+	c.LoginEndpointConfig = NewLoginEndpointConfigClient(c.config)
+	c.OIDCConnection = NewOIDCConnectionClient(c.config)
 	c.RefreshToken = NewRefreshTokenClient(c.config)
 	c.Service = NewServiceClient(c.config)
 	c.Session = NewSessionClient(c.config)
@@ -107,7 +120,6 @@ func (c *Client) init() {
 	c.TokenEndpointConfig = NewTokenEndpointConfigClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserInfoEndpointConfig = NewUserInfoEndpointConfigClient(c.config)
-	c.UserPool = NewUserPoolClient(c.config)
 	c.WellKnownEndpointConfig = NewWellKnownEndpointConfigClient(c.config)
 }
 
@@ -205,11 +217,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AuthorizationCode:           NewAuthorizationCodeClient(cfg),
 		AuthorizationEndpointConfig: NewAuthorizationEndpointConfigClient(cfg),
 		AuthorizationPayload:        NewAuthorizationPayloadClient(cfg),
+		ConnectionConfig:            NewConnectionConfigClient(cfg),
 		CookieStore:                 NewCookieStoreClient(cfg),
 		Credentials:                 NewCredentialsClient(cfg),
+		EmailPasswordConnection:     NewEmailPasswordConnectionClient(cfg),
 		IntrospectionEndpointConfig: NewIntrospectionEndpointConfigClient(cfg),
 		JwksEndpointConfig:          NewJwksEndpointConfigClient(cfg),
 		KeySet:                      NewKeySetClient(cfg),
+		LoginEndpointConfig:         NewLoginEndpointConfigClient(cfg),
+		OIDCConnection:              NewOIDCConnectionClient(cfg),
 		RefreshToken:                NewRefreshTokenClient(cfg),
 		Service:                     NewServiceClient(cfg),
 		Session:                     NewSessionClient(cfg),
@@ -218,7 +234,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		TokenEndpointConfig:         NewTokenEndpointConfigClient(cfg),
 		User:                        NewUserClient(cfg),
 		UserInfoEndpointConfig:      NewUserInfoEndpointConfigClient(cfg),
-		UserPool:                    NewUserPoolClient(cfg),
 		WellKnownEndpointConfig:     NewWellKnownEndpointConfigClient(cfg),
 	}, nil
 }
@@ -243,11 +258,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AuthorizationCode:           NewAuthorizationCodeClient(cfg),
 		AuthorizationEndpointConfig: NewAuthorizationEndpointConfigClient(cfg),
 		AuthorizationPayload:        NewAuthorizationPayloadClient(cfg),
+		ConnectionConfig:            NewConnectionConfigClient(cfg),
 		CookieStore:                 NewCookieStoreClient(cfg),
 		Credentials:                 NewCredentialsClient(cfg),
+		EmailPasswordConnection:     NewEmailPasswordConnectionClient(cfg),
 		IntrospectionEndpointConfig: NewIntrospectionEndpointConfigClient(cfg),
 		JwksEndpointConfig:          NewJwksEndpointConfigClient(cfg),
 		KeySet:                      NewKeySetClient(cfg),
+		LoginEndpointConfig:         NewLoginEndpointConfigClient(cfg),
+		OIDCConnection:              NewOIDCConnectionClient(cfg),
 		RefreshToken:                NewRefreshTokenClient(cfg),
 		Service:                     NewServiceClient(cfg),
 		Session:                     NewSessionClient(cfg),
@@ -256,7 +275,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		TokenEndpointConfig:         NewTokenEndpointConfigClient(cfg),
 		User:                        NewUserClient(cfg),
 		UserInfoEndpointConfig:      NewUserInfoEndpointConfigClient(cfg),
-		UserPool:                    NewUserPoolClient(cfg),
 		WellKnownEndpointConfig:     NewWellKnownEndpointConfigClient(cfg),
 	}, nil
 }
@@ -288,10 +306,11 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Application, c.AuthorizationCode, c.AuthorizationEndpointConfig,
-		c.AuthorizationPayload, c.CookieStore, c.Credentials,
-		c.IntrospectionEndpointConfig, c.JwksEndpointConfig, c.KeySet, c.RefreshToken,
-		c.Service, c.Session, c.SigningKey, c.StandardClaims, c.TokenEndpointConfig,
-		c.User, c.UserInfoEndpointConfig, c.UserPool, c.WellKnownEndpointConfig,
+		c.AuthorizationPayload, c.ConnectionConfig, c.CookieStore, c.Credentials,
+		c.EmailPasswordConnection, c.IntrospectionEndpointConfig, c.JwksEndpointConfig,
+		c.KeySet, c.LoginEndpointConfig, c.OIDCConnection, c.RefreshToken, c.Service,
+		c.Session, c.SigningKey, c.StandardClaims, c.TokenEndpointConfig, c.User,
+		c.UserInfoEndpointConfig, c.WellKnownEndpointConfig,
 	} {
 		n.Use(hooks...)
 	}
@@ -302,10 +321,11 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Application, c.AuthorizationCode, c.AuthorizationEndpointConfig,
-		c.AuthorizationPayload, c.CookieStore, c.Credentials,
-		c.IntrospectionEndpointConfig, c.JwksEndpointConfig, c.KeySet, c.RefreshToken,
-		c.Service, c.Session, c.SigningKey, c.StandardClaims, c.TokenEndpointConfig,
-		c.User, c.UserInfoEndpointConfig, c.UserPool, c.WellKnownEndpointConfig,
+		c.AuthorizationPayload, c.ConnectionConfig, c.CookieStore, c.Credentials,
+		c.EmailPasswordConnection, c.IntrospectionEndpointConfig, c.JwksEndpointConfig,
+		c.KeySet, c.LoginEndpointConfig, c.OIDCConnection, c.RefreshToken, c.Service,
+		c.Session, c.SigningKey, c.StandardClaims, c.TokenEndpointConfig, c.User,
+		c.UserInfoEndpointConfig, c.WellKnownEndpointConfig,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -322,16 +342,24 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AuthorizationEndpointConfig.mutate(ctx, m)
 	case *AuthorizationPayloadMutation:
 		return c.AuthorizationPayload.mutate(ctx, m)
+	case *ConnectionConfigMutation:
+		return c.ConnectionConfig.mutate(ctx, m)
 	case *CookieStoreMutation:
 		return c.CookieStore.mutate(ctx, m)
 	case *CredentialsMutation:
 		return c.Credentials.mutate(ctx, m)
+	case *EmailPasswordConnectionMutation:
+		return c.EmailPasswordConnection.mutate(ctx, m)
 	case *IntrospectionEndpointConfigMutation:
 		return c.IntrospectionEndpointConfig.mutate(ctx, m)
 	case *JwksEndpointConfigMutation:
 		return c.JwksEndpointConfig.mutate(ctx, m)
 	case *KeySetMutation:
 		return c.KeySet.mutate(ctx, m)
+	case *LoginEndpointConfigMutation:
+		return c.LoginEndpointConfig.mutate(ctx, m)
+	case *OIDCConnectionMutation:
+		return c.OIDCConnection.mutate(ctx, m)
 	case *RefreshTokenMutation:
 		return c.RefreshToken.mutate(ctx, m)
 	case *ServiceMutation:
@@ -348,8 +376,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	case *UserInfoEndpointConfigMutation:
 		return c.UserInfoEndpointConfig.mutate(ctx, m)
-	case *UserPoolMutation:
-		return c.UserPool.mutate(ctx, m)
 	case *WellKnownEndpointConfigMutation:
 		return c.WellKnownEndpointConfig.mutate(ctx, m)
 	default:
@@ -953,6 +979,187 @@ func (c *AuthorizationPayloadClient) mutate(ctx context.Context, m *Authorizatio
 	}
 }
 
+// ConnectionConfigClient is a client for the ConnectionConfig schema.
+type ConnectionConfigClient struct {
+	config
+}
+
+// NewConnectionConfigClient returns a client for the ConnectionConfig from the given config.
+func NewConnectionConfigClient(c config) *ConnectionConfigClient {
+	return &ConnectionConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `connectionconfig.Hooks(f(g(h())))`.
+func (c *ConnectionConfigClient) Use(hooks ...Hook) {
+	c.hooks.ConnectionConfig = append(c.hooks.ConnectionConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `connectionconfig.Intercept(f(g(h())))`.
+func (c *ConnectionConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ConnectionConfig = append(c.inters.ConnectionConfig, interceptors...)
+}
+
+// Create returns a builder for creating a ConnectionConfig entity.
+func (c *ConnectionConfigClient) Create() *ConnectionConfigCreate {
+	mutation := newConnectionConfigMutation(c.config, OpCreate)
+	return &ConnectionConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ConnectionConfig entities.
+func (c *ConnectionConfigClient) CreateBulk(builders ...*ConnectionConfigCreate) *ConnectionConfigCreateBulk {
+	return &ConnectionConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ConnectionConfigClient) MapCreateBulk(slice any, setFunc func(*ConnectionConfigCreate, int)) *ConnectionConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ConnectionConfigCreateBulk{err: fmt.Errorf("calling to ConnectionConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ConnectionConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ConnectionConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ConnectionConfig.
+func (c *ConnectionConfigClient) Update() *ConnectionConfigUpdate {
+	mutation := newConnectionConfigMutation(c.config, OpUpdate)
+	return &ConnectionConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ConnectionConfigClient) UpdateOne(cc *ConnectionConfig) *ConnectionConfigUpdateOne {
+	mutation := newConnectionConfigMutation(c.config, OpUpdateOne, withConnectionConfig(cc))
+	return &ConnectionConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ConnectionConfigClient) UpdateOneID(id string) *ConnectionConfigUpdateOne {
+	mutation := newConnectionConfigMutation(c.config, OpUpdateOne, withConnectionConfigID(id))
+	return &ConnectionConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ConnectionConfig.
+func (c *ConnectionConfigClient) Delete() *ConnectionConfigDelete {
+	mutation := newConnectionConfigMutation(c.config, OpDelete)
+	return &ConnectionConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ConnectionConfigClient) DeleteOne(cc *ConnectionConfig) *ConnectionConfigDeleteOne {
+	return c.DeleteOneID(cc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ConnectionConfigClient) DeleteOneID(id string) *ConnectionConfigDeleteOne {
+	builder := c.Delete().Where(connectionconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ConnectionConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for ConnectionConfig.
+func (c *ConnectionConfigClient) Query() *ConnectionConfigQuery {
+	return &ConnectionConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeConnectionConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ConnectionConfig entity by its id.
+func (c *ConnectionConfigClient) Get(ctx context.Context, id string) (*ConnectionConfig, error) {
+	return c.Query().Where(connectionconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ConnectionConfigClient) GetX(ctx context.Context, id string) *ConnectionConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a ConnectionConfig.
+func (c *ConnectionConfigClient) QueryService(cc *ConnectionConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(connectionconfig.Table, connectionconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, connectionconfig.ServiceTable, connectionconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOidcConnections queries the oidc_connections edge of a ConnectionConfig.
+func (c *ConnectionConfigClient) QueryOidcConnections(cc *ConnectionConfig) *OIDCConnectionQuery {
+	query := (&OIDCConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(connectionconfig.Table, connectionconfig.FieldID, id),
+			sqlgraph.To(oidcconnection.Table, oidcconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, connectionconfig.OidcConnectionsTable, connectionconfig.OidcConnectionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmailPasswordConnection queries the email_password_connection edge of a ConnectionConfig.
+func (c *ConnectionConfigClient) QueryEmailPasswordConnection(cc *ConnectionConfig) *EmailPasswordConnectionQuery {
+	query := (&EmailPasswordConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(connectionconfig.Table, connectionconfig.FieldID, id),
+			sqlgraph.To(emailpasswordconnection.Table, emailpasswordconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, connectionconfig.EmailPasswordConnectionTable, connectionconfig.EmailPasswordConnectionColumn),
+		)
+		fromV = sqlgraph.Neighbors(cc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ConnectionConfigClient) Hooks() []Hook {
+	return c.hooks.ConnectionConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *ConnectionConfigClient) Interceptors() []Interceptor {
+	return c.inters.ConnectionConfig
+}
+
+func (c *ConnectionConfigClient) mutate(ctx context.Context, m *ConnectionConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ConnectionConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ConnectionConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ConnectionConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ConnectionConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ConnectionConfig mutation op: %q", m.Op())
+	}
+}
+
 // CookieStoreClient is a client for the CookieStore schema.
 type CookieStoreClient struct {
 	config
@@ -1232,6 +1439,171 @@ func (c *CredentialsClient) mutate(ctx context.Context, m *CredentialsMutation) 
 		return (&CredentialsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Credentials mutation op: %q", m.Op())
+	}
+}
+
+// EmailPasswordConnectionClient is a client for the EmailPasswordConnection schema.
+type EmailPasswordConnectionClient struct {
+	config
+}
+
+// NewEmailPasswordConnectionClient returns a client for the EmailPasswordConnection from the given config.
+func NewEmailPasswordConnectionClient(c config) *EmailPasswordConnectionClient {
+	return &EmailPasswordConnectionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `emailpasswordconnection.Hooks(f(g(h())))`.
+func (c *EmailPasswordConnectionClient) Use(hooks ...Hook) {
+	c.hooks.EmailPasswordConnection = append(c.hooks.EmailPasswordConnection, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `emailpasswordconnection.Intercept(f(g(h())))`.
+func (c *EmailPasswordConnectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EmailPasswordConnection = append(c.inters.EmailPasswordConnection, interceptors...)
+}
+
+// Create returns a builder for creating a EmailPasswordConnection entity.
+func (c *EmailPasswordConnectionClient) Create() *EmailPasswordConnectionCreate {
+	mutation := newEmailPasswordConnectionMutation(c.config, OpCreate)
+	return &EmailPasswordConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EmailPasswordConnection entities.
+func (c *EmailPasswordConnectionClient) CreateBulk(builders ...*EmailPasswordConnectionCreate) *EmailPasswordConnectionCreateBulk {
+	return &EmailPasswordConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EmailPasswordConnectionClient) MapCreateBulk(slice any, setFunc func(*EmailPasswordConnectionCreate, int)) *EmailPasswordConnectionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EmailPasswordConnectionCreateBulk{err: fmt.Errorf("calling to EmailPasswordConnectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EmailPasswordConnectionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EmailPasswordConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EmailPasswordConnection.
+func (c *EmailPasswordConnectionClient) Update() *EmailPasswordConnectionUpdate {
+	mutation := newEmailPasswordConnectionMutation(c.config, OpUpdate)
+	return &EmailPasswordConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmailPasswordConnectionClient) UpdateOne(epc *EmailPasswordConnection) *EmailPasswordConnectionUpdateOne {
+	mutation := newEmailPasswordConnectionMutation(c.config, OpUpdateOne, withEmailPasswordConnection(epc))
+	return &EmailPasswordConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmailPasswordConnectionClient) UpdateOneID(id string) *EmailPasswordConnectionUpdateOne {
+	mutation := newEmailPasswordConnectionMutation(c.config, OpUpdateOne, withEmailPasswordConnectionID(id))
+	return &EmailPasswordConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EmailPasswordConnection.
+func (c *EmailPasswordConnectionClient) Delete() *EmailPasswordConnectionDelete {
+	mutation := newEmailPasswordConnectionMutation(c.config, OpDelete)
+	return &EmailPasswordConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EmailPasswordConnectionClient) DeleteOne(epc *EmailPasswordConnection) *EmailPasswordConnectionDeleteOne {
+	return c.DeleteOneID(epc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EmailPasswordConnectionClient) DeleteOneID(id string) *EmailPasswordConnectionDeleteOne {
+	builder := c.Delete().Where(emailpasswordconnection.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmailPasswordConnectionDeleteOne{builder}
+}
+
+// Query returns a query builder for EmailPasswordConnection.
+func (c *EmailPasswordConnectionClient) Query() *EmailPasswordConnectionQuery {
+	return &EmailPasswordConnectionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEmailPasswordConnection},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EmailPasswordConnection entity by its id.
+func (c *EmailPasswordConnectionClient) Get(ctx context.Context, id string) (*EmailPasswordConnection, error) {
+	return c.Query().Where(emailpasswordconnection.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmailPasswordConnectionClient) GetX(ctx context.Context, id string) *EmailPasswordConnection {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryConnectionConfig queries the connection_config edge of a EmailPasswordConnection.
+func (c *EmailPasswordConnectionClient) QueryConnectionConfig(epc *EmailPasswordConnection) *ConnectionConfigQuery {
+	query := (&ConnectionConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := epc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emailpasswordconnection.Table, emailpasswordconnection.FieldID, id),
+			sqlgraph.To(connectionconfig.Table, connectionconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, emailpasswordconnection.ConnectionConfigTable, emailpasswordconnection.ConnectionConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(epc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUsers queries the users edge of a EmailPasswordConnection.
+func (c *EmailPasswordConnectionClient) QueryUsers(epc *EmailPasswordConnection) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := epc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(emailpasswordconnection.Table, emailpasswordconnection.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, emailpasswordconnection.UsersTable, emailpasswordconnection.UsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(epc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EmailPasswordConnectionClient) Hooks() []Hook {
+	return c.hooks.EmailPasswordConnection
+}
+
+// Interceptors returns the client interceptors.
+func (c *EmailPasswordConnectionClient) Interceptors() []Interceptor {
+	return c.inters.EmailPasswordConnection
+}
+
+func (c *EmailPasswordConnectionClient) mutate(ctx context.Context, m *EmailPasswordConnectionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EmailPasswordConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EmailPasswordConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EmailPasswordConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EmailPasswordConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EmailPasswordConnection mutation op: %q", m.Op())
 	}
 }
 
@@ -1698,6 +2070,320 @@ func (c *KeySetClient) mutate(ctx context.Context, m *KeySetMutation) (Value, er
 	}
 }
 
+// LoginEndpointConfigClient is a client for the LoginEndpointConfig schema.
+type LoginEndpointConfigClient struct {
+	config
+}
+
+// NewLoginEndpointConfigClient returns a client for the LoginEndpointConfig from the given config.
+func NewLoginEndpointConfigClient(c config) *LoginEndpointConfigClient {
+	return &LoginEndpointConfigClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `loginendpointconfig.Hooks(f(g(h())))`.
+func (c *LoginEndpointConfigClient) Use(hooks ...Hook) {
+	c.hooks.LoginEndpointConfig = append(c.hooks.LoginEndpointConfig, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `loginendpointconfig.Intercept(f(g(h())))`.
+func (c *LoginEndpointConfigClient) Intercept(interceptors ...Interceptor) {
+	c.inters.LoginEndpointConfig = append(c.inters.LoginEndpointConfig, interceptors...)
+}
+
+// Create returns a builder for creating a LoginEndpointConfig entity.
+func (c *LoginEndpointConfigClient) Create() *LoginEndpointConfigCreate {
+	mutation := newLoginEndpointConfigMutation(c.config, OpCreate)
+	return &LoginEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LoginEndpointConfig entities.
+func (c *LoginEndpointConfigClient) CreateBulk(builders ...*LoginEndpointConfigCreate) *LoginEndpointConfigCreateBulk {
+	return &LoginEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LoginEndpointConfigClient) MapCreateBulk(slice any, setFunc func(*LoginEndpointConfigCreate, int)) *LoginEndpointConfigCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LoginEndpointConfigCreateBulk{err: fmt.Errorf("calling to LoginEndpointConfigClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LoginEndpointConfigCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LoginEndpointConfigCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LoginEndpointConfig.
+func (c *LoginEndpointConfigClient) Update() *LoginEndpointConfigUpdate {
+	mutation := newLoginEndpointConfigMutation(c.config, OpUpdate)
+	return &LoginEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LoginEndpointConfigClient) UpdateOne(lec *LoginEndpointConfig) *LoginEndpointConfigUpdateOne {
+	mutation := newLoginEndpointConfigMutation(c.config, OpUpdateOne, withLoginEndpointConfig(lec))
+	return &LoginEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LoginEndpointConfigClient) UpdateOneID(id string) *LoginEndpointConfigUpdateOne {
+	mutation := newLoginEndpointConfigMutation(c.config, OpUpdateOne, withLoginEndpointConfigID(id))
+	return &LoginEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LoginEndpointConfig.
+func (c *LoginEndpointConfigClient) Delete() *LoginEndpointConfigDelete {
+	mutation := newLoginEndpointConfigMutation(c.config, OpDelete)
+	return &LoginEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LoginEndpointConfigClient) DeleteOne(lec *LoginEndpointConfig) *LoginEndpointConfigDeleteOne {
+	return c.DeleteOneID(lec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LoginEndpointConfigClient) DeleteOneID(id string) *LoginEndpointConfigDeleteOne {
+	builder := c.Delete().Where(loginendpointconfig.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LoginEndpointConfigDeleteOne{builder}
+}
+
+// Query returns a query builder for LoginEndpointConfig.
+func (c *LoginEndpointConfigClient) Query() *LoginEndpointConfigQuery {
+	return &LoginEndpointConfigQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLoginEndpointConfig},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a LoginEndpointConfig entity by its id.
+func (c *LoginEndpointConfigClient) Get(ctx context.Context, id string) (*LoginEndpointConfig, error) {
+	return c.Query().Where(loginendpointconfig.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LoginEndpointConfigClient) GetX(ctx context.Context, id string) *LoginEndpointConfig {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryService queries the service edge of a LoginEndpointConfig.
+func (c *LoginEndpointConfigClient) QueryService(lec *LoginEndpointConfig) *ServiceQuery {
+	query := (&ServiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(loginendpointconfig.Table, loginendpointconfig.FieldID, id),
+			sqlgraph.To(service.Table, service.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, loginendpointconfig.ServiceTable, loginendpointconfig.ServiceColumn),
+		)
+		fromV = sqlgraph.Neighbors(lec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *LoginEndpointConfigClient) Hooks() []Hook {
+	return c.hooks.LoginEndpointConfig
+}
+
+// Interceptors returns the client interceptors.
+func (c *LoginEndpointConfigClient) Interceptors() []Interceptor {
+	return c.inters.LoginEndpointConfig
+}
+
+func (c *LoginEndpointConfigClient) mutate(ctx context.Context, m *LoginEndpointConfigMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LoginEndpointConfigCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LoginEndpointConfigUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LoginEndpointConfigUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LoginEndpointConfigDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown LoginEndpointConfig mutation op: %q", m.Op())
+	}
+}
+
+// OIDCConnectionClient is a client for the OIDCConnection schema.
+type OIDCConnectionClient struct {
+	config
+}
+
+// NewOIDCConnectionClient returns a client for the OIDCConnection from the given config.
+func NewOIDCConnectionClient(c config) *OIDCConnectionClient {
+	return &OIDCConnectionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oidcconnection.Hooks(f(g(h())))`.
+func (c *OIDCConnectionClient) Use(hooks ...Hook) {
+	c.hooks.OIDCConnection = append(c.hooks.OIDCConnection, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oidcconnection.Intercept(f(g(h())))`.
+func (c *OIDCConnectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OIDCConnection = append(c.inters.OIDCConnection, interceptors...)
+}
+
+// Create returns a builder for creating a OIDCConnection entity.
+func (c *OIDCConnectionClient) Create() *OIDCConnectionCreate {
+	mutation := newOIDCConnectionMutation(c.config, OpCreate)
+	return &OIDCConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OIDCConnection entities.
+func (c *OIDCConnectionClient) CreateBulk(builders ...*OIDCConnectionCreate) *OIDCConnectionCreateBulk {
+	return &OIDCConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OIDCConnectionClient) MapCreateBulk(slice any, setFunc func(*OIDCConnectionCreate, int)) *OIDCConnectionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OIDCConnectionCreateBulk{err: fmt.Errorf("calling to OIDCConnectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OIDCConnectionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OIDCConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OIDCConnection.
+func (c *OIDCConnectionClient) Update() *OIDCConnectionUpdate {
+	mutation := newOIDCConnectionMutation(c.config, OpUpdate)
+	return &OIDCConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OIDCConnectionClient) UpdateOne(oc *OIDCConnection) *OIDCConnectionUpdateOne {
+	mutation := newOIDCConnectionMutation(c.config, OpUpdateOne, withOIDCConnection(oc))
+	return &OIDCConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OIDCConnectionClient) UpdateOneID(id string) *OIDCConnectionUpdateOne {
+	mutation := newOIDCConnectionMutation(c.config, OpUpdateOne, withOIDCConnectionID(id))
+	return &OIDCConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OIDCConnection.
+func (c *OIDCConnectionClient) Delete() *OIDCConnectionDelete {
+	mutation := newOIDCConnectionMutation(c.config, OpDelete)
+	return &OIDCConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OIDCConnectionClient) DeleteOne(oc *OIDCConnection) *OIDCConnectionDeleteOne {
+	return c.DeleteOneID(oc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OIDCConnectionClient) DeleteOneID(id string) *OIDCConnectionDeleteOne {
+	builder := c.Delete().Where(oidcconnection.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OIDCConnectionDeleteOne{builder}
+}
+
+// Query returns a query builder for OIDCConnection.
+func (c *OIDCConnectionClient) Query() *OIDCConnectionQuery {
+	return &OIDCConnectionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOIDCConnection},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OIDCConnection entity by its id.
+func (c *OIDCConnectionClient) Get(ctx context.Context, id string) (*OIDCConnection, error) {
+	return c.Query().Where(oidcconnection.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OIDCConnectionClient) GetX(ctx context.Context, id string) *OIDCConnection {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryConnectionConfig queries the connection_config edge of a OIDCConnection.
+func (c *OIDCConnectionClient) QueryConnectionConfig(oc *OIDCConnection) *ConnectionConfigQuery {
+	query := (&ConnectionConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oidcconnection.Table, oidcconnection.FieldID, id),
+			sqlgraph.To(connectionconfig.Table, connectionconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oidcconnection.ConnectionConfigTable, oidcconnection.ConnectionConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(oc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUsers queries the users edge of a OIDCConnection.
+func (c *OIDCConnectionClient) QueryUsers(oc *OIDCConnection) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := oc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oidcconnection.Table, oidcconnection.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, oidcconnection.UsersTable, oidcconnection.UsersColumn),
+		)
+		fromV = sqlgraph.Neighbors(oc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OIDCConnectionClient) Hooks() []Hook {
+	return c.hooks.OIDCConnection
+}
+
+// Interceptors returns the client interceptors.
+func (c *OIDCConnectionClient) Interceptors() []Interceptor {
+	return c.inters.OIDCConnection
+}
+
+func (c *OIDCConnectionClient) mutate(ctx context.Context, m *OIDCConnectionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OIDCConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OIDCConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OIDCConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OIDCConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OIDCConnection mutation op: %q", m.Op())
+	}
+}
+
 // RefreshTokenClient is a client for the RefreshToken schema.
 type RefreshTokenClient struct {
 	config
@@ -2044,6 +2730,38 @@ func (c *ServiceClient) QueryServiceWellKnownEndpointConfig(s *Service) *WellKno
 			sqlgraph.From(service.Table, service.FieldID, id),
 			sqlgraph.To(wellknownendpointconfig.Table, wellknownendpointconfig.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceWellKnownEndpointConfigTable, service.ServiceWellKnownEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceLoginEndpointConfig queries the service_login_endpoint_config edge of a Service.
+func (c *ServiceClient) QueryServiceLoginEndpointConfig(s *Service) *LoginEndpointConfigQuery {
+	query := (&LoginEndpointConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(loginendpointconfig.Table, loginendpointconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceLoginEndpointConfigTable, service.ServiceLoginEndpointConfigColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryServiceConnectionConfig queries the service_connection_config edge of a Service.
+func (c *ServiceClient) QueryServiceConnectionConfig(s *Service) *ConnectionConfigQuery {
+	query := (&ConnectionConfigClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(service.Table, service.FieldID, id),
+			sqlgraph.To(connectionconfig.Table, connectionconfig.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, service.ServiceConnectionConfigTable, service.ServiceConnectionConfigColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -2796,22 +3514,6 @@ func (c *UserClient) GetX(ctx context.Context, id string) *User {
 	return obj
 }
 
-// QueryUserPool queries the user_pool edge of a User.
-func (c *UserClient) QueryUserPool(u *User) *UserPoolQuery {
-	query := (&UserPoolClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(userpool.Table, userpool.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, user.UserPoolTable, user.UserPoolColumn),
-		)
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryStandardClaims queries the standard_claims edge of a User.
 func (c *UserClient) QueryStandardClaims(u *User) *StandardClaimsQuery {
 	query := (&StandardClaimsClient{config: c.config}).Query()
@@ -2821,6 +3523,38 @@ func (c *UserClient) QueryStandardClaims(u *User) *StandardClaimsQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(standardclaims.Table, standardclaims.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, user.StandardClaimsTable, user.StandardClaimsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEmailPasswordConnection queries the email_password_connection edge of a User.
+func (c *UserClient) QueryEmailPasswordConnection(u *User) *EmailPasswordConnectionQuery {
+	query := (&EmailPasswordConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(emailpasswordconnection.Table, emailpasswordconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, user.EmailPasswordConnectionTable, user.EmailPasswordConnectionColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOidcConnections queries the oidc_connections edge of a User.
+func (c *UserClient) QueryOidcConnections(u *User) *OIDCConnectionQuery {
+	query := (&OIDCConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(oidcconnection.Table, oidcconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, user.OidcConnectionsTable, user.OidcConnectionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil
@@ -3002,155 +3736,6 @@ func (c *UserInfoEndpointConfigClient) mutate(ctx context.Context, m *UserInfoEn
 	}
 }
 
-// UserPoolClient is a client for the UserPool schema.
-type UserPoolClient struct {
-	config
-}
-
-// NewUserPoolClient returns a client for the UserPool from the given config.
-func NewUserPoolClient(c config) *UserPoolClient {
-	return &UserPoolClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `userpool.Hooks(f(g(h())))`.
-func (c *UserPoolClient) Use(hooks ...Hook) {
-	c.hooks.UserPool = append(c.hooks.UserPool, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `userpool.Intercept(f(g(h())))`.
-func (c *UserPoolClient) Intercept(interceptors ...Interceptor) {
-	c.inters.UserPool = append(c.inters.UserPool, interceptors...)
-}
-
-// Create returns a builder for creating a UserPool entity.
-func (c *UserPoolClient) Create() *UserPoolCreate {
-	mutation := newUserPoolMutation(c.config, OpCreate)
-	return &UserPoolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of UserPool entities.
-func (c *UserPoolClient) CreateBulk(builders ...*UserPoolCreate) *UserPoolCreateBulk {
-	return &UserPoolCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *UserPoolClient) MapCreateBulk(slice any, setFunc func(*UserPoolCreate, int)) *UserPoolCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &UserPoolCreateBulk{err: fmt.Errorf("calling to UserPoolClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*UserPoolCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &UserPoolCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for UserPool.
-func (c *UserPoolClient) Update() *UserPoolUpdate {
-	mutation := newUserPoolMutation(c.config, OpUpdate)
-	return &UserPoolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *UserPoolClient) UpdateOne(up *UserPool) *UserPoolUpdateOne {
-	mutation := newUserPoolMutation(c.config, OpUpdateOne, withUserPool(up))
-	return &UserPoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *UserPoolClient) UpdateOneID(id string) *UserPoolUpdateOne {
-	mutation := newUserPoolMutation(c.config, OpUpdateOne, withUserPoolID(id))
-	return &UserPoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for UserPool.
-func (c *UserPoolClient) Delete() *UserPoolDelete {
-	mutation := newUserPoolMutation(c.config, OpDelete)
-	return &UserPoolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *UserPoolClient) DeleteOne(up *UserPool) *UserPoolDeleteOne {
-	return c.DeleteOneID(up.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *UserPoolClient) DeleteOneID(id string) *UserPoolDeleteOne {
-	builder := c.Delete().Where(userpool.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &UserPoolDeleteOne{builder}
-}
-
-// Query returns a query builder for UserPool.
-func (c *UserPoolClient) Query() *UserPoolQuery {
-	return &UserPoolQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeUserPool},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a UserPool entity by its id.
-func (c *UserPoolClient) Get(ctx context.Context, id string) (*UserPool, error) {
-	return c.Query().Where(userpool.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *UserPoolClient) GetX(ctx context.Context, id string) *UserPool {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryUsers queries the users edge of a UserPool.
-func (c *UserPoolClient) QueryUsers(up *UserPool) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := up.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(userpool.Table, userpool.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, userpool.UsersTable, userpool.UsersColumn),
-		)
-		fromV = sqlgraph.Neighbors(up.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *UserPoolClient) Hooks() []Hook {
-	return c.hooks.UserPool
-}
-
-// Interceptors returns the client interceptors.
-func (c *UserPoolClient) Interceptors() []Interceptor {
-	return c.inters.UserPool
-}
-
-func (c *UserPoolClient) mutate(ctx context.Context, m *UserPoolMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&UserPoolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&UserPoolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&UserPoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&UserPoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown UserPool mutation op: %q", m.Op())
-	}
-}
-
 // WellKnownEndpointConfigClient is a client for the WellKnownEndpointConfig schema.
 type WellKnownEndpointConfigClient struct {
 	config
@@ -3304,16 +3889,18 @@ func (c *WellKnownEndpointConfigClient) mutate(ctx context.Context, m *WellKnown
 type (
 	hooks struct {
 		Application, AuthorizationCode, AuthorizationEndpointConfig,
-		AuthorizationPayload, CookieStore, Credentials, IntrospectionEndpointConfig,
-		JwksEndpointConfig, KeySet, RefreshToken, Service, Session, SigningKey,
-		StandardClaims, TokenEndpointConfig, User, UserInfoEndpointConfig, UserPool,
+		AuthorizationPayload, ConnectionConfig, CookieStore, Credentials,
+		EmailPasswordConnection, IntrospectionEndpointConfig, JwksEndpointConfig,
+		KeySet, LoginEndpointConfig, OIDCConnection, RefreshToken, Service, Session,
+		SigningKey, StandardClaims, TokenEndpointConfig, User, UserInfoEndpointConfig,
 		WellKnownEndpointConfig []ent.Hook
 	}
 	inters struct {
 		Application, AuthorizationCode, AuthorizationEndpointConfig,
-		AuthorizationPayload, CookieStore, Credentials, IntrospectionEndpointConfig,
-		JwksEndpointConfig, KeySet, RefreshToken, Service, Session, SigningKey,
-		StandardClaims, TokenEndpointConfig, User, UserInfoEndpointConfig, UserPool,
+		AuthorizationPayload, ConnectionConfig, CookieStore, Credentials,
+		EmailPasswordConnection, IntrospectionEndpointConfig, JwksEndpointConfig,
+		KeySet, LoginEndpointConfig, OIDCConnection, RefreshToken, Service, Session,
+		SigningKey, StandardClaims, TokenEndpointConfig, User, UserInfoEndpointConfig,
 		WellKnownEndpointConfig []ent.Interceptor
 	}
 )

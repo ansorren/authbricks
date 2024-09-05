@@ -42,6 +42,10 @@ const (
 	EdgeServiceJwksEndpointConfig = "service_jwks_endpoint_config"
 	// EdgeServiceWellKnownEndpointConfig holds the string denoting the service_well_known_endpoint_config edge name in mutations.
 	EdgeServiceWellKnownEndpointConfig = "service_well_known_endpoint_config"
+	// EdgeServiceLoginEndpointConfig holds the string denoting the service_login_endpoint_config edge name in mutations.
+	EdgeServiceLoginEndpointConfig = "service_login_endpoint_config"
+	// EdgeServiceConnectionConfig holds the string denoting the service_connection_config edge name in mutations.
+	EdgeServiceConnectionConfig = "service_connection_config"
 	// EdgeApplications holds the string denoting the applications edge name in mutations.
 	EdgeApplications = "applications"
 	// Table holds the table name of the service in the database.
@@ -95,6 +99,20 @@ const (
 	ServiceWellKnownEndpointConfigInverseTable = "well_known_endpoint_configs"
 	// ServiceWellKnownEndpointConfigColumn is the table column denoting the service_well_known_endpoint_config relation/edge.
 	ServiceWellKnownEndpointConfigColumn = "service_service_well_known_endpoint_config"
+	// ServiceLoginEndpointConfigTable is the table that holds the service_login_endpoint_config relation/edge.
+	ServiceLoginEndpointConfigTable = "login_endpoint_configs"
+	// ServiceLoginEndpointConfigInverseTable is the table name for the LoginEndpointConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "loginendpointconfig" package.
+	ServiceLoginEndpointConfigInverseTable = "login_endpoint_configs"
+	// ServiceLoginEndpointConfigColumn is the table column denoting the service_login_endpoint_config relation/edge.
+	ServiceLoginEndpointConfigColumn = "service_service_login_endpoint_config"
+	// ServiceConnectionConfigTable is the table that holds the service_connection_config relation/edge.
+	ServiceConnectionConfigTable = "connection_configs"
+	// ServiceConnectionConfigInverseTable is the table name for the ConnectionConfig entity.
+	// It exists in this package in order to avoid circular dependency with the "connectionconfig" package.
+	ServiceConnectionConfigInverseTable = "connection_configs"
+	// ServiceConnectionConfigColumn is the table column denoting the service_connection_config relation/edge.
+	ServiceConnectionConfigColumn = "service_service_connection_config"
 	// ApplicationsTable is the table that holds the applications relation/edge.
 	ApplicationsTable = "applications"
 	// ApplicationsInverseTable is the table name for the Application entity.
@@ -213,6 +231,20 @@ func ByServiceWellKnownEndpointConfigField(field string, opts ...sql.OrderTermOp
 	}
 }
 
+// ByServiceLoginEndpointConfigField orders the results by service_login_endpoint_config field.
+func ByServiceLoginEndpointConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceLoginEndpointConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByServiceConnectionConfigField orders the results by service_connection_config field.
+func ByServiceConnectionConfigField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newServiceConnectionConfigStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByApplicationsCount orders the results by applications count.
 func ByApplicationsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -273,6 +305,20 @@ func newServiceWellKnownEndpointConfigStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ServiceWellKnownEndpointConfigInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ServiceWellKnownEndpointConfigTable, ServiceWellKnownEndpointConfigColumn),
+	)
+}
+func newServiceLoginEndpointConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceLoginEndpointConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceLoginEndpointConfigTable, ServiceLoginEndpointConfigColumn),
+	)
+}
+func newServiceConnectionConfigStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ServiceConnectionConfigInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ServiceConnectionConfigTable, ServiceConnectionConfigColumn),
 	)
 }
 func newApplicationsStep() *sqlgraph.Step {

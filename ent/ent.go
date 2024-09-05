@@ -16,11 +16,15 @@ import (
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/session"
@@ -29,7 +33,6 @@ import (
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
-	"go.authbricks.com/bricks/ent/userpool"
 	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
@@ -95,11 +98,15 @@ func checkColumn(table, column string) error {
 			authorizationcode.Table:           authorizationcode.ValidColumn,
 			authorizationendpointconfig.Table: authorizationendpointconfig.ValidColumn,
 			authorizationpayload.Table:        authorizationpayload.ValidColumn,
+			connectionconfig.Table:            connectionconfig.ValidColumn,
 			cookiestore.Table:                 cookiestore.ValidColumn,
 			credentials.Table:                 credentials.ValidColumn,
+			emailpasswordconnection.Table:     emailpasswordconnection.ValidColumn,
 			introspectionendpointconfig.Table: introspectionendpointconfig.ValidColumn,
 			jwksendpointconfig.Table:          jwksendpointconfig.ValidColumn,
 			keyset.Table:                      keyset.ValidColumn,
+			loginendpointconfig.Table:         loginendpointconfig.ValidColumn,
+			oidcconnection.Table:              oidcconnection.ValidColumn,
 			refreshtoken.Table:                refreshtoken.ValidColumn,
 			service.Table:                     service.ValidColumn,
 			session.Table:                     session.ValidColumn,
@@ -108,7 +115,6 @@ func checkColumn(table, column string) error {
 			tokenendpointconfig.Table:         tokenendpointconfig.ValidColumn,
 			user.Table:                        user.ValidColumn,
 			userinfoendpointconfig.Table:      userinfoendpointconfig.ValidColumn,
-			userpool.Table:                    userpool.ValidColumn,
 			wellknownendpointconfig.Table:     wellknownendpointconfig.ValidColumn,
 		})
 	})

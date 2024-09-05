@@ -68,9 +68,9 @@ func CreatedAt(v int64) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// ServerName applies equality check predicate on the "server_name" field. It's identical to ServerNameEQ.
-func ServerName(v string) predicate.Session {
-	return predicate.Session(sql.FieldEQ(FieldServerName, v))
+// ServiceName applies equality check predicate on the "service_name" field. It's identical to ServiceNameEQ.
+func ServiceName(v string) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldServiceName, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -113,69 +113,69 @@ func CreatedAtLTE(v int64) predicate.Session {
 	return predicate.Session(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// ServerNameEQ applies the EQ predicate on the "server_name" field.
-func ServerNameEQ(v string) predicate.Session {
-	return predicate.Session(sql.FieldEQ(FieldServerName, v))
+// ServiceNameEQ applies the EQ predicate on the "service_name" field.
+func ServiceNameEQ(v string) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldServiceName, v))
 }
 
-// ServerNameNEQ applies the NEQ predicate on the "server_name" field.
-func ServerNameNEQ(v string) predicate.Session {
-	return predicate.Session(sql.FieldNEQ(FieldServerName, v))
+// ServiceNameNEQ applies the NEQ predicate on the "service_name" field.
+func ServiceNameNEQ(v string) predicate.Session {
+	return predicate.Session(sql.FieldNEQ(FieldServiceName, v))
 }
 
-// ServerNameIn applies the In predicate on the "server_name" field.
-func ServerNameIn(vs ...string) predicate.Session {
-	return predicate.Session(sql.FieldIn(FieldServerName, vs...))
+// ServiceNameIn applies the In predicate on the "service_name" field.
+func ServiceNameIn(vs ...string) predicate.Session {
+	return predicate.Session(sql.FieldIn(FieldServiceName, vs...))
 }
 
-// ServerNameNotIn applies the NotIn predicate on the "server_name" field.
-func ServerNameNotIn(vs ...string) predicate.Session {
-	return predicate.Session(sql.FieldNotIn(FieldServerName, vs...))
+// ServiceNameNotIn applies the NotIn predicate on the "service_name" field.
+func ServiceNameNotIn(vs ...string) predicate.Session {
+	return predicate.Session(sql.FieldNotIn(FieldServiceName, vs...))
 }
 
-// ServerNameGT applies the GT predicate on the "server_name" field.
-func ServerNameGT(v string) predicate.Session {
-	return predicate.Session(sql.FieldGT(FieldServerName, v))
+// ServiceNameGT applies the GT predicate on the "service_name" field.
+func ServiceNameGT(v string) predicate.Session {
+	return predicate.Session(sql.FieldGT(FieldServiceName, v))
 }
 
-// ServerNameGTE applies the GTE predicate on the "server_name" field.
-func ServerNameGTE(v string) predicate.Session {
-	return predicate.Session(sql.FieldGTE(FieldServerName, v))
+// ServiceNameGTE applies the GTE predicate on the "service_name" field.
+func ServiceNameGTE(v string) predicate.Session {
+	return predicate.Session(sql.FieldGTE(FieldServiceName, v))
 }
 
-// ServerNameLT applies the LT predicate on the "server_name" field.
-func ServerNameLT(v string) predicate.Session {
-	return predicate.Session(sql.FieldLT(FieldServerName, v))
+// ServiceNameLT applies the LT predicate on the "service_name" field.
+func ServiceNameLT(v string) predicate.Session {
+	return predicate.Session(sql.FieldLT(FieldServiceName, v))
 }
 
-// ServerNameLTE applies the LTE predicate on the "server_name" field.
-func ServerNameLTE(v string) predicate.Session {
-	return predicate.Session(sql.FieldLTE(FieldServerName, v))
+// ServiceNameLTE applies the LTE predicate on the "service_name" field.
+func ServiceNameLTE(v string) predicate.Session {
+	return predicate.Session(sql.FieldLTE(FieldServiceName, v))
 }
 
-// ServerNameContains applies the Contains predicate on the "server_name" field.
-func ServerNameContains(v string) predicate.Session {
-	return predicate.Session(sql.FieldContains(FieldServerName, v))
+// ServiceNameContains applies the Contains predicate on the "service_name" field.
+func ServiceNameContains(v string) predicate.Session {
+	return predicate.Session(sql.FieldContains(FieldServiceName, v))
 }
 
-// ServerNameHasPrefix applies the HasPrefix predicate on the "server_name" field.
-func ServerNameHasPrefix(v string) predicate.Session {
-	return predicate.Session(sql.FieldHasPrefix(FieldServerName, v))
+// ServiceNameHasPrefix applies the HasPrefix predicate on the "service_name" field.
+func ServiceNameHasPrefix(v string) predicate.Session {
+	return predicate.Session(sql.FieldHasPrefix(FieldServiceName, v))
 }
 
-// ServerNameHasSuffix applies the HasSuffix predicate on the "server_name" field.
-func ServerNameHasSuffix(v string) predicate.Session {
-	return predicate.Session(sql.FieldHasSuffix(FieldServerName, v))
+// ServiceNameHasSuffix applies the HasSuffix predicate on the "service_name" field.
+func ServiceNameHasSuffix(v string) predicate.Session {
+	return predicate.Session(sql.FieldHasSuffix(FieldServiceName, v))
 }
 
-// ServerNameEqualFold applies the EqualFold predicate on the "server_name" field.
-func ServerNameEqualFold(v string) predicate.Session {
-	return predicate.Session(sql.FieldEqualFold(FieldServerName, v))
+// ServiceNameEqualFold applies the EqualFold predicate on the "service_name" field.
+func ServiceNameEqualFold(v string) predicate.Session {
+	return predicate.Session(sql.FieldEqualFold(FieldServiceName, v))
 }
 
-// ServerNameContainsFold applies the ContainsFold predicate on the "server_name" field.
-func ServerNameContainsFold(v string) predicate.Session {
-	return predicate.Session(sql.FieldContainsFold(FieldServerName, v))
+// ServiceNameContainsFold applies the ContainsFold predicate on the "service_name" field.
+func ServiceNameContainsFold(v string) predicate.Session {
+	return predicate.Session(sql.FieldContainsFold(FieldServiceName, v))
 }
 
 // HasAuthorizationPayload applies the HasEdge predicate on the "authorization_payload" edge.

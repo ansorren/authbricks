@@ -14,8 +14,8 @@ const (
 	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldServerName holds the string denoting the server_name field in the database.
-	FieldServerName = "server_name"
+	// FieldServiceName holds the string denoting the service_name field in the database.
+	FieldServiceName = "service_name"
 	// EdgeAuthorizationPayload holds the string denoting the authorization_payload edge name in mutations.
 	EdgeAuthorizationPayload = "authorization_payload"
 	// Table holds the table name of the session in the database.
@@ -33,7 +33,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
-	FieldServerName,
+	FieldServiceName,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -49,8 +49,8 @@ func ValidColumn(column string) bool {
 var (
 	// CreatedAtValidator is a validator for the "created_at" field. It is called by the builders before save.
 	CreatedAtValidator func(int64) error
-	// ServerNameValidator is a validator for the "server_name" field. It is called by the builders before save.
-	ServerNameValidator func(string) error
+	// ServiceNameValidator is a validator for the "service_name" field. It is called by the builders before save.
+	ServiceNameValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -68,9 +68,9 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByServerName orders the results by the server_name field.
-func ByServerName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServerName, opts...).ToFunc()
+// ByServiceName orders the results by the service_name field.
+func ByServiceName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldServiceName, opts...).ToFunc()
 }
 
 // ByAuthorizationPayloadField orders the results by authorization_payload field.

@@ -10,9 +10,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
@@ -62,11 +64,15 @@ type ServiceEdges struct {
 	ServiceJwksEndpointConfig *JwksEndpointConfig `json:"service_jwks_endpoint_config,omitempty"`
 	// ServiceWellKnownEndpointConfig holds the value of the service_well_known_endpoint_config edge.
 	ServiceWellKnownEndpointConfig *WellKnownEndpointConfig `json:"service_well_known_endpoint_config,omitempty"`
+	// ServiceLoginEndpointConfig holds the value of the service_login_endpoint_config edge.
+	ServiceLoginEndpointConfig *LoginEndpointConfig `json:"service_login_endpoint_config,omitempty"`
+	// ServiceConnectionConfig holds the value of the service_connection_config edge.
+	ServiceConnectionConfig *ConnectionConfig `json:"service_connection_config,omitempty"`
 	// Applications holds the value of the applications edge.
 	Applications []*Application `json:"applications,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [10]bool
 }
 
 // KeySetOrErr returns the KeySet value or an error if the edge
@@ -146,10 +152,32 @@ func (e ServiceEdges) ServiceWellKnownEndpointConfigOrErr() (*WellKnownEndpointC
 	return nil, &NotLoadedError{edge: "service_well_known_endpoint_config"}
 }
 
+// ServiceLoginEndpointConfigOrErr returns the ServiceLoginEndpointConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceLoginEndpointConfigOrErr() (*LoginEndpointConfig, error) {
+	if e.ServiceLoginEndpointConfig != nil {
+		return e.ServiceLoginEndpointConfig, nil
+	} else if e.loadedTypes[7] {
+		return nil, &NotFoundError{label: loginendpointconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_login_endpoint_config"}
+}
+
+// ServiceConnectionConfigOrErr returns the ServiceConnectionConfig value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ServiceEdges) ServiceConnectionConfigOrErr() (*ConnectionConfig, error) {
+	if e.ServiceConnectionConfig != nil {
+		return e.ServiceConnectionConfig, nil
+	} else if e.loadedTypes[8] {
+		return nil, &NotFoundError{label: connectionconfig.Label}
+	}
+	return nil, &NotLoadedError{edge: "service_connection_config"}
+}
+
 // ApplicationsOrErr returns the Applications value or an error if the edge
 // was not loaded in eager-loading.
 func (e ServiceEdges) ApplicationsOrErr() ([]*Application, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[9] {
 		return e.Applications, nil
 	}
 	return nil, &NotLoadedError{edge: "applications"}
@@ -287,6 +315,16 @@ func (s *Service) QueryServiceJwksEndpointConfig() *JwksEndpointConfigQuery {
 // QueryServiceWellKnownEndpointConfig queries the "service_well_known_endpoint_config" edge of the Service entity.
 func (s *Service) QueryServiceWellKnownEndpointConfig() *WellKnownEndpointConfigQuery {
 	return NewServiceClient(s.config).QueryServiceWellKnownEndpointConfig(s)
+}
+
+// QueryServiceLoginEndpointConfig queries the "service_login_endpoint_config" edge of the Service entity.
+func (s *Service) QueryServiceLoginEndpointConfig() *LoginEndpointConfigQuery {
+	return NewServiceClient(s.config).QueryServiceLoginEndpointConfig(s)
+}
+
+// QueryServiceConnectionConfig queries the "service_connection_config" edge of the Service entity.
+func (s *Service) QueryServiceConnectionConfig() *ConnectionConfigQuery {
+	return NewServiceClient(s.config).QueryServiceConnectionConfig(s)
 }
 
 // QueryApplications queries the "applications" edge of the Service entity.

@@ -18,7 +18,7 @@ func (c *Client) CreateApplication(ctx context.Context, cfg config.Application) 
 	}
 	svc, err := c.GetService(ctx, cfg.Service)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot create application %s - service not found", cfg.Service)
+		return nil, errors.Wrapf(err, "cannot get service %s", cfg.Service)
 	}
 
 	return c.DB.EntClient.Application.Create().

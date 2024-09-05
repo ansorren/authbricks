@@ -31,8 +31,8 @@ type AuthorizationPayload struct {
 	ResponseType string `json:"response_type"`
 	// Scope holds the value of the "scope" field.
 	Scope string `json:"scope"`
-	// ServerName holds the value of the "server_name" field.
-	ServerName string `json:"server_name"`
+	// ServiceName holds the value of the "service_name" field.
+	ServiceName string `json:"service_name"`
 	// State holds the value of the "state" field.
 	State string `json:"state"`
 	// ResponseMode holds the value of the "response_mode" field.
@@ -69,7 +69,7 @@ func (*AuthorizationPayload) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case authorizationpayload.FieldID, authorizationpayload.FieldCodeChallenge, authorizationpayload.FieldCodeChallengeMethod, authorizationpayload.FieldClientID, authorizationpayload.FieldNonce, authorizationpayload.FieldRedirectURI, authorizationpayload.FieldResponseType, authorizationpayload.FieldScope, authorizationpayload.FieldServerName, authorizationpayload.FieldState, authorizationpayload.FieldResponseMode:
+		case authorizationpayload.FieldID, authorizationpayload.FieldCodeChallenge, authorizationpayload.FieldCodeChallengeMethod, authorizationpayload.FieldClientID, authorizationpayload.FieldNonce, authorizationpayload.FieldRedirectURI, authorizationpayload.FieldResponseType, authorizationpayload.FieldScope, authorizationpayload.FieldServiceName, authorizationpayload.FieldState, authorizationpayload.FieldResponseMode:
 			values[i] = new(sql.NullString)
 		case authorizationpayload.ForeignKeys[0]: // session_authorization_payload
 			values[i] = new(sql.NullString)
@@ -136,11 +136,11 @@ func (ap *AuthorizationPayload) assignValues(columns []string, values []any) err
 			} else if value.Valid {
 				ap.Scope = value.String
 			}
-		case authorizationpayload.FieldServerName:
+		case authorizationpayload.FieldServiceName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field server_name", values[i])
+				return fmt.Errorf("unexpected type %T for field service_name", values[i])
 			} else if value.Valid {
-				ap.ServerName = value.String
+				ap.ServiceName = value.String
 			}
 		case authorizationpayload.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -223,8 +223,8 @@ func (ap *AuthorizationPayload) String() string {
 	builder.WriteString("scope=")
 	builder.WriteString(ap.Scope)
 	builder.WriteString(", ")
-	builder.WriteString("server_name=")
-	builder.WriteString(ap.ServerName)
+	builder.WriteString("service_name=")
+	builder.WriteString(ap.ServiceName)
 	builder.WriteString(", ")
 	builder.WriteString("state=")
 	builder.WriteString(ap.State)

@@ -22,7 +22,7 @@ func (AuthorizationPayload) Fields() []ent.Field {
 		field.String("redirect_uri").StructTag(`json:"redirect_uri"`),
 		field.String("response_type").StructTag(`json:"response_type"`),
 		field.String("scope").StructTag(`json:"scope"`),
-		field.String("server_name").StructTag(`json:"server_name"`),
+		field.String("service_name").StructTag(`json:"service_name"`),
 		field.String("state").StructTag(`json:"state"`),
 		field.String("response_mode").StructTag(`json:"response_mode"`),
 	}
