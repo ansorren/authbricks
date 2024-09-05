@@ -11,9 +11,11 @@ import (
 	"entgo.io/ent/schema/field"
 	"go.authbricks.com/bricks/ent/application"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
@@ -212,6 +214,44 @@ func (sc *ServiceCreate) SetNillableServiceWellKnownEndpointConfigID(id *string)
 // SetServiceWellKnownEndpointConfig sets the "service_well_known_endpoint_config" edge to the WellKnownEndpointConfig entity.
 func (sc *ServiceCreate) SetServiceWellKnownEndpointConfig(w *WellKnownEndpointConfig) *ServiceCreate {
 	return sc.SetServiceWellKnownEndpointConfigID(w.ID)
+}
+
+// SetServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID.
+func (sc *ServiceCreate) SetServiceLoginEndpointConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceLoginEndpointConfigID(id)
+	return sc
+}
+
+// SetNillableServiceLoginEndpointConfigID sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceLoginEndpointConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceLoginEndpointConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceLoginEndpointConfig sets the "service_login_endpoint_config" edge to the LoginEndpointConfig entity.
+func (sc *ServiceCreate) SetServiceLoginEndpointConfig(l *LoginEndpointConfig) *ServiceCreate {
+	return sc.SetServiceLoginEndpointConfigID(l.ID)
+}
+
+// SetServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID.
+func (sc *ServiceCreate) SetServiceConnectionConfigID(id string) *ServiceCreate {
+	sc.mutation.SetServiceConnectionConfigID(id)
+	return sc
+}
+
+// SetNillableServiceConnectionConfigID sets the "service_connection_config" edge to the ConnectionConfig entity by ID if the given value is not nil.
+func (sc *ServiceCreate) SetNillableServiceConnectionConfigID(id *string) *ServiceCreate {
+	if id != nil {
+		sc = sc.SetServiceConnectionConfigID(*id)
+	}
+	return sc
+}
+
+// SetServiceConnectionConfig sets the "service_connection_config" edge to the ConnectionConfig entity.
+func (sc *ServiceCreate) SetServiceConnectionConfig(c *ConnectionConfig) *ServiceCreate {
+	return sc.SetServiceConnectionConfigID(c.ID)
 }
 
 // AddApplicationIDs adds the "applications" edge to the Application entity by IDs.
@@ -474,6 +514,38 @@ func (sc *ServiceCreate) createSpec() (*Service, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(wellknownendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceLoginEndpointConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceLoginEndpointConfigTable,
+			Columns: []string{service.ServiceLoginEndpointConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(loginendpointconfig.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ServiceConnectionConfigIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   service.ServiceConnectionConfigTable,
+			Columns: []string{service.ServiceConnectionConfigColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(connectionconfig.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

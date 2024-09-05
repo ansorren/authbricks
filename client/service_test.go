@@ -3,10 +3,11 @@ package client
 import (
 	"context"
 	"crypto"
-	abcrypto "go.authbricks.com/bricks/crypto"
 	"testing"
+	"time"
 
 	"go.authbricks.com/bricks/config"
+	abcrypto "go.authbricks.com/bricks/crypto"
 	"go.authbricks.com/bricks/testutils"
 
 	"github.com/stretchr/testify/require"
@@ -54,6 +55,10 @@ func TestService(t *testing.T) {
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "https://example.com/oauth2/.well-known/openid-configuration",
 		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "/login",
+			SessionTimeout: 30 * time.Minute,
+		},
 		Keys: []crypto.PrivateKey{key},
 	}
 
@@ -97,6 +102,27 @@ func TestService(t *testing.T) {
 	require.NotNil(t, userInfoEndpointConfig.ID)
 	require.Equal(t, cfg.UserInfoEndpoint.Endpoint, userInfoEndpointConfig.Endpoint)
 
+	// JWKs Endpoint
+	jwksEndpointConfig, err := svc.QueryServiceJwksEndpointConfig().Only(context.Background())
+	require.Nil(t, err)
+	require.NotNil(t, jwksEndpointConfig)
+	require.NotNil(t, jwksEndpointConfig.ID)
+	require.Equal(t, cfg.JWKSEndpoint.Endpoint, jwksEndpointConfig.Endpoint)
+
+	// Well Known Endpoint
+	wellKnownEndpointConfig, err := svc.QueryServiceWellKnownEndpointConfig().Only(context.Background())
+	require.Nil(t, err)
+	require.NotNil(t, wellKnownEndpointConfig)
+	require.NotNil(t, wellKnownEndpointConfig.ID)
+	require.Equal(t, cfg.WellKnownEndpoint.Endpoint, wellKnownEndpointConfig.Endpoint)
+
+	// Login Endpoint
+	loginEndpointConfig, err := svc.QueryServiceLoginEndpointConfig().Only(context.Background())
+	require.Nil(t, err)
+	require.NotNil(t, loginEndpointConfig)
+	require.NotNil(t, loginEndpointConfig.ID)
+	require.Equal(t, cfg.LoginEndpoint.Endpoint, loginEndpointConfig.Endpoint)
+	require.Equal(t, cfg.LoginEndpoint.SessionTimeout, time.Duration(loginEndpointConfig.SessionTimeout))
 	// Update the service
 	cfg.Description = "updated-description"
 	svc, err = client.UpdateService(context.Background(), cfg)

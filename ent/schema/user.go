@@ -15,15 +15,16 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Unique().NotEmpty().StructTag(`json:"id"`),
-		field.String("username").NotEmpty().Unique().StructTag(`json:"username"`),
-		field.String("password").NotEmpty().StructTag(`json:"password"`),
+		field.String("username").NotEmpty().StructTag(`json:"username"`),
+		field.String("hashed_password").StructTag(`json:"hashed_password"`),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("user_pool", UserPool.Type).Ref("users").Unique(),
 		edge.To("standard_claims", StandardClaims.Type).Unique(),
+		edge.From("email_password_connection", EmailPasswordConnection.Type).Ref("users").Unique(),
+		edge.From("oidc_connections", OIDCConnection.Type).Ref("users").Unique(),
 	}
 }

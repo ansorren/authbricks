@@ -57,6 +57,18 @@ func (f AuthorizationPayloadFunc) Mutate(ctx context.Context, m ent.Mutation) (e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AuthorizationPayloadMutation", m)
 }
 
+// The ConnectionConfigFunc type is an adapter to allow the use of ordinary
+// function as ConnectionConfig mutator.
+type ConnectionConfigFunc func(context.Context, *ent.ConnectionConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ConnectionConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ConnectionConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConnectionConfigMutation", m)
+}
+
 // The CookieStoreFunc type is an adapter to allow the use of ordinary
 // function as CookieStore mutator.
 type CookieStoreFunc func(context.Context, *ent.CookieStoreMutation) (ent.Value, error)
@@ -79,6 +91,18 @@ func (f CredentialsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CredentialsMutation", m)
+}
+
+// The EmailPasswordConnectionFunc type is an adapter to allow the use of ordinary
+// function as EmailPasswordConnection mutator.
+type EmailPasswordConnectionFunc func(context.Context, *ent.EmailPasswordConnectionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmailPasswordConnectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EmailPasswordConnectionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmailPasswordConnectionMutation", m)
 }
 
 // The IntrospectionEndpointConfigFunc type is an adapter to allow the use of ordinary
@@ -115,6 +139,30 @@ func (f KeySetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.KeySetMutation", m)
+}
+
+// The LoginEndpointConfigFunc type is an adapter to allow the use of ordinary
+// function as LoginEndpointConfig mutator.
+type LoginEndpointConfigFunc func(context.Context, *ent.LoginEndpointConfigMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LoginEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LoginEndpointConfigMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LoginEndpointConfigMutation", m)
+}
+
+// The OIDCConnectionFunc type is an adapter to allow the use of ordinary
+// function as OIDCConnection mutator.
+type OIDCConnectionFunc func(context.Context, *ent.OIDCConnectionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OIDCConnectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OIDCConnectionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OIDCConnectionMutation", m)
 }
 
 // The RefreshTokenFunc type is an adapter to allow the use of ordinary
@@ -211,18 +259,6 @@ func (f UserInfoEndpointConfigFunc) Mutate(ctx context.Context, m ent.Mutation) 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserInfoEndpointConfigMutation", m)
-}
-
-// The UserPoolFunc type is an adapter to allow the use of ordinary
-// function as UserPool mutator.
-type UserPoolFunc func(context.Context, *ent.UserPoolMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f UserPoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UserPoolMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserPoolMutation", m)
 }
 
 // The WellKnownEndpointConfigFunc type is an adapter to allow the use of ordinary

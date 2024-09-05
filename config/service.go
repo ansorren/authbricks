@@ -41,6 +41,8 @@ type Service struct {
 	UserInfoEndpoint      UserInfoEndpoint
 	JWKSEndpoint          JWKSEndpoint
 	WellKnownEndpoint     WellKnownEndpoint
+	LoginEndpoint         LoginEndpoint
+	Connection            Connection
 	Keys                  []crypto.PrivateKey
 }
 
@@ -67,7 +69,7 @@ func grantTypesAreAllowed(grantTypes []string) bool {
 // Validate validates the Service configuration.
 func (s Service) Validate() error {
 	if s.Name == "" {
-		return fmt.Errorf("service Name is required")
+		return fmt.Errorf("service name is required")
 	}
 	if s.Identifier == "" {
 		return fmt.Errorf("service identifier is required")
@@ -100,6 +102,12 @@ func (s Service) Validate() error {
 	}
 	if err := s.WellKnownEndpoint.Validate(); err != nil {
 		return errors.Wrapf(err, "well-known endpoint validation failed")
+	}
+	if err := s.LoginEndpoint.Validate(); err != nil {
+		return errors.Wrapf(err, "login endpoint validation failed")
+	}
+	if err := s.Connection.Validate(); err != nil {
+		return errors.Wrapf(err, "connection validation failed")
 	}
 
 	if err := validateKeys(s.Keys); err != nil {

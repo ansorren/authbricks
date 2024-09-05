@@ -8,9 +8,10 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
-	"go.authbricks.com/bricks/ent/userpool"
 )
 
 // User is the model entity for the User schema.
@@ -20,35 +21,27 @@ type User struct {
 	ID string `json:"id"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username"`
-	// Password holds the value of the "password" field.
-	Password string `json:"password"`
+	// HashedPassword holds the value of the "hashed_password" field.
+	HashedPassword string `json:"hashed_password"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges           UserEdges `json:"edges"`
-	user_pool_users *string
-	selectValues    sql.SelectValues
+	Edges                           UserEdges `json:"edges"`
+	email_password_connection_users *string
+	oidc_connection_users           *string
+	selectValues                    sql.SelectValues
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// UserPool holds the value of the user_pool edge.
-	UserPool *UserPool `json:"user_pool,omitempty"`
 	// StandardClaims holds the value of the standard_claims edge.
 	StandardClaims *StandardClaims `json:"standard_claims,omitempty"`
+	// EmailPasswordConnection holds the value of the email_password_connection edge.
+	EmailPasswordConnection *EmailPasswordConnection `json:"email_password_connection,omitempty"`
+	// OidcConnections holds the value of the oidc_connections edge.
+	OidcConnections *OIDCConnection `json:"oidc_connections,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// UserPoolOrErr returns the UserPool value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) UserPoolOrErr() (*UserPool, error) {
-	if e.UserPool != nil {
-		return e.UserPool, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: userpool.Label}
-	}
-	return nil, &NotLoadedError{edge: "user_pool"}
+	loadedTypes [3]bool
 }
 
 // StandardClaimsOrErr returns the StandardClaims value or an error if the edge
@@ -56,10 +49,32 @@ func (e UserEdges) UserPoolOrErr() (*UserPool, error) {
 func (e UserEdges) StandardClaimsOrErr() (*StandardClaims, error) {
 	if e.StandardClaims != nil {
 		return e.StandardClaims, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: standardclaims.Label}
 	}
 	return nil, &NotLoadedError{edge: "standard_claims"}
+}
+
+// EmailPasswordConnectionOrErr returns the EmailPasswordConnection value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) EmailPasswordConnectionOrErr() (*EmailPasswordConnection, error) {
+	if e.EmailPasswordConnection != nil {
+		return e.EmailPasswordConnection, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: emailpasswordconnection.Label}
+	}
+	return nil, &NotLoadedError{edge: "email_password_connection"}
+}
+
+// OidcConnectionsOrErr returns the OidcConnections value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) OidcConnectionsOrErr() (*OIDCConnection, error) {
+	if e.OidcConnections != nil {
+		return e.OidcConnections, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: oidcconnection.Label}
+	}
+	return nil, &NotLoadedError{edge: "oidc_connections"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -67,9 +82,11 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldUsername, user.FieldPassword:
+		case user.FieldID, user.FieldUsername, user.FieldHashedPassword:
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[0]: // user_pool_users
+		case user.ForeignKeys[0]: // email_password_connection_users
+			values[i] = new(sql.NullString)
+		case user.ForeignKeys[1]: // oidc_connection_users
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -98,18 +115,25 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Username = value.String
 			}
-		case user.FieldPassword:
+		case user.FieldHashedPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field password", values[i])
+				return fmt.Errorf("unexpected type %T for field hashed_password", values[i])
 			} else if value.Valid {
-				u.Password = value.String
+				u.HashedPassword = value.String
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_pool_users", values[i])
+				return fmt.Errorf("unexpected type %T for field email_password_connection_users", values[i])
 			} else if value.Valid {
-				u.user_pool_users = new(string)
-				*u.user_pool_users = value.String
+				u.email_password_connection_users = new(string)
+				*u.email_password_connection_users = value.String
+			}
+		case user.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field oidc_connection_users", values[i])
+			} else if value.Valid {
+				u.oidc_connection_users = new(string)
+				*u.oidc_connection_users = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
@@ -124,14 +148,19 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryUserPool queries the "user_pool" edge of the User entity.
-func (u *User) QueryUserPool() *UserPoolQuery {
-	return NewUserClient(u.config).QueryUserPool(u)
-}
-
 // QueryStandardClaims queries the "standard_claims" edge of the User entity.
 func (u *User) QueryStandardClaims() *StandardClaimsQuery {
 	return NewUserClient(u.config).QueryStandardClaims(u)
+}
+
+// QueryEmailPasswordConnection queries the "email_password_connection" edge of the User entity.
+func (u *User) QueryEmailPasswordConnection() *EmailPasswordConnectionQuery {
+	return NewUserClient(u.config).QueryEmailPasswordConnection(u)
+}
+
+// QueryOidcConnections queries the "oidc_connections" edge of the User entity.
+func (u *User) QueryOidcConnections() *OIDCConnectionQuery {
+	return NewUserClient(u.config).QueryOidcConnections(u)
 }
 
 // Update returns a builder for updating this User.
@@ -160,8 +189,8 @@ func (u *User) String() string {
 	builder.WriteString("username=")
 	builder.WriteString(u.Username)
 	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(u.Password)
+	builder.WriteString("hashed_password=")
+	builder.WriteString(u.HashedPassword)
 	builder.WriteByte(')')
 	return builder.String()
 }

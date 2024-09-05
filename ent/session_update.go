@@ -49,16 +49,16 @@ func (su *SessionUpdate) AddCreatedAt(i int64) *SessionUpdate {
 	return su
 }
 
-// SetServerName sets the "server_name" field.
-func (su *SessionUpdate) SetServerName(s string) *SessionUpdate {
-	su.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (su *SessionUpdate) SetServiceName(s string) *SessionUpdate {
+	su.mutation.SetServiceName(s)
 	return su
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (su *SessionUpdate) SetNillableServerName(s *string) *SessionUpdate {
+// SetNillableServiceName sets the "service_name" field if the given value is not nil.
+func (su *SessionUpdate) SetNillableServiceName(s *string) *SessionUpdate {
 	if s != nil {
-		su.SetServerName(*s)
+		su.SetServiceName(*s)
 	}
 	return su
 }
@@ -127,9 +127,9 @@ func (su *SessionUpdate) check() error {
 			return &ValidationError{Name: "created_at", err: fmt.Errorf(`ent: validator failed for field "Session.created_at": %w`, err)}
 		}
 	}
-	if v, ok := su.mutation.ServerName(); ok {
-		if err := session.ServerNameValidator(v); err != nil {
-			return &ValidationError{Name: "server_name", err: fmt.Errorf(`ent: validator failed for field "Session.server_name": %w`, err)}
+	if v, ok := su.mutation.ServiceName(); ok {
+		if err := session.ServiceNameValidator(v); err != nil {
+			return &ValidationError{Name: "service_name", err: fmt.Errorf(`ent: validator failed for field "Session.service_name": %w`, err)}
 		}
 	}
 	return nil
@@ -153,8 +153,8 @@ func (su *SessionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.AddedCreatedAt(); ok {
 		_spec.AddField(session.FieldCreatedAt, field.TypeInt64, value)
 	}
-	if value, ok := su.mutation.ServerName(); ok {
-		_spec.SetField(session.FieldServerName, field.TypeString, value)
+	if value, ok := su.mutation.ServiceName(); ok {
+		_spec.SetField(session.FieldServiceName, field.TypeString, value)
 	}
 	if su.mutation.AuthorizationPayloadCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -226,16 +226,16 @@ func (suo *SessionUpdateOne) AddCreatedAt(i int64) *SessionUpdateOne {
 	return suo
 }
 
-// SetServerName sets the "server_name" field.
-func (suo *SessionUpdateOne) SetServerName(s string) *SessionUpdateOne {
-	suo.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (suo *SessionUpdateOne) SetServiceName(s string) *SessionUpdateOne {
+	suo.mutation.SetServiceName(s)
 	return suo
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (suo *SessionUpdateOne) SetNillableServerName(s *string) *SessionUpdateOne {
+// SetNillableServiceName sets the "service_name" field if the given value is not nil.
+func (suo *SessionUpdateOne) SetNillableServiceName(s *string) *SessionUpdateOne {
 	if s != nil {
-		suo.SetServerName(*s)
+		suo.SetServiceName(*s)
 	}
 	return suo
 }
@@ -317,9 +317,9 @@ func (suo *SessionUpdateOne) check() error {
 			return &ValidationError{Name: "created_at", err: fmt.Errorf(`ent: validator failed for field "Session.created_at": %w`, err)}
 		}
 	}
-	if v, ok := suo.mutation.ServerName(); ok {
-		if err := session.ServerNameValidator(v); err != nil {
-			return &ValidationError{Name: "server_name", err: fmt.Errorf(`ent: validator failed for field "Session.server_name": %w`, err)}
+	if v, ok := suo.mutation.ServiceName(); ok {
+		if err := session.ServiceNameValidator(v); err != nil {
+			return &ValidationError{Name: "service_name", err: fmt.Errorf(`ent: validator failed for field "Session.service_name": %w`, err)}
 		}
 	}
 	return nil
@@ -360,8 +360,8 @@ func (suo *SessionUpdateOne) sqlSave(ctx context.Context) (_node *Session, err e
 	if value, ok := suo.mutation.AddedCreatedAt(); ok {
 		_spec.AddField(session.FieldCreatedAt, field.TypeInt64, value)
 	}
-	if value, ok := suo.mutation.ServerName(); ok {
-		_spec.SetField(session.FieldServerName, field.TypeString, value)
+	if value, ok := suo.mutation.ServiceName(); ok {
+		_spec.SetField(session.FieldServiceName, field.TypeString, value)
 	}
 	if suo.mutation.AuthorizationPayloadCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -106,4 +108,55 @@ func validateGrant(app *ent.Application, service *ent.Service, grantType string)
 		return fmt.Errorf("service %s is not allowed to use grant type: %s", service.Name, grantType)
 	}
 	return nil
+}
+
+// generateRandomState generates a new random state to be used as the `state` value
+// during an `authorization_code` flow.
+func generateRandomState() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	s := base64.StdEncoding.EncodeToString(b)
+	return s, nil
+}
+
+// sanitiseEndpoint sanitises the endpoint by removing the base URL
+// and any leading/trailing slashes.
+func sanitiseEndpoint(endpoint string, baseURL string) string {
+	if strings.HasPrefix(endpoint, baseURL) {
+		newEndpoint := strings.TrimPrefix(endpoint, baseURL)
+		return sanitiseEndpoint(newEndpoint, baseURL)
+	}
+	if strings.HasPrefix(endpoint, "/") {
+		newEndpoint := strings.TrimPrefix(endpoint, "/")
+		return sanitiseEndpoint(newEndpoint, baseURL)
+	}
+	if strings.HasSuffix(endpoint, "/") {
+		newEndpoint := strings.TrimSuffix(endpoint, "/")
+		return sanitiseEndpoint(newEndpoint, baseURL)
+	}
+	return endpoint
+}
+
+// sessionIsExpired checks if the given session is expired based on the given current time and duration.
+func sessionIsExpired(session *ent.Session, duration time.Duration, now time.Time) bool {
+	// Convert the CreatedAt field from int64
+	sessionCreatedAt := time.Unix(session.CreatedAt, 0)
+
+	// Calculate the expiration time by adding the session expiration duration to the CreatedAt time.
+	expirationTime := sessionCreatedAt.Add(duration)
+
+	// Check if the current time is after the expiration time.
+	return now.After(expirationTime)
+}
+
+// Subject hashes the ID, so that it can be used as the `sub`
+// field.
+func Subject(id string) string {
+	h := sha256.New()
+	h.Write([]byte(id))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }

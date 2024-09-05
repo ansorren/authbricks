@@ -10,10 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
-	"go.authbricks.com/bricks/ent/userpool"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -43,37 +44,18 @@ func (uu *UserUpdate) SetNillableUsername(s *string) *UserUpdate {
 	return uu
 }
 
-// SetPassword sets the "password" field.
-func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
-	uu.mutation.SetPassword(s)
+// SetHashedPassword sets the "hashed_password" field.
+func (uu *UserUpdate) SetHashedPassword(s string) *UserUpdate {
+	uu.mutation.SetHashedPassword(s)
 	return uu
 }
 
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
+// SetNillableHashedPassword sets the "hashed_password" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableHashedPassword(s *string) *UserUpdate {
 	if s != nil {
-		uu.SetPassword(*s)
+		uu.SetHashedPassword(*s)
 	}
 	return uu
-}
-
-// SetUserPoolID sets the "user_pool" edge to the UserPool entity by ID.
-func (uu *UserUpdate) SetUserPoolID(id string) *UserUpdate {
-	uu.mutation.SetUserPoolID(id)
-	return uu
-}
-
-// SetNillableUserPoolID sets the "user_pool" edge to the UserPool entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableUserPoolID(id *string) *UserUpdate {
-	if id != nil {
-		uu = uu.SetUserPoolID(*id)
-	}
-	return uu
-}
-
-// SetUserPool sets the "user_pool" edge to the UserPool entity.
-func (uu *UserUpdate) SetUserPool(u *UserPool) *UserUpdate {
-	return uu.SetUserPoolID(u.ID)
 }
 
 // SetStandardClaimsID sets the "standard_claims" edge to the StandardClaims entity by ID.
@@ -95,20 +77,64 @@ func (uu *UserUpdate) SetStandardClaims(s *StandardClaims) *UserUpdate {
 	return uu.SetStandardClaimsID(s.ID)
 }
 
+// SetEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID.
+func (uu *UserUpdate) SetEmailPasswordConnectionID(id string) *UserUpdate {
+	uu.mutation.SetEmailPasswordConnectionID(id)
+	return uu
+}
+
+// SetNillableEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableEmailPasswordConnectionID(id *string) *UserUpdate {
+	if id != nil {
+		uu = uu.SetEmailPasswordConnectionID(*id)
+	}
+	return uu
+}
+
+// SetEmailPasswordConnection sets the "email_password_connection" edge to the EmailPasswordConnection entity.
+func (uu *UserUpdate) SetEmailPasswordConnection(e *EmailPasswordConnection) *UserUpdate {
+	return uu.SetEmailPasswordConnectionID(e.ID)
+}
+
+// SetOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID.
+func (uu *UserUpdate) SetOidcConnectionsID(id string) *UserUpdate {
+	uu.mutation.SetOidcConnectionsID(id)
+	return uu
+}
+
+// SetNillableOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableOidcConnectionsID(id *string) *UserUpdate {
+	if id != nil {
+		uu = uu.SetOidcConnectionsID(*id)
+	}
+	return uu
+}
+
+// SetOidcConnections sets the "oidc_connections" edge to the OIDCConnection entity.
+func (uu *UserUpdate) SetOidcConnections(o *OIDCConnection) *UserUpdate {
+	return uu.SetOidcConnectionsID(o.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
 }
 
-// ClearUserPool clears the "user_pool" edge to the UserPool entity.
-func (uu *UserUpdate) ClearUserPool() *UserUpdate {
-	uu.mutation.ClearUserPool()
-	return uu
-}
-
 // ClearStandardClaims clears the "standard_claims" edge to the StandardClaims entity.
 func (uu *UserUpdate) ClearStandardClaims() *UserUpdate {
 	uu.mutation.ClearStandardClaims()
+	return uu
+}
+
+// ClearEmailPasswordConnection clears the "email_password_connection" edge to the EmailPasswordConnection entity.
+func (uu *UserUpdate) ClearEmailPasswordConnection() *UserUpdate {
+	uu.mutation.ClearEmailPasswordConnection()
+	return uu
+}
+
+// ClearOidcConnections clears the "oidc_connections" edge to the OIDCConnection entity.
+func (uu *UserUpdate) ClearOidcConnections() *UserUpdate {
+	uu.mutation.ClearOidcConnections()
 	return uu
 }
 
@@ -146,11 +172,6 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
 		}
 	}
-	if v, ok := uu.mutation.Password(); ok {
-		if err := user.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -169,37 +190,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.Password(); ok {
-		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if uu.mutation.UserPoolCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.UserPoolTable,
-			Columns: []string{user.UserPoolColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpool.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.UserPoolIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.UserPoolTable,
-			Columns: []string{user.UserPoolColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpool.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := uu.mutation.HashedPassword(); ok {
+		_spec.SetField(user.FieldHashedPassword, field.TypeString, value)
 	}
 	if uu.mutation.StandardClaimsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -223,6 +215,64 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(standardclaims.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.EmailPasswordConnectionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.EmailPasswordConnectionTable,
+			Columns: []string{user.EmailPasswordConnectionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(emailpasswordconnection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.EmailPasswordConnectionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.EmailPasswordConnectionTable,
+			Columns: []string{user.EmailPasswordConnectionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(emailpasswordconnection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.OidcConnectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.OidcConnectionsTable,
+			Columns: []string{user.OidcConnectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oidcconnection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.OidcConnectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.OidcConnectionsTable,
+			Columns: []string{user.OidcConnectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oidcconnection.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -264,37 +314,18 @@ func (uuo *UserUpdateOne) SetNillableUsername(s *string) *UserUpdateOne {
 	return uuo
 }
 
-// SetPassword sets the "password" field.
-func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
-	uuo.mutation.SetPassword(s)
+// SetHashedPassword sets the "hashed_password" field.
+func (uuo *UserUpdateOne) SetHashedPassword(s string) *UserUpdateOne {
+	uuo.mutation.SetHashedPassword(s)
 	return uuo
 }
 
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
+// SetNillableHashedPassword sets the "hashed_password" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableHashedPassword(s *string) *UserUpdateOne {
 	if s != nil {
-		uuo.SetPassword(*s)
+		uuo.SetHashedPassword(*s)
 	}
 	return uuo
-}
-
-// SetUserPoolID sets the "user_pool" edge to the UserPool entity by ID.
-func (uuo *UserUpdateOne) SetUserPoolID(id string) *UserUpdateOne {
-	uuo.mutation.SetUserPoolID(id)
-	return uuo
-}
-
-// SetNillableUserPoolID sets the "user_pool" edge to the UserPool entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableUserPoolID(id *string) *UserUpdateOne {
-	if id != nil {
-		uuo = uuo.SetUserPoolID(*id)
-	}
-	return uuo
-}
-
-// SetUserPool sets the "user_pool" edge to the UserPool entity.
-func (uuo *UserUpdateOne) SetUserPool(u *UserPool) *UserUpdateOne {
-	return uuo.SetUserPoolID(u.ID)
 }
 
 // SetStandardClaimsID sets the "standard_claims" edge to the StandardClaims entity by ID.
@@ -316,20 +347,64 @@ func (uuo *UserUpdateOne) SetStandardClaims(s *StandardClaims) *UserUpdateOne {
 	return uuo.SetStandardClaimsID(s.ID)
 }
 
+// SetEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID.
+func (uuo *UserUpdateOne) SetEmailPasswordConnectionID(id string) *UserUpdateOne {
+	uuo.mutation.SetEmailPasswordConnectionID(id)
+	return uuo
+}
+
+// SetNillableEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableEmailPasswordConnectionID(id *string) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetEmailPasswordConnectionID(*id)
+	}
+	return uuo
+}
+
+// SetEmailPasswordConnection sets the "email_password_connection" edge to the EmailPasswordConnection entity.
+func (uuo *UserUpdateOne) SetEmailPasswordConnection(e *EmailPasswordConnection) *UserUpdateOne {
+	return uuo.SetEmailPasswordConnectionID(e.ID)
+}
+
+// SetOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID.
+func (uuo *UserUpdateOne) SetOidcConnectionsID(id string) *UserUpdateOne {
+	uuo.mutation.SetOidcConnectionsID(id)
+	return uuo
+}
+
+// SetNillableOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableOidcConnectionsID(id *string) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetOidcConnectionsID(*id)
+	}
+	return uuo
+}
+
+// SetOidcConnections sets the "oidc_connections" edge to the OIDCConnection entity.
+func (uuo *UserUpdateOne) SetOidcConnections(o *OIDCConnection) *UserUpdateOne {
+	return uuo.SetOidcConnectionsID(o.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
 }
 
-// ClearUserPool clears the "user_pool" edge to the UserPool entity.
-func (uuo *UserUpdateOne) ClearUserPool() *UserUpdateOne {
-	uuo.mutation.ClearUserPool()
-	return uuo
-}
-
 // ClearStandardClaims clears the "standard_claims" edge to the StandardClaims entity.
 func (uuo *UserUpdateOne) ClearStandardClaims() *UserUpdateOne {
 	uuo.mutation.ClearStandardClaims()
+	return uuo
+}
+
+// ClearEmailPasswordConnection clears the "email_password_connection" edge to the EmailPasswordConnection entity.
+func (uuo *UserUpdateOne) ClearEmailPasswordConnection() *UserUpdateOne {
+	uuo.mutation.ClearEmailPasswordConnection()
+	return uuo
+}
+
+// ClearOidcConnections clears the "oidc_connections" edge to the OIDCConnection entity.
+func (uuo *UserUpdateOne) ClearOidcConnections() *UserUpdateOne {
+	uuo.mutation.ClearOidcConnections()
 	return uuo
 }
 
@@ -380,11 +455,6 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
 		}
 	}
-	if v, ok := uuo.mutation.Password(); ok {
-		if err := user.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -420,37 +490,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.Password(); ok {
-		_spec.SetField(user.FieldPassword, field.TypeString, value)
-	}
-	if uuo.mutation.UserPoolCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.UserPoolTable,
-			Columns: []string{user.UserPoolColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpool.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.UserPoolIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.UserPoolTable,
-			Columns: []string{user.UserPoolColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpool.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := uuo.mutation.HashedPassword(); ok {
+		_spec.SetField(user.FieldHashedPassword, field.TypeString, value)
 	}
 	if uuo.mutation.StandardClaimsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -474,6 +515,64 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(standardclaims.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.EmailPasswordConnectionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.EmailPasswordConnectionTable,
+			Columns: []string{user.EmailPasswordConnectionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(emailpasswordconnection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.EmailPasswordConnectionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.EmailPasswordConnectionTable,
+			Columns: []string{user.EmailPasswordConnectionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(emailpasswordconnection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.OidcConnectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.OidcConnectionsTable,
+			Columns: []string{user.OidcConnectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oidcconnection.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.OidcConnectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.OidcConnectionsTable,
+			Columns: []string{user.OidcConnectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oidcconnection.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto"
 	"testing"
+	"time"
 
 	"go.authbricks.com/bricks/config"
 	abcrypto "go.authbricks.com/bricks/crypto"
@@ -52,6 +53,10 @@ func TestApplication(t *testing.T) {
 		},
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "https://example.com/oauth2/.well-known/openid-configuration",
+		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "/login",
+			SessionTimeout: 30 * time.Minute,
 		},
 		Keys: []crypto.PrivateKey{key},
 	}

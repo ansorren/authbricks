@@ -62,9 +62,9 @@ func (apc *AuthorizationPayloadCreate) SetScope(s string) *AuthorizationPayloadC
 	return apc
 }
 
-// SetServerName sets the "server_name" field.
-func (apc *AuthorizationPayloadCreate) SetServerName(s string) *AuthorizationPayloadCreate {
-	apc.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (apc *AuthorizationPayloadCreate) SetServiceName(s string) *AuthorizationPayloadCreate {
+	apc.mutation.SetServiceName(s)
 	return apc
 }
 
@@ -160,8 +160,8 @@ func (apc *AuthorizationPayloadCreate) check() error {
 	if _, ok := apc.mutation.Scope(); !ok {
 		return &ValidationError{Name: "scope", err: errors.New(`ent: missing required field "AuthorizationPayload.scope"`)}
 	}
-	if _, ok := apc.mutation.ServerName(); !ok {
-		return &ValidationError{Name: "server_name", err: errors.New(`ent: missing required field "AuthorizationPayload.server_name"`)}
+	if _, ok := apc.mutation.ServiceName(); !ok {
+		return &ValidationError{Name: "service_name", err: errors.New(`ent: missing required field "AuthorizationPayload.service_name"`)}
 	}
 	if _, ok := apc.mutation.State(); !ok {
 		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "AuthorizationPayload.state"`)}
@@ -237,9 +237,9 @@ func (apc *AuthorizationPayloadCreate) createSpec() (*AuthorizationPayload, *sql
 		_spec.SetField(authorizationpayload.FieldScope, field.TypeString, value)
 		_node.Scope = value
 	}
-	if value, ok := apc.mutation.ServerName(); ok {
-		_spec.SetField(authorizationpayload.FieldServerName, field.TypeString, value)
-		_node.ServerName = value
+	if value, ok := apc.mutation.ServiceName(); ok {
+		_spec.SetField(authorizationpayload.FieldServiceName, field.TypeString, value)
+		_node.ServiceName = value
 	}
 	if value, ok := apc.mutation.State(); ok {
 		_spec.SetField(authorizationpayload.FieldState, field.TypeString, value)

@@ -98,9 +98,9 @@ func Scope(v string) predicate.AuthorizationPayload {
 	return predicate.AuthorizationPayload(sql.FieldEQ(FieldScope, v))
 }
 
-// ServerName applies equality check predicate on the "server_name" field. It's identical to ServerNameEQ.
-func ServerName(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldEQ(FieldServerName, v))
+// ServiceName applies equality check predicate on the "service_name" field. It's identical to ServiceNameEQ.
+func ServiceName(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldEQ(FieldServiceName, v))
 }
 
 // State applies equality check predicate on the "state" field. It's identical to StateEQ.
@@ -568,69 +568,69 @@ func ScopeContainsFold(v string) predicate.AuthorizationPayload {
 	return predicate.AuthorizationPayload(sql.FieldContainsFold(FieldScope, v))
 }
 
-// ServerNameEQ applies the EQ predicate on the "server_name" field.
-func ServerNameEQ(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldEQ(FieldServerName, v))
+// ServiceNameEQ applies the EQ predicate on the "service_name" field.
+func ServiceNameEQ(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldEQ(FieldServiceName, v))
 }
 
-// ServerNameNEQ applies the NEQ predicate on the "server_name" field.
-func ServerNameNEQ(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldNEQ(FieldServerName, v))
+// ServiceNameNEQ applies the NEQ predicate on the "service_name" field.
+func ServiceNameNEQ(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldNEQ(FieldServiceName, v))
 }
 
-// ServerNameIn applies the In predicate on the "server_name" field.
-func ServerNameIn(vs ...string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldIn(FieldServerName, vs...))
+// ServiceNameIn applies the In predicate on the "service_name" field.
+func ServiceNameIn(vs ...string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldIn(FieldServiceName, vs...))
 }
 
-// ServerNameNotIn applies the NotIn predicate on the "server_name" field.
-func ServerNameNotIn(vs ...string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldNotIn(FieldServerName, vs...))
+// ServiceNameNotIn applies the NotIn predicate on the "service_name" field.
+func ServiceNameNotIn(vs ...string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldNotIn(FieldServiceName, vs...))
 }
 
-// ServerNameGT applies the GT predicate on the "server_name" field.
-func ServerNameGT(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldGT(FieldServerName, v))
+// ServiceNameGT applies the GT predicate on the "service_name" field.
+func ServiceNameGT(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldGT(FieldServiceName, v))
 }
 
-// ServerNameGTE applies the GTE predicate on the "server_name" field.
-func ServerNameGTE(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldGTE(FieldServerName, v))
+// ServiceNameGTE applies the GTE predicate on the "service_name" field.
+func ServiceNameGTE(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldGTE(FieldServiceName, v))
 }
 
-// ServerNameLT applies the LT predicate on the "server_name" field.
-func ServerNameLT(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldLT(FieldServerName, v))
+// ServiceNameLT applies the LT predicate on the "service_name" field.
+func ServiceNameLT(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldLT(FieldServiceName, v))
 }
 
-// ServerNameLTE applies the LTE predicate on the "server_name" field.
-func ServerNameLTE(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldLTE(FieldServerName, v))
+// ServiceNameLTE applies the LTE predicate on the "service_name" field.
+func ServiceNameLTE(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldLTE(FieldServiceName, v))
 }
 
-// ServerNameContains applies the Contains predicate on the "server_name" field.
-func ServerNameContains(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldContains(FieldServerName, v))
+// ServiceNameContains applies the Contains predicate on the "service_name" field.
+func ServiceNameContains(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldContains(FieldServiceName, v))
 }
 
-// ServerNameHasPrefix applies the HasPrefix predicate on the "server_name" field.
-func ServerNameHasPrefix(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldHasPrefix(FieldServerName, v))
+// ServiceNameHasPrefix applies the HasPrefix predicate on the "service_name" field.
+func ServiceNameHasPrefix(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldHasPrefix(FieldServiceName, v))
 }
 
-// ServerNameHasSuffix applies the HasSuffix predicate on the "server_name" field.
-func ServerNameHasSuffix(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldHasSuffix(FieldServerName, v))
+// ServiceNameHasSuffix applies the HasSuffix predicate on the "service_name" field.
+func ServiceNameHasSuffix(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldHasSuffix(FieldServiceName, v))
 }
 
-// ServerNameEqualFold applies the EqualFold predicate on the "server_name" field.
-func ServerNameEqualFold(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldEqualFold(FieldServerName, v))
+// ServiceNameEqualFold applies the EqualFold predicate on the "service_name" field.
+func ServiceNameEqualFold(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldEqualFold(FieldServiceName, v))
 }
 
-// ServerNameContainsFold applies the ContainsFold predicate on the "server_name" field.
-func ServerNameContainsFold(v string) predicate.AuthorizationPayload {
-	return predicate.AuthorizationPayload(sql.FieldContainsFold(FieldServerName, v))
+// ServiceNameContainsFold applies the ContainsFold predicate on the "service_name" field.
+func ServiceNameContainsFold(v string) predicate.AuthorizationPayload {
+	return predicate.AuthorizationPayload(sql.FieldContainsFold(FieldServiceName, v))
 }
 
 // StateEQ applies the EQ predicate on the "state" field.

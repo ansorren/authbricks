@@ -126,16 +126,16 @@ func (apu *AuthorizationPayloadUpdate) SetNillableScope(s *string) *Authorizatio
 	return apu
 }
 
-// SetServerName sets the "server_name" field.
-func (apu *AuthorizationPayloadUpdate) SetServerName(s string) *AuthorizationPayloadUpdate {
-	apu.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (apu *AuthorizationPayloadUpdate) SetServiceName(s string) *AuthorizationPayloadUpdate {
+	apu.mutation.SetServiceName(s)
 	return apu
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (apu *AuthorizationPayloadUpdate) SetNillableServerName(s *string) *AuthorizationPayloadUpdate {
+// SetNillableServiceName sets the "service_name" field if the given value is not nil.
+func (apu *AuthorizationPayloadUpdate) SetNillableServiceName(s *string) *AuthorizationPayloadUpdate {
 	if s != nil {
-		apu.SetServerName(*s)
+		apu.SetServiceName(*s)
 	}
 	return apu
 }
@@ -255,8 +255,8 @@ func (apu *AuthorizationPayloadUpdate) sqlSave(ctx context.Context) (n int, err 
 	if value, ok := apu.mutation.Scope(); ok {
 		_spec.SetField(authorizationpayload.FieldScope, field.TypeString, value)
 	}
-	if value, ok := apu.mutation.ServerName(); ok {
-		_spec.SetField(authorizationpayload.FieldServerName, field.TypeString, value)
+	if value, ok := apu.mutation.ServiceName(); ok {
+		_spec.SetField(authorizationpayload.FieldServiceName, field.TypeString, value)
 	}
 	if value, ok := apu.mutation.State(); ok {
 		_spec.SetField(authorizationpayload.FieldState, field.TypeString, value)
@@ -411,16 +411,16 @@ func (apuo *AuthorizationPayloadUpdateOne) SetNillableScope(s *string) *Authoriz
 	return apuo
 }
 
-// SetServerName sets the "server_name" field.
-func (apuo *AuthorizationPayloadUpdateOne) SetServerName(s string) *AuthorizationPayloadUpdateOne {
-	apuo.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (apuo *AuthorizationPayloadUpdateOne) SetServiceName(s string) *AuthorizationPayloadUpdateOne {
+	apuo.mutation.SetServiceName(s)
 	return apuo
 }
 
-// SetNillableServerName sets the "server_name" field if the given value is not nil.
-func (apuo *AuthorizationPayloadUpdateOne) SetNillableServerName(s *string) *AuthorizationPayloadUpdateOne {
+// SetNillableServiceName sets the "service_name" field if the given value is not nil.
+func (apuo *AuthorizationPayloadUpdateOne) SetNillableServiceName(s *string) *AuthorizationPayloadUpdateOne {
 	if s != nil {
-		apuo.SetServerName(*s)
+		apuo.SetServiceName(*s)
 	}
 	return apuo
 }
@@ -570,8 +570,8 @@ func (apuo *AuthorizationPayloadUpdateOne) sqlSave(ctx context.Context) (_node *
 	if value, ok := apuo.mutation.Scope(); ok {
 		_spec.SetField(authorizationpayload.FieldScope, field.TypeString, value)
 	}
-	if value, ok := apuo.mutation.ServerName(); ok {
-		_spec.SetField(authorizationpayload.FieldServerName, field.TypeString, value)
+	if value, ok := apuo.mutation.ServiceName(); ok {
+		_spec.SetField(authorizationpayload.FieldServiceName, field.TypeString, value)
 	}
 	if value, ok := apuo.mutation.State(); ok {
 		_spec.SetField(authorizationpayload.FieldState, field.TypeString, value)

@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 	"crypto"
-	"go.authbricks.com/bricks/ent"
 	"testing"
+	"time"
 
 	"go.authbricks.com/bricks/config"
 	abcrypto "go.authbricks.com/bricks/crypto"
+	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/testutils"
 
 	"github.com/stretchr/testify/require"
@@ -54,6 +55,10 @@ func TestKeySet(t *testing.T) {
 		},
 		WellKnownEndpoint: config.WellKnownEndpoint{
 			Endpoint: "https://example.com/oauth2/.well-known/openid-configuration",
+		},
+		LoginEndpoint: config.LoginEndpoint{
+			Endpoint:       "/login",
+			SessionTimeout: 30 * time.Minute,
 		},
 		Keys: []crypto.PrivateKey{key},
 	}

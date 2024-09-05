@@ -19,8 +19,8 @@ type Session struct {
 	ID string `json:"id"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt int64 `json:"created_at"`
-	// ServerName holds the value of the "server_name" field.
-	ServerName string `json:"server_name"`
+	// ServiceName holds the value of the "service_name" field.
+	ServiceName string `json:"service_name"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SessionQuery when eager-loading is set.
 	Edges        SessionEdges `json:"edges"`
@@ -54,7 +54,7 @@ func (*Session) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case session.FieldCreatedAt:
 			values[i] = new(sql.NullInt64)
-		case session.FieldID, session.FieldServerName:
+		case session.FieldID, session.FieldServiceName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -83,11 +83,11 @@ func (s *Session) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.CreatedAt = value.Int64
 			}
-		case session.FieldServerName:
+		case session.FieldServiceName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field server_name", values[i])
+				return fmt.Errorf("unexpected type %T for field service_name", values[i])
 			} else if value.Valid {
-				s.ServerName = value.String
+				s.ServiceName = value.String
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -133,8 +133,8 @@ func (s *Session) String() string {
 	builder.WriteString("created_at=")
 	builder.WriteString(fmt.Sprintf("%v", s.CreatedAt))
 	builder.WriteString(", ")
-	builder.WriteString("server_name=")
-	builder.WriteString(s.ServerName)
+	builder.WriteString("service_name=")
+	builder.WriteString(s.ServiceName)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -18,11 +18,17 @@ type AuthorizationEndpointConfig func(*sql.Selector)
 // AuthorizationPayload is the predicate function for authorizationpayload builders.
 type AuthorizationPayload func(*sql.Selector)
 
+// ConnectionConfig is the predicate function for connectionconfig builders.
+type ConnectionConfig func(*sql.Selector)
+
 // CookieStore is the predicate function for cookiestore builders.
 type CookieStore func(*sql.Selector)
 
 // Credentials is the predicate function for credentials builders.
 type Credentials func(*sql.Selector)
+
+// EmailPasswordConnection is the predicate function for emailpasswordconnection builders.
+type EmailPasswordConnection func(*sql.Selector)
 
 // IntrospectionEndpointConfig is the predicate function for introspectionendpointconfig builders.
 type IntrospectionEndpointConfig func(*sql.Selector)
@@ -32,6 +38,12 @@ type JwksEndpointConfig func(*sql.Selector)
 
 // KeySet is the predicate function for keyset builders.
 type KeySet func(*sql.Selector)
+
+// LoginEndpointConfig is the predicate function for loginendpointconfig builders.
+type LoginEndpointConfig func(*sql.Selector)
+
+// OIDCConnection is the predicate function for oidcconnection builders.
+type OIDCConnection func(*sql.Selector)
 
 // RefreshToken is the predicate function for refreshtoken builders.
 type RefreshToken func(*sql.Selector)
@@ -56,9 +68,6 @@ type User func(*sql.Selector)
 
 // UserInfoEndpointConfig is the predicate function for userinfoendpointconfig builders.
 type UserInfoEndpointConfig func(*sql.Selector)
-
-// UserPool is the predicate function for userpool builders.
-type UserPool func(*sql.Selector)
 
 // WellKnownEndpointConfig is the predicate function for wellknownendpointconfig builders.
 type WellKnownEndpointConfig func(*sql.Selector)

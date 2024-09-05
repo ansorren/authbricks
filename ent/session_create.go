@@ -26,9 +26,9 @@ func (sc *SessionCreate) SetCreatedAt(i int64) *SessionCreate {
 	return sc
 }
 
-// SetServerName sets the "server_name" field.
-func (sc *SessionCreate) SetServerName(s string) *SessionCreate {
-	sc.mutation.SetServerName(s)
+// SetServiceName sets the "service_name" field.
+func (sc *SessionCreate) SetServiceName(s string) *SessionCreate {
+	sc.mutation.SetServiceName(s)
 	return sc
 }
 
@@ -99,12 +99,12 @@ func (sc *SessionCreate) check() error {
 			return &ValidationError{Name: "created_at", err: fmt.Errorf(`ent: validator failed for field "Session.created_at": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.ServerName(); !ok {
-		return &ValidationError{Name: "server_name", err: errors.New(`ent: missing required field "Session.server_name"`)}
+	if _, ok := sc.mutation.ServiceName(); !ok {
+		return &ValidationError{Name: "service_name", err: errors.New(`ent: missing required field "Session.service_name"`)}
 	}
-	if v, ok := sc.mutation.ServerName(); ok {
-		if err := session.ServerNameValidator(v); err != nil {
-			return &ValidationError{Name: "server_name", err: fmt.Errorf(`ent: validator failed for field "Session.server_name": %w`, err)}
+	if v, ok := sc.mutation.ServiceName(); ok {
+		if err := session.ServiceNameValidator(v); err != nil {
+			return &ValidationError{Name: "service_name", err: fmt.Errorf(`ent: validator failed for field "Session.service_name": %w`, err)}
 		}
 	}
 	if v, ok := sc.mutation.ID(); ok {
@@ -151,9 +151,9 @@ func (sc *SessionCreate) createSpec() (*Session, *sqlgraph.CreateSpec) {
 		_spec.SetField(session.FieldCreatedAt, field.TypeInt64, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := sc.mutation.ServerName(); ok {
-		_spec.SetField(session.FieldServerName, field.TypeString, value)
-		_node.ServerName = value
+	if value, ok := sc.mutation.ServiceName(); ok {
+		_spec.SetField(session.FieldServiceName, field.TypeString, value)
+		_node.ServiceName = value
 	}
 	if nodes := sc.mutation.AuthorizationPayloadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

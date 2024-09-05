@@ -9,6 +9,7 @@ import (
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
 	"go.authbricks.com/bricks/ent/service"
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
@@ -106,7 +107,24 @@ func (c *Client) CreateService(ctx context.Context, cfg config.Service) (*ent.Se
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create well known endpoint configuration for service %s", cfg.Name)
 	}
+	// create the login endpoint
+	_, err = c.DB.EntClient.LoginEndpointConfig.Create().
+		SetID(uuid.New().String()).
+		SetService(svc).
+		SetEndpoint(cfg.LoginEndpoint.Endpoint).
+		SetSessionTimeout(int64(cfg.LoginEndpoint.SessionTimeout)).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create login endpoint configuration for service %s", cfg.Name)
+	}
 
+	// create the connection configuration
+	_, err = c.createConnectionConfig(ctx, svc, cfg.Connection)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot create connection configuration for service %s", cfg.Name)
+	}
+
+	// create the key set
 	_, err = c.CreateKeySet(ctx, cfg.Name, cfg.Keys)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot create keyset for service %s", cfg.Name)
@@ -154,13 +172,23 @@ func (c *Client) DeleteService(ctx context.Context, name string) error {
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete well known endpoint configuration for service %s", name)
 	}
+	_, err = c.DB.EntClient.LoginEndpointConfig.Delete().Where(loginendpointconfig.HasServiceWith(service.ID(svc.ID))).Exec(ctx)
+	if err != nil {
+		return errors.Wrapf(err, "cannot delete login endpoint configuration for service %s", name)
+	}
+	if err := c.deleteConnectionConfig(ctx, svc); err != nil {
+		return errors.Wrapf(err, "cannot delete connection configuration for service %s", name)
+	}
 
 	err = c.DeleteKeySetByService(ctx, name)
 	if err != nil {
 		return errors.Wrapf(err, "cannot delete key sets for service %s", name)
 	}
 
-	return c.DB.EntClient.Service.DeleteOne(svc).Exec(ctx)
+	if err := c.DB.EntClient.Service.DeleteOne(svc).Exec(ctx); err != nil {
+		return errors.Wrapf(err, "cannot delete service %s", name)
+	}
+	return nil
 }
 
 // ListServices retrieves all services from the database.
@@ -266,6 +294,22 @@ func (c *Client) UpdateService(ctx context.Context, cfg config.Service) (*ent.Se
 		Save(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot update well known endpoint configuration for service %s", cfg.Name)
+	}
+	// update the login endpoint
+	loginEndpointConfig, err := c.DB.EntClient.LoginEndpointConfig.Query().Where(loginendpointconfig.HasServiceWith(service.ID(svc.ID))).Only(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to get login endpoint config")
+	}
+	_, err = c.DB.EntClient.LoginEndpointConfig.UpdateOne(loginEndpointConfig).
+		SetEndpoint(cfg.LoginEndpoint.Endpoint).
+		SetSessionTimeout(int64(cfg.LoginEndpoint.SessionTimeout)).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update login endpoint configuration for service %s", cfg.Name)
+	}
+	_, err = c.updateConnectionConfigForService(ctx, svc, cfg.Connection)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update connection configuration for service %s", cfg.Name)
 	}
 
 	if err := c.UpdateSigningKeysByService(ctx, cfg.Name, cfg.Keys); err != nil {

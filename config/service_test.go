@@ -3,6 +3,7 @@ package config
 import (
 	"crypto"
 	"testing"
+	"time"
 
 	abcrypto "go.authbricks.com/bricks/crypto"
 
@@ -261,6 +262,122 @@ func TestServiceValidate(t *testing.T) {
 			ExpectedError: true,
 		},
 		{
+			Name: "empty login endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				WellKnownEndpoint: WellKnownEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/.well-known",
+				},
+				Keys: []crypto.PrivateKey{key},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "no session timeout for login endpoint",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				WellKnownEndpoint: WellKnownEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/.well-known",
+				},
+				LoginEndpoint: LoginEndpoint{
+					Endpoint: "/login",
+				},
+				Keys: []crypto.PrivateKey{key},
+			},
+			ExpectedError: true,
+		},
+		{
+			Name: "OIDC connection enabled without OIDC config",
+			Service: Service{
+				Name:       "test",
+				Identifier: "test",
+				Scopes:     []string{"test"},
+				GrantTypes: []string{GrantTypeAuthorizationCode},
+				ServiceMetadata: ServiceMetadata{
+					"foo": "bar",
+				},
+				AuthorizationEndpoint: AuthorizationEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/authorize",
+				},
+				IntrospectionEndpoint: IntrospectionEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/introspect",
+				},
+				TokenEndpoint: TokenEndpoint{
+					Endpoint:                     "http://localhost:8080/oauth2/token",
+					AllowedAuthenticationMethods: []string{AuthenticationMethodClientSecretBasic},
+				},
+				UserInfoEndpoint: UserInfoEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/userinfo",
+				},
+				JWKSEndpoint: JWKSEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/jwks",
+				},
+				WellKnownEndpoint: WellKnownEndpoint{
+					Endpoint: "http://localhost:8080/oauth2/.well-known",
+				},
+				LoginEndpoint: LoginEndpoint{
+					Endpoint:       "/login",
+					SessionTimeout: 30 * time.Minute,
+				},
+				Connection: Connection{
+					EmailPassword: &EmailPasswordConnection{
+						Enabled: true,
+					},
+					OIDC: []OIDCConnection{
+						{
+							Enabled: true,
+						},
+					},
+				},
+				Keys: []crypto.PrivateKey{key},
+			},
+			ExpectedError: true,
+		},
+		{
 			Name: "no keys",
 			Service: Service{
 				Name:       "test",
@@ -288,6 +405,10 @@ func TestServiceValidate(t *testing.T) {
 				},
 				WellKnownEndpoint: WellKnownEndpoint{
 					Endpoint: "http://localhost:8080/oauth2/.well-known",
+				},
+				LoginEndpoint: LoginEndpoint{
+					Endpoint:       "/login",
+					SessionTimeout: 30 * time.Minute,
 				},
 				Keys: []crypto.PrivateKey{},
 			},
@@ -321,6 +442,10 @@ func TestServiceValidate(t *testing.T) {
 				},
 				WellKnownEndpoint: WellKnownEndpoint{
 					Endpoint: "http://localhost:8080/oauth2/.well-known",
+				},
+				LoginEndpoint: LoginEndpoint{
+					Endpoint:       "/login",
+					SessionTimeout: 30 * time.Minute,
 				},
 				Keys: []crypto.PrivateKey{key},
 			},

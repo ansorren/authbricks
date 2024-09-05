@@ -9,9 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
-	"go.authbricks.com/bricks/ent/userpool"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -27,9 +28,9 @@ func (uc *UserCreate) SetUsername(s string) *UserCreate {
 	return uc
 }
 
-// SetPassword sets the "password" field.
-func (uc *UserCreate) SetPassword(s string) *UserCreate {
-	uc.mutation.SetPassword(s)
+// SetHashedPassword sets the "hashed_password" field.
+func (uc *UserCreate) SetHashedPassword(s string) *UserCreate {
+	uc.mutation.SetHashedPassword(s)
 	return uc
 }
 
@@ -37,25 +38,6 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 func (uc *UserCreate) SetID(s string) *UserCreate {
 	uc.mutation.SetID(s)
 	return uc
-}
-
-// SetUserPoolID sets the "user_pool" edge to the UserPool entity by ID.
-func (uc *UserCreate) SetUserPoolID(id string) *UserCreate {
-	uc.mutation.SetUserPoolID(id)
-	return uc
-}
-
-// SetNillableUserPoolID sets the "user_pool" edge to the UserPool entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableUserPoolID(id *string) *UserCreate {
-	if id != nil {
-		uc = uc.SetUserPoolID(*id)
-	}
-	return uc
-}
-
-// SetUserPool sets the "user_pool" edge to the UserPool entity.
-func (uc *UserCreate) SetUserPool(u *UserPool) *UserCreate {
-	return uc.SetUserPoolID(u.ID)
 }
 
 // SetStandardClaimsID sets the "standard_claims" edge to the StandardClaims entity by ID.
@@ -75,6 +57,44 @@ func (uc *UserCreate) SetNillableStandardClaimsID(id *int) *UserCreate {
 // SetStandardClaims sets the "standard_claims" edge to the StandardClaims entity.
 func (uc *UserCreate) SetStandardClaims(s *StandardClaims) *UserCreate {
 	return uc.SetStandardClaimsID(s.ID)
+}
+
+// SetEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID.
+func (uc *UserCreate) SetEmailPasswordConnectionID(id string) *UserCreate {
+	uc.mutation.SetEmailPasswordConnectionID(id)
+	return uc
+}
+
+// SetNillableEmailPasswordConnectionID sets the "email_password_connection" edge to the EmailPasswordConnection entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableEmailPasswordConnectionID(id *string) *UserCreate {
+	if id != nil {
+		uc = uc.SetEmailPasswordConnectionID(*id)
+	}
+	return uc
+}
+
+// SetEmailPasswordConnection sets the "email_password_connection" edge to the EmailPasswordConnection entity.
+func (uc *UserCreate) SetEmailPasswordConnection(e *EmailPasswordConnection) *UserCreate {
+	return uc.SetEmailPasswordConnectionID(e.ID)
+}
+
+// SetOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID.
+func (uc *UserCreate) SetOidcConnectionsID(id string) *UserCreate {
+	uc.mutation.SetOidcConnectionsID(id)
+	return uc
+}
+
+// SetNillableOidcConnectionsID sets the "oidc_connections" edge to the OIDCConnection entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableOidcConnectionsID(id *string) *UserCreate {
+	if id != nil {
+		uc = uc.SetOidcConnectionsID(*id)
+	}
+	return uc
+}
+
+// SetOidcConnections sets the "oidc_connections" edge to the OIDCConnection entity.
+func (uc *UserCreate) SetOidcConnections(o *OIDCConnection) *UserCreate {
+	return uc.SetOidcConnectionsID(o.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -119,13 +139,8 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "User.username": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.Password(); !ok {
-		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
-	}
-	if v, ok := uc.mutation.Password(); ok {
-		if err := user.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
-		}
+	if _, ok := uc.mutation.HashedPassword(); !ok {
+		return &ValidationError{Name: "hashed_password", err: errors.New(`ent: missing required field "User.hashed_password"`)}
 	}
 	if v, ok := uc.mutation.ID(); ok {
 		if err := user.IDValidator(v); err != nil {
@@ -171,26 +186,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
 		_node.Username = value
 	}
-	if value, ok := uc.mutation.Password(); ok {
-		_spec.SetField(user.FieldPassword, field.TypeString, value)
-		_node.Password = value
-	}
-	if nodes := uc.mutation.UserPoolIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.UserPoolTable,
-			Columns: []string{user.UserPoolColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(userpool.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.user_pool_users = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := uc.mutation.HashedPassword(); ok {
+		_spec.SetField(user.FieldHashedPassword, field.TypeString, value)
+		_node.HashedPassword = value
 	}
 	if nodes := uc.mutation.StandardClaimsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -206,6 +204,40 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.EmailPasswordConnectionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.EmailPasswordConnectionTable,
+			Columns: []string{user.EmailPasswordConnectionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(emailpasswordconnection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.email_password_connection_users = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.OidcConnectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.OidcConnectionsTable,
+			Columns: []string{user.OidcConnectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oidcconnection.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.oidc_connection_users = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

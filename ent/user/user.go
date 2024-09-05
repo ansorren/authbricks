@@ -14,21 +14,16 @@ const (
 	FieldID = "id"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
-	// FieldPassword holds the string denoting the password field in the database.
-	FieldPassword = "password"
-	// EdgeUserPool holds the string denoting the user_pool edge name in mutations.
-	EdgeUserPool = "user_pool"
+	// FieldHashedPassword holds the string denoting the hashed_password field in the database.
+	FieldHashedPassword = "hashed_password"
 	// EdgeStandardClaims holds the string denoting the standard_claims edge name in mutations.
 	EdgeStandardClaims = "standard_claims"
+	// EdgeEmailPasswordConnection holds the string denoting the email_password_connection edge name in mutations.
+	EdgeEmailPasswordConnection = "email_password_connection"
+	// EdgeOidcConnections holds the string denoting the oidc_connections edge name in mutations.
+	EdgeOidcConnections = "oidc_connections"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// UserPoolTable is the table that holds the user_pool relation/edge.
-	UserPoolTable = "users"
-	// UserPoolInverseTable is the table name for the UserPool entity.
-	// It exists in this package in order to avoid circular dependency with the "userpool" package.
-	UserPoolInverseTable = "user_pools"
-	// UserPoolColumn is the table column denoting the user_pool relation/edge.
-	UserPoolColumn = "user_pool_users"
 	// StandardClaimsTable is the table that holds the standard_claims relation/edge.
 	StandardClaimsTable = "standard_claims"
 	// StandardClaimsInverseTable is the table name for the StandardClaims entity.
@@ -36,19 +31,34 @@ const (
 	StandardClaimsInverseTable = "standard_claims"
 	// StandardClaimsColumn is the table column denoting the standard_claims relation/edge.
 	StandardClaimsColumn = "user_standard_claims"
+	// EmailPasswordConnectionTable is the table that holds the email_password_connection relation/edge.
+	EmailPasswordConnectionTable = "users"
+	// EmailPasswordConnectionInverseTable is the table name for the EmailPasswordConnection entity.
+	// It exists in this package in order to avoid circular dependency with the "emailpasswordconnection" package.
+	EmailPasswordConnectionInverseTable = "email_password_connections"
+	// EmailPasswordConnectionColumn is the table column denoting the email_password_connection relation/edge.
+	EmailPasswordConnectionColumn = "email_password_connection_users"
+	// OidcConnectionsTable is the table that holds the oidc_connections relation/edge.
+	OidcConnectionsTable = "users"
+	// OidcConnectionsInverseTable is the table name for the OIDCConnection entity.
+	// It exists in this package in order to avoid circular dependency with the "oidcconnection" package.
+	OidcConnectionsInverseTable = "oidc_connections"
+	// OidcConnectionsColumn is the table column denoting the oidc_connections relation/edge.
+	OidcConnectionsColumn = "oidc_connection_users"
 )
 
 // Columns holds all SQL columns for user fields.
 var Columns = []string{
 	FieldID,
 	FieldUsername,
-	FieldPassword,
+	FieldHashedPassword,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_pool_users",
+	"email_password_connection_users",
+	"oidc_connection_users",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -69,8 +79,6 @@ func ValidColumn(column string) bool {
 var (
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
-	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -88,16 +96,9 @@ func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsername, opts...).ToFunc()
 }
 
-// ByPassword orders the results by the password field.
-func ByPassword(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPassword, opts...).ToFunc()
-}
-
-// ByUserPoolField orders the results by user_pool field.
-func ByUserPoolField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUserPoolStep(), sql.OrderByField(field, opts...))
-	}
+// ByHashedPassword orders the results by the hashed_password field.
+func ByHashedPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHashedPassword, opts...).ToFunc()
 }
 
 // ByStandardClaimsField orders the results by standard_claims field.
@@ -106,17 +107,38 @@ func ByStandardClaimsField(field string, opts ...sql.OrderTermOption) OrderOptio
 		sqlgraph.OrderByNeighborTerms(s, newStandardClaimsStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newUserPoolStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UserPoolInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UserPoolTable, UserPoolColumn),
-	)
+
+// ByEmailPasswordConnectionField orders the results by email_password_connection field.
+func ByEmailPasswordConnectionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEmailPasswordConnectionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByOidcConnectionsField orders the results by oidc_connections field.
+func ByOidcConnectionsField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOidcConnectionsStep(), sql.OrderByField(field, opts...))
+	}
 }
 func newStandardClaimsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StandardClaimsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, StandardClaimsTable, StandardClaimsColumn),
+	)
+}
+func newEmailPasswordConnectionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EmailPasswordConnectionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, EmailPasswordConnectionTable, EmailPasswordConnectionColumn),
+	)
+}
+func newOidcConnectionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OidcConnectionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, OidcConnectionsTable, OidcConnectionsColumn),
 	)
 }

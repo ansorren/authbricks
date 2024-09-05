@@ -7,11 +7,15 @@ import (
 	"go.authbricks.com/bricks/ent/authorizationcode"
 	"go.authbricks.com/bricks/ent/authorizationendpointconfig"
 	"go.authbricks.com/bricks/ent/authorizationpayload"
+	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/cookiestore"
 	"go.authbricks.com/bricks/ent/credentials"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
 	"go.authbricks.com/bricks/ent/introspectionendpointconfig"
 	"go.authbricks.com/bricks/ent/jwksendpointconfig"
 	"go.authbricks.com/bricks/ent/keyset"
+	"go.authbricks.com/bricks/ent/loginendpointconfig"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/refreshtoken"
 	"go.authbricks.com/bricks/ent/schema"
 	"go.authbricks.com/bricks/ent/service"
@@ -21,7 +25,6 @@ import (
 	"go.authbricks.com/bricks/ent/tokenendpointconfig"
 	"go.authbricks.com/bricks/ent/user"
 	"go.authbricks.com/bricks/ent/userinfoendpointconfig"
-	"go.authbricks.com/bricks/ent/userpool"
 	"go.authbricks.com/bricks/ent/wellknownendpointconfig"
 )
 
@@ -73,6 +76,12 @@ func init() {
 	authorizationpayloadDescID := authorizationpayloadFields[0].Descriptor()
 	// authorizationpayload.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	authorizationpayload.IDValidator = authorizationpayloadDescID.Validators[0].(func(string) error)
+	connectionconfigFields := schema.ConnectionConfig{}.Fields()
+	_ = connectionconfigFields
+	// connectionconfigDescID is the schema descriptor for id field.
+	connectionconfigDescID := connectionconfigFields[0].Descriptor()
+	// connectionconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	connectionconfig.IDValidator = connectionconfigDescID.Validators[0].(func(string) error)
 	cookiestoreFields := schema.CookieStore{}.Fields()
 	_ = cookiestoreFields
 	// cookiestoreDescAuthKey is the schema descriptor for auth_key field.
@@ -97,6 +106,16 @@ func init() {
 	credentialsDescID := credentialsFields[0].Descriptor()
 	// credentials.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	credentials.IDValidator = credentialsDescID.Validators[0].(func(string) error)
+	emailpasswordconnectionFields := schema.EmailPasswordConnection{}.Fields()
+	_ = emailpasswordconnectionFields
+	// emailpasswordconnectionDescEnabled is the schema descriptor for enabled field.
+	emailpasswordconnectionDescEnabled := emailpasswordconnectionFields[1].Descriptor()
+	// emailpasswordconnection.DefaultEnabled holds the default value on creation for the enabled field.
+	emailpasswordconnection.DefaultEnabled = emailpasswordconnectionDescEnabled.Default.(bool)
+	// emailpasswordconnectionDescID is the schema descriptor for id field.
+	emailpasswordconnectionDescID := emailpasswordconnectionFields[0].Descriptor()
+	// emailpasswordconnection.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	emailpasswordconnection.IDValidator = emailpasswordconnectionDescID.Validators[0].(func(string) error)
 	introspectionendpointconfigFields := schema.IntrospectionEndpointConfig{}.Fields()
 	_ = introspectionendpointconfigFields
 	// introspectionendpointconfigDescEndpoint is the schema descriptor for endpoint field.
@@ -123,6 +142,30 @@ func init() {
 	keysetDescID := keysetFields[0].Descriptor()
 	// keyset.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	keyset.IDValidator = keysetDescID.Validators[0].(func(string) error)
+	loginendpointconfigFields := schema.LoginEndpointConfig{}.Fields()
+	_ = loginendpointconfigFields
+	// loginendpointconfigDescEndpoint is the schema descriptor for endpoint field.
+	loginendpointconfigDescEndpoint := loginendpointconfigFields[1].Descriptor()
+	// loginendpointconfig.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	loginendpointconfig.EndpointValidator = loginendpointconfigDescEndpoint.Validators[0].(func(string) error)
+	// loginendpointconfigDescSessionTimeout is the schema descriptor for session_timeout field.
+	loginendpointconfigDescSessionTimeout := loginendpointconfigFields[2].Descriptor()
+	// loginendpointconfig.SessionTimeoutValidator is a validator for the "session_timeout" field. It is called by the builders before save.
+	loginendpointconfig.SessionTimeoutValidator = loginendpointconfigDescSessionTimeout.Validators[0].(func(int64) error)
+	// loginendpointconfigDescID is the schema descriptor for id field.
+	loginendpointconfigDescID := loginendpointconfigFields[0].Descriptor()
+	// loginendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	loginendpointconfig.IDValidator = loginendpointconfigDescID.Validators[0].(func(string) error)
+	oidcconnectionFields := schema.OIDCConnection{}.Fields()
+	_ = oidcconnectionFields
+	// oidcconnectionDescEnabled is the schema descriptor for enabled field.
+	oidcconnectionDescEnabled := oidcconnectionFields[1].Descriptor()
+	// oidcconnection.DefaultEnabled holds the default value on creation for the enabled field.
+	oidcconnection.DefaultEnabled = oidcconnectionDescEnabled.Default.(bool)
+	// oidcconnectionDescID is the schema descriptor for id field.
+	oidcconnectionDescID := oidcconnectionFields[0].Descriptor()
+	// oidcconnection.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	oidcconnection.IDValidator = oidcconnectionDescID.Validators[0].(func(string) error)
 	refreshtokenFields := schema.RefreshToken{}.Fields()
 	_ = refreshtokenFields
 	// refreshtokenDescCreatedAt is the schema descriptor for created_at field.
@@ -157,10 +200,10 @@ func init() {
 	sessionDescCreatedAt := sessionFields[1].Descriptor()
 	// session.CreatedAtValidator is a validator for the "created_at" field. It is called by the builders before save.
 	session.CreatedAtValidator = sessionDescCreatedAt.Validators[0].(func(int64) error)
-	// sessionDescServerName is the schema descriptor for server_name field.
-	sessionDescServerName := sessionFields[2].Descriptor()
-	// session.ServerNameValidator is a validator for the "server_name" field. It is called by the builders before save.
-	session.ServerNameValidator = sessionDescServerName.Validators[0].(func(string) error)
+	// sessionDescServiceName is the schema descriptor for service_name field.
+	sessionDescServiceName := sessionFields[2].Descriptor()
+	// session.ServiceNameValidator is a validator for the "service_name" field. It is called by the builders before save.
+	session.ServiceNameValidator = sessionDescServiceName.Validators[0].(func(string) error)
 	// sessionDescID is the schema descriptor for id field.
 	sessionDescID := sessionFields[0].Descriptor()
 	// session.IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -205,10 +248,6 @@ func init() {
 	userDescUsername := userFields[1].Descriptor()
 	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
-	// userDescPassword is the schema descriptor for password field.
-	userDescPassword := userFields[2].Descriptor()
-	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()
 	// user.IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -223,12 +262,6 @@ func init() {
 	userinfoendpointconfigDescID := userinfoendpointconfigFields[0].Descriptor()
 	// userinfoendpointconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	userinfoendpointconfig.IDValidator = userinfoendpointconfigDescID.Validators[0].(func(string) error)
-	userpoolFields := schema.UserPool{}.Fields()
-	_ = userpoolFields
-	// userpoolDescID is the schema descriptor for id field.
-	userpoolDescID := userpoolFields[0].Descriptor()
-	// userpool.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	userpool.IDValidator = userpoolDescID.Validators[0].(func(string) error)
 	wellknownendpointconfigFields := schema.WellKnownEndpointConfig{}.Fields()
 	_ = wellknownendpointconfigFields
 	// wellknownendpointconfigDescEndpoint is the schema descriptor for endpoint field.

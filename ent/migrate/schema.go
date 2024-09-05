@@ -90,7 +90,7 @@ var (
 		{Name: "redirect_uri", Type: field.TypeString},
 		{Name: "response_type", Type: field.TypeString},
 		{Name: "scope", Type: field.TypeString},
-		{Name: "server_name", Type: field.TypeString},
+		{Name: "service_name", Type: field.TypeString},
 		{Name: "state", Type: field.TypeString},
 		{Name: "response_mode", Type: field.TypeString},
 		{Name: "session_authorization_payload", Type: field.TypeString, Unique: true, Nullable: true},
@@ -106,6 +106,25 @@ var (
 				Columns:    []*schema.Column{AuthorizationPayloadsColumns[11]},
 				RefColumns: []*schema.Column{SessionsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ConnectionConfigsColumns holds the columns for the "connection_configs" table.
+	ConnectionConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "service_service_connection_config", Type: field.TypeString, Unique: true},
+	}
+	// ConnectionConfigsTable holds the schema information for the "connection_configs" table.
+	ConnectionConfigsTable = &schema.Table{
+		Name:       "connection_configs",
+		Columns:    ConnectionConfigsColumns,
+		PrimaryKey: []*schema.Column{ConnectionConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "connection_configs_services_service_connection_config",
+				Columns:    []*schema.Column{ConnectionConfigsColumns[1]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -139,6 +158,26 @@ var (
 				Columns:    []*schema.Column{CredentialsColumns[3]},
 				RefColumns: []*schema.Column{ApplicationsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EmailPasswordConnectionsColumns holds the columns for the "email_password_connections" table.
+	EmailPasswordConnectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "enabled", Type: field.TypeBool, Default: false},
+		{Name: "connection_config_email_password_connection", Type: field.TypeString, Unique: true},
+	}
+	// EmailPasswordConnectionsTable holds the schema information for the "email_password_connections" table.
+	EmailPasswordConnectionsTable = &schema.Table{
+		Name:       "email_password_connections",
+		Columns:    EmailPasswordConnectionsColumns,
+		PrimaryKey: []*schema.Column{EmailPasswordConnectionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "email_password_connections_connection_configs_email_password_connection",
+				Columns:    []*schema.Column{EmailPasswordConnectionsColumns[2]},
+				RefColumns: []*schema.Column{ConnectionConfigsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -201,6 +240,52 @@ var (
 			},
 		},
 	}
+	// LoginEndpointConfigsColumns holds the columns for the "login_endpoint_configs" table.
+	LoginEndpointConfigsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "endpoint", Type: field.TypeString, Unique: true},
+		{Name: "session_timeout", Type: field.TypeInt64},
+		{Name: "service_service_login_endpoint_config", Type: field.TypeString, Unique: true},
+	}
+	// LoginEndpointConfigsTable holds the schema information for the "login_endpoint_configs" table.
+	LoginEndpointConfigsTable = &schema.Table{
+		Name:       "login_endpoint_configs",
+		Columns:    LoginEndpointConfigsColumns,
+		PrimaryKey: []*schema.Column{LoginEndpointConfigsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "login_endpoint_configs_services_service_login_endpoint_config",
+				Columns:    []*schema.Column{LoginEndpointConfigsColumns[3]},
+				RefColumns: []*schema.Column{ServicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// OidcConnectionsColumns holds the columns for the "oidc_connections" table.
+	OidcConnectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "enabled", Type: field.TypeBool, Default: false},
+		{Name: "client_id", Type: field.TypeString, Nullable: true},
+		{Name: "client_secret", Type: field.TypeString, Nullable: true},
+		{Name: "scopes", Type: field.TypeJSON, Nullable: true},
+		{Name: "redirect_uri", Type: field.TypeString, Nullable: true},
+		{Name: "well_known_openid_configuration", Type: field.TypeString, Nullable: true},
+		{Name: "connection_config_oidc_connections", Type: field.TypeString, Nullable: true},
+	}
+	// OidcConnectionsTable holds the schema information for the "oidc_connections" table.
+	OidcConnectionsTable = &schema.Table{
+		Name:       "oidc_connections",
+		Columns:    OidcConnectionsColumns,
+		PrimaryKey: []*schema.Column{OidcConnectionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oidc_connections_connection_configs_oidc_connections",
+				Columns:    []*schema.Column{OidcConnectionsColumns[7]},
+				RefColumns: []*schema.Column{ConnectionConfigsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// RefreshTokensColumns holds the columns for the "refresh_tokens" table.
 	RefreshTokensColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -249,7 +334,7 @@ var (
 	SessionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeInt64},
-		{Name: "server_name", Type: field.TypeString},
+		{Name: "service_name", Type: field.TypeString},
 	}
 	// SessionsTable holds the schema information for the "sessions" table.
 	SessionsTable = &schema.Table{
@@ -340,9 +425,10 @@ var (
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
-		{Name: "username", Type: field.TypeString, Unique: true},
-		{Name: "password", Type: field.TypeString},
-		{Name: "user_pool_users", Type: field.TypeString, Nullable: true},
+		{Name: "username", Type: field.TypeString},
+		{Name: "hashed_password", Type: field.TypeString},
+		{Name: "email_password_connection_users", Type: field.TypeString, Unique: true, Nullable: true},
+		{Name: "oidc_connection_users", Type: field.TypeString, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -351,9 +437,15 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "users_user_pools_users",
+				Symbol:     "users_email_password_connections_users",
 				Columns:    []*schema.Column{UsersColumns[3]},
-				RefColumns: []*schema.Column{UserPoolsColumns[0]},
+				RefColumns: []*schema.Column{EmailPasswordConnectionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_oidc_connections_users",
+				Columns:    []*schema.Column{UsersColumns[4]},
+				RefColumns: []*schema.Column{OidcConnectionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -377,16 +469,6 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
-	}
-	// UserPoolsColumns holds the columns for the "user_pools" table.
-	UserPoolsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeString, Unique: true},
-	}
-	// UserPoolsTable holds the schema information for the "user_pools" table.
-	UserPoolsTable = &schema.Table{
-		Name:       "user_pools",
-		Columns:    UserPoolsColumns,
-		PrimaryKey: []*schema.Column{UserPoolsColumns[0]},
 	}
 	// WellKnownEndpointConfigsColumns holds the columns for the "well_known_endpoint_configs" table.
 	WellKnownEndpointConfigsColumns = []*schema.Column{
@@ -414,11 +496,15 @@ var (
 		AuthorizationCodesTable,
 		AuthorizationEndpointConfigsTable,
 		AuthorizationPayloadsTable,
+		ConnectionConfigsTable,
 		CookieStoresTable,
 		CredentialsTable,
+		EmailPasswordConnectionsTable,
 		IntrospectionEndpointConfigsTable,
 		JwksEndpointConfigsTable,
 		KeySetsTable,
+		LoginEndpointConfigsTable,
+		OidcConnectionsTable,
 		RefreshTokensTable,
 		ServicesTable,
 		SessionsTable,
@@ -427,7 +513,6 @@ var (
 		TokenEndpointConfigsTable,
 		UsersTable,
 		UserInfoEndpointConfigsTable,
-		UserPoolsTable,
 		WellKnownEndpointConfigsTable,
 	}
 )
@@ -436,14 +521,19 @@ func init() {
 	ApplicationsTable.ForeignKeys[0].RefTable = ServicesTable
 	AuthorizationEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	AuthorizationPayloadsTable.ForeignKeys[0].RefTable = SessionsTable
+	ConnectionConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	CredentialsTable.ForeignKeys[0].RefTable = ApplicationsTable
+	EmailPasswordConnectionsTable.ForeignKeys[0].RefTable = ConnectionConfigsTable
 	IntrospectionEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	JwksEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	KeySetsTable.ForeignKeys[0].RefTable = ServicesTable
+	LoginEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
+	OidcConnectionsTable.ForeignKeys[0].RefTable = ConnectionConfigsTable
 	SigningKeysTable.ForeignKeys[0].RefTable = KeySetsTable
 	StandardClaimsTable.ForeignKeys[0].RefTable = UsersTable
 	TokenEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
-	UsersTable.ForeignKeys[0].RefTable = UserPoolsTable
+	UsersTable.ForeignKeys[0].RefTable = EmailPasswordConnectionsTable
+	UsersTable.ForeignKeys[1].RefTable = OidcConnectionsTable
 	UserInfoEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 	WellKnownEndpointConfigsTable.ForeignKeys[0].RefTable = ServicesTable
 }

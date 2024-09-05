@@ -11,22 +11,24 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"go.authbricks.com/bricks/ent/emailpasswordconnection"
+	"go.authbricks.com/bricks/ent/oidcconnection"
 	"go.authbricks.com/bricks/ent/predicate"
 	"go.authbricks.com/bricks/ent/standardclaims"
 	"go.authbricks.com/bricks/ent/user"
-	"go.authbricks.com/bricks/ent/userpool"
 )
 
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx                *QueryContext
-	order              []user.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.User
-	withUserPool       *UserPoolQuery
-	withStandardClaims *StandardClaimsQuery
-	withFKs            bool
+	ctx                         *QueryContext
+	order                       []user.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.User
+	withStandardClaims          *StandardClaimsQuery
+	withEmailPasswordConnection *EmailPasswordConnectionQuery
+	withOidcConnections         *OIDCConnectionQuery
+	withFKs                     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,28 +65,6 @@ func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	return uq
 }
 
-// QueryUserPool chains the current query on the "user_pool" edge.
-func (uq *UserQuery) QueryUserPool() *UserPoolQuery {
-	query := (&UserPoolClient{config: uq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(userpool.Table, userpool.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, user.UserPoolTable, user.UserPoolColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryStandardClaims chains the current query on the "standard_claims" edge.
 func (uq *UserQuery) QueryStandardClaims() *StandardClaimsQuery {
 	query := (&StandardClaimsClient{config: uq.config}).Query()
@@ -100,6 +80,50 @@ func (uq *UserQuery) QueryStandardClaims() *StandardClaimsQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(standardclaims.Table, standardclaims.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, user.StandardClaimsTable, user.StandardClaimsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEmailPasswordConnection chains the current query on the "email_password_connection" edge.
+func (uq *UserQuery) QueryEmailPasswordConnection() *EmailPasswordConnectionQuery {
+	query := (&EmailPasswordConnectionClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(emailpasswordconnection.Table, emailpasswordconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, user.EmailPasswordConnectionTable, user.EmailPasswordConnectionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOidcConnections chains the current query on the "oidc_connections" edge.
+func (uq *UserQuery) QueryOidcConnections() *OIDCConnectionQuery {
+	query := (&OIDCConnectionClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(oidcconnection.Table, oidcconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, user.OidcConnectionsTable, user.OidcConnectionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,28 +318,18 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:             uq.config,
-		ctx:                uq.ctx.Clone(),
-		order:              append([]user.OrderOption{}, uq.order...),
-		inters:             append([]Interceptor{}, uq.inters...),
-		predicates:         append([]predicate.User{}, uq.predicates...),
-		withUserPool:       uq.withUserPool.Clone(),
-		withStandardClaims: uq.withStandardClaims.Clone(),
+		config:                      uq.config,
+		ctx:                         uq.ctx.Clone(),
+		order:                       append([]user.OrderOption{}, uq.order...),
+		inters:                      append([]Interceptor{}, uq.inters...),
+		predicates:                  append([]predicate.User{}, uq.predicates...),
+		withStandardClaims:          uq.withStandardClaims.Clone(),
+		withEmailPasswordConnection: uq.withEmailPasswordConnection.Clone(),
+		withOidcConnections:         uq.withOidcConnections.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
-}
-
-// WithUserPool tells the query-builder to eager-load the nodes that are connected to
-// the "user_pool" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithUserPool(opts ...func(*UserPoolQuery)) *UserQuery {
-	query := (&UserPoolClient{config: uq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withUserPool = query
-	return uq
 }
 
 // WithStandardClaims tells the query-builder to eager-load the nodes that are connected to
@@ -326,6 +340,28 @@ func (uq *UserQuery) WithStandardClaims(opts ...func(*StandardClaimsQuery)) *Use
 		opt(query)
 	}
 	uq.withStandardClaims = query
+	return uq
+}
+
+// WithEmailPasswordConnection tells the query-builder to eager-load the nodes that are connected to
+// the "email_password_connection" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithEmailPasswordConnection(opts ...func(*EmailPasswordConnectionQuery)) *UserQuery {
+	query := (&EmailPasswordConnectionClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withEmailPasswordConnection = query
+	return uq
+}
+
+// WithOidcConnections tells the query-builder to eager-load the nodes that are connected to
+// the "oidc_connections" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithOidcConnections(opts ...func(*OIDCConnectionQuery)) *UserQuery {
+	query := (&OIDCConnectionClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withOidcConnections = query
 	return uq
 }
 
@@ -408,12 +444,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		nodes       = []*User{}
 		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
-			uq.withUserPool != nil,
+		loadedTypes = [3]bool{
 			uq.withStandardClaims != nil,
+			uq.withEmailPasswordConnection != nil,
+			uq.withOidcConnections != nil,
 		}
 	)
-	if uq.withUserPool != nil {
+	if uq.withEmailPasswordConnection != nil || uq.withOidcConnections != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -437,53 +474,27 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uq.withUserPool; query != nil {
-		if err := uq.loadUserPool(ctx, query, nodes, nil,
-			func(n *User, e *UserPool) { n.Edges.UserPool = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := uq.withStandardClaims; query != nil {
 		if err := uq.loadStandardClaims(ctx, query, nodes, nil,
 			func(n *User, e *StandardClaims) { n.Edges.StandardClaims = e }); err != nil {
 			return nil, err
 		}
 	}
+	if query := uq.withEmailPasswordConnection; query != nil {
+		if err := uq.loadEmailPasswordConnection(ctx, query, nodes, nil,
+			func(n *User, e *EmailPasswordConnection) { n.Edges.EmailPasswordConnection = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withOidcConnections; query != nil {
+		if err := uq.loadOidcConnections(ctx, query, nodes, nil,
+			func(n *User, e *OIDCConnection) { n.Edges.OidcConnections = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
-func (uq *UserQuery) loadUserPool(ctx context.Context, query *UserPoolQuery, nodes []*User, init func(*User), assign func(*User, *UserPool)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*User)
-	for i := range nodes {
-		if nodes[i].user_pool_users == nil {
-			continue
-		}
-		fk := *nodes[i].user_pool_users
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(userpool.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_pool_users" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
 func (uq *UserQuery) loadStandardClaims(ctx context.Context, query *StandardClaimsQuery, nodes []*User, init func(*User), assign func(*User, *StandardClaims)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[string]*User)
@@ -509,6 +520,70 @@ func (uq *UserQuery) loadStandardClaims(ctx context.Context, query *StandardClai
 			return fmt.Errorf(`unexpected referenced foreign-key "user_standard_claims" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadEmailPasswordConnection(ctx context.Context, query *EmailPasswordConnectionQuery, nodes []*User, init func(*User), assign func(*User, *EmailPasswordConnection)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*User)
+	for i := range nodes {
+		if nodes[i].email_password_connection_users == nil {
+			continue
+		}
+		fk := *nodes[i].email_password_connection_users
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(emailpasswordconnection.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "email_password_connection_users" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (uq *UserQuery) loadOidcConnections(ctx context.Context, query *OIDCConnectionQuery, nodes []*User, init func(*User), assign func(*User, *OIDCConnection)) error {
+	ids := make([]string, 0, len(nodes))
+	nodeids := make(map[string][]*User)
+	for i := range nodes {
+		if nodes[i].oidc_connection_users == nil {
+			continue
+		}
+		fk := *nodes[i].oidc_connection_users
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(oidcconnection.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "oidc_connection_users" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
