@@ -2,15 +2,15 @@ package api
 
 import (
 	"context"
-	"go.authbricks.com/bricks/ent/user"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"time"
 
 	"go.authbricks.com/bricks/ent"
+	"go.authbricks.com/bricks/ent/user"
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (

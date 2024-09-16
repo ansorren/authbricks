@@ -214,25 +214,6 @@ func testRandomState(t *testing.T) string {
 	return state
 }
 
-// login is a helper function used to call the login endpoint. It will make multiple GET requests
-// to the login endpoint and then a POST request.
-func login(t *testing.T, payload EmailPasswordPayload, endpoint string) (*http.Response, error) {
-	t.Helper()
-	// make a GET request to the login endpoint
-	// This will redirect again to the login endpoint with a session ID
-	loginEndpointWithSessionID, err := firstGETLoginRequest(t, endpoint)
-	require.Nil(t, err)
-
-	// make a second GET request to the login endpoint
-	// This will set the CSRF cookie in the response
-	resp, err := loginRequestWithSessionID(t, loginEndpointWithSessionID)
-	require.Nil(t, err)
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-
-	// execute the POST request to the login endpoint
-	return POSTLoginRequest(t, loginEndpointWithSessionID, payload, resp.Cookies())
-}
-
 func TestSessionIsExpired(t *testing.T) {
 	testCases := []struct {
 		name     string

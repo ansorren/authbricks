@@ -3,11 +3,12 @@ package api
 import (
 	"context"
 	"fmt"
-	"go.authbricks.com/bricks/client"
 	"io"
 	"net/http"
 	"strings"
 	"testing"
+
+	"go.authbricks.com/bricks/client"
 
 	"github.com/stretchr/testify/require"
 )
