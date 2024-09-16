@@ -3,12 +3,12 @@ package client
 import (
 	"context"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/oidcconnection"
 
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (

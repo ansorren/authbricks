@@ -2,12 +2,14 @@ package client
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
+
 	"go.authbricks.com/bricks/config"
 	"go.authbricks.com/bricks/ent"
 	"go.authbricks.com/bricks/ent/connectionconfig"
 	"go.authbricks.com/bricks/ent/oidcconnection"
+
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 // createConnectionConfig creates a new connection configuration for the given service.

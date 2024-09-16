@@ -2,10 +2,10 @@ package api
 
 import (
 	"fmt"
-	"github.com/gorilla/sessions"
 	"net/http"
 	"time"
 
+	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
