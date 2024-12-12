@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.13.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/google/uuid v1.3.0
+	github.com/gorilla/sessions v1.2.2
 	github.com/hashicorp/cap v0.6.0
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/labstack/echo-contrib v0.17.1
@@ -14,6 +15,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/oauth2 v0.18.0
 	gopkg.in/go-jose/go-jose.v2 v2.6.3
 )
@@ -34,7 +36,6 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/gorilla/context v1.1.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/sessions v1.2.2 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
@@ -45,11 +46,10 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/mod v0.15.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
