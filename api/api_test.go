@@ -71,7 +71,9 @@ func (api TestAPI) Run(t *testing.T) {
 	t.Helper()
 	go func() {
 		err := api.API.Run(context.Background())
-		require.Nil(t, err)
+		if err != nil && errors.Is(err, http.ErrServerClosed) {
+			return
+		}
 	}()
 	time.Sleep(1 * time.Second)
 }
@@ -327,4 +329,13 @@ func TestAPI_TLS_FilePath(t *testing.T) {
 	resp, err := http.DefaultClient.Get(fmt.Sprintf("https://%s/", address))
 	require.Nil(t, err)
 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
+}
+
+func TestAPI_Shutdown(t *testing.T) {
+	a, cancel := NewTestAPI(t)
+	defer cancel(t)
+	a.Run(t)
+
+	err := a.API.Shutdown(context.Background())
+	require.Nil(t, err)
 }

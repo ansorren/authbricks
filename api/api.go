@@ -223,6 +223,16 @@ func (a *API) Run(ctx context.Context) error {
 	return a.Echo.Start(a.Address)
 }
 
+// Shutdown shuts down the server and closes the connection to the DB.
+func (a *API) Shutdown(ctx context.Context) error {
+	err := a.DB.Close()
+	if err != nil {
+		return errors.Wrapf(err, "unable to close DB connection")
+	}
+
+	return a.Echo.Shutdown(ctx)
+}
+
 // getAllServices returns all services.
 func (a *API) getAllServices(ctx context.Context) ([]*ent.Service, error) {
 	return a.DB.EntClient.Service.Query().All(ctx)
