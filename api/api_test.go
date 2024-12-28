@@ -7,8 +7,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"math/big"
 	"net/http"
 	"os"
@@ -20,6 +18,8 @@ import (
 	"go.authbricks.com/bricks/testutils"
 
 	"github.com/hashicorp/go-hclog"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
