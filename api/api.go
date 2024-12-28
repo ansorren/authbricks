@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"net/http"
 
 	"go.authbricks.com/bricks/database"
 	"go.authbricks.com/bricks/ent"
@@ -16,6 +17,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	validAPIMethods = []string{
+		http.MethodConnect,
+		http.MethodDelete,
+		http.MethodGet,
+		http.MethodHead,
+		http.MethodOptions,
+		http.MethodPatch,
+		http.MethodPost,
+		http.MethodPut,
+		http.MethodTrace,
+	}
+)
+
 // API is the data structure used to represent the AuthBricks API.
 type API struct {
 	Address string
@@ -23,6 +38,7 @@ type API struct {
 	Echo    *echo.Echo
 	Logger  hclog.Logger
 	BaseURL string
+	Routes  []Route
 	// TLS config
 	TLSEnabled          bool
 	Cert                []byte
@@ -81,6 +97,13 @@ func WithKeyFilePath(keyFilePath string) Option {
 	}
 }
 
+// WithRoutes sets the given custom routes on the API.
+func WithRoutes(routes []Route) Option {
+	return func(a *API) {
+		a.Routes = routes
+	}
+}
+
 // New returns a new API, which will be ready to run at the given address.
 // It is the caller's responsibility to run the API by calling API.Run.
 func New(db *database.DB, address string, opts ...Option) (*API, error) {
@@ -129,6 +152,16 @@ func (a *API) Validate() error {
 		}
 	}
 
+	if len(a.Routes) != 0 {
+		for _, route := range a.Routes {
+			if !contains(validAPIMethods, route.Method) {
+				return fmt.Errorf("invalid method: %s", route.Method)
+			}
+			if !pathUnique(route.Path, a.Routes) {
+				return fmt.Errorf("not unique path: %s", route.Path)
+			}
+		}
+	}
 	return nil
 }
 
@@ -207,6 +240,10 @@ func (a *API) Run(ctx context.Context) error {
 		l := sanitiseEndpoint(login.Endpoint, a.BaseURL)
 		a.Echo.GET(l, a.GETLoginHandler(service), csrfMiddleware)
 		a.Echo.POST(l, a.POSTLoginHandler(service), csrfMiddleware)
+	}
+
+	for _, route := range a.Routes {
+		a.Echo.Add(route.Method, route.Path, route.Handler, route.Middlewares...)
 	}
 
 	if a.TLSEnabled {

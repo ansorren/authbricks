@@ -7,6 +7,8 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"math/big"
 	"net/http"
 	"os"
@@ -85,7 +87,7 @@ func TestAPI_Run(t *testing.T) {
 	testAPI.Run(t)
 }
 
-func TestAPICertificateValidation(t *testing.T) {
+func TestAPI_Validate(t *testing.T) {
 	tests := []struct {
 		name        string
 		api         API
@@ -141,6 +143,34 @@ func TestAPICertificateValidation(t *testing.T) {
 				CertificateFilePath: "/path/to/cert",
 			},
 			expectedErr: errors.New("either the certificate and key or the certificate file path and key file path must be provided when TLS is enabled"),
+		},
+		{
+			name: "Invalid - invalid method on route",
+			api: API{
+				Routes: []Route{
+					{
+						Method: "INVALID",
+						Path:   "/",
+					},
+				},
+			},
+			expectedErr: fmt.Errorf("invalid method: %s", "INVALID"),
+		},
+		{
+			name: "Invalid - non-unique path on route",
+			api: API{
+				Routes: []Route{
+					{
+						Method: "GET",
+						Path:   "/",
+					},
+					{
+						Method: "GET",
+						Path:   "/", // duplicate path
+					},
+				},
+			},
+			expectedErr: fmt.Errorf("not unique path: %s", "/"),
 		},
 	}
 
@@ -338,4 +368,97 @@ func TestAPI_Shutdown(t *testing.T) {
 
 	err := a.API.Shutdown(context.Background())
 	require.Nil(t, err)
+}
+
+func TestAPI_WithRoutes(t *testing.T) {
+	routes := []Route{
+		{
+			Method: http.MethodGet,
+			Path:   "/custom",
+			Handler: echo.HandlerFunc(func(c echo.Context) error {
+				return c.JSON(http.StatusTeapot, "custom route")
+			}),
+			Middlewares: []echo.MiddlewareFunc{},
+		},
+		{
+			Method: http.MethodGet,
+			Path:   "/custom/with/middleware",
+			Handler: echo.HandlerFunc(func(c echo.Context) error {
+				return c.JSON(http.StatusTeapot, "custom route with middleware")
+			}),
+			Middlewares: []echo.MiddlewareFunc{
+				middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+					if username == "toni" && password == "hunter2" {
+						return true, nil
+					}
+					return false, nil
+				}),
+			},
+		},
+	}
+
+	// do not use the test API, as we need to test the custom route
+	// with the custom handler - rewrite the test to instantiate the API
+	// directly
+
+	db, cancelDB := testutils.DB(t)
+	defer cancelDB(t)
+	c := client.New(db)
+
+	address := testutils.LocalhostAddress()
+	testCfg := testutils.NewTestConfig(t, address)
+	for _, svc := range testCfg.Services {
+		_, err := c.CreateService(context.Background(), svc)
+		require.Nil(t, err)
+	}
+	for _, app := range testCfg.Applications {
+		_, err := c.CreateApplication(context.Background(), app)
+		require.Nil(t, err)
+	}
+	for _, cred := range testCfg.Credentials {
+		_, err := c.CreateCredentials(context.Background(), cred)
+		require.Nil(t, err)
+	}
+	logger := hclog.Default().Named("test")
+
+	a, err := New(db, address,
+		WithLogger(logger),
+		WithBaseURL(fmt.Sprintf("http://%s", address)),
+		WithRoutes(routes),
+	)
+	require.Nil(t, err)
+
+	go func() {
+		_ = a.Run(context.Background())
+	}()
+	time.Sleep(1 * time.Second)
+
+	resp, err := http.DefaultClient.Get(fmt.Sprintf("http://%s/custom", address))
+	require.Nil(t, err)
+	require.Equal(t, http.StatusTeapot, resp.StatusCode)
+
+	// make a standard, unauthenticated request to the protected route
+	// assert that the status code is 401
+	resp, err = http.DefaultClient.Get(fmt.Sprintf("http://%s/custom/with/middleware", address))
+	require.Nil(t, err)
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+
+	// make an authenticated request to the protected route
+	// but with the wrong credentials
+	// assert that the status code is 401
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s/custom/with/middleware", address), nil)
+	require.Nil(t, err)
+	req.SetBasicAuth("toni", "wrong-password")
+	resp, err = http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+
+	// make an authenticated request to the protected route
+	// assert that the status code is 418
+	req, err = http.NewRequest(http.MethodGet, fmt.Sprintf("http://%s/custom/with/middleware", address), nil)
+	require.Nil(t, err)
+	req.SetBasicAuth("toni", "hunter2")
+	resp, err = http.DefaultClient.Do(req)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusTeapot, resp.StatusCode)
 }
