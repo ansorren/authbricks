@@ -141,6 +141,15 @@ func sanitiseEndpoint(endpoint string, baseURL string) string {
 	return endpoint
 }
 
+// removeTrailingSlashes recursively removes trailing slashes from a string.
+func removeTrailingSlashes(s string) string {
+	if strings.HasSuffix(s, "/") {
+		trimmed := strings.TrimSuffix(s, "/")
+		return removeTrailingSlashes(trimmed)
+	}
+	return s
+}
+
 // sessionIsExpired checks if the given session is expired based on the given current time and duration.
 func sessionIsExpired(session *ent.Session, duration time.Duration, now time.Time) bool {
 	// Convert the CreatedAt field from int64

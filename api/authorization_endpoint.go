@@ -23,6 +23,11 @@ const (
 	SessionAuthenticate           = "authenticate"
 )
 
+var (
+	supportedResponseTypes = []string{ResponseTypeAuthorizationCode, ResponseTypeIDToken, ResponseTypeCodeIDToken}
+	supportedResponseModes = []string{ResponseModeFragment, ResponseModeQuery}
+)
+
 // allowedCodeChallengeMethods is the list of allowed code challenge methods.
 var allowedCodeChallengeMethods = []string{PKCECodeChallengeMethodPlain, PKCECodeChallengeMethodS256}
 

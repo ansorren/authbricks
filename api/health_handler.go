@@ -19,4 +19,3 @@ func (a *API) HealthHandler() func(echo.Context) error {
 		})
 	}
 }
-

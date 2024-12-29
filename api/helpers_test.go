@@ -258,3 +258,36 @@ func TestSessionIsExpired(t *testing.T) {
 		})
 	}
 }
+
+func TestAPI_removeTrailingSlashes(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "No trailing slashes",
+			input:    "http://example.com/api/v1/resource",
+			expected: "http://example.com/api/v1/resource",
+		},
+		{
+			name:     "One trailing slash",
+			input:    "http://example.com/api/v1/resource/",
+			expected: "http://example.com/api/v1/resource",
+		},
+		{
+			name:     "Multiple trailing slashes",
+			input:    "http://example.com/api/v1/resource///",
+			expected: "http://example.com/api/v1/resource",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := removeTrailingSlashes(tt.input)
+			if actual != tt.expected {
+				t.Errorf("removeTrailingSlashes(%q) = %q; expected %q", tt.input, actual, tt.expected)
+			}
+		})
+	}
+}
