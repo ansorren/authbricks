@@ -291,3 +291,36 @@ func TestAPI_removeTrailingSlashes(t *testing.T) {
 		})
 	}
 }
+
+func TestAPI_removeLeadingSlashes(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "No leading slashes",
+			input:    "http://example.com/api/v1/resource",
+			expected: "http://example.com/api/v1/resource",
+		},
+		{
+			name:     "One leading slash",
+			input:    "/api/v1/resource",
+			expected: "api/v1/resource",
+		},
+		{
+			name:     "Multiple leading slashes",
+			input:    "///api/v1/resource",
+			expected: "api/v1/resource",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := removeLeadingSlashes(tt.input)
+			if actual != tt.expected {
+				t.Errorf("removeLeadingSlashes(%q) = %q; expected %q", tt.input, actual, tt.expected)
+			}
+		})
+	}
+}
