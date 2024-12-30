@@ -150,6 +150,11 @@ func removeTrailingSlashes(s string) string {
 	return s
 }
 
+// removeTrailingSlashes removes the trailing slashes from the given string.
+func removeLeadingSlashes(s string) string {
+	return strings.TrimLeft(s, "/")
+}
+
 // sessionIsExpired checks if the given session is expired based on the given current time and duration.
 func sessionIsExpired(session *ent.Session, duration time.Duration, now time.Time) bool {
 	// Convert the CreatedAt field from int64

@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"go.authbricks.com/bricks/ent"
 
@@ -127,9 +126,4 @@ func (a *API) WellKnownHandler(service *ent.Service) func(echo.Context) error {
 
 		return c.JSON(http.StatusOK, response)
 	}
-}
-
-// removeTrailingSlashes removes the trailing slashes from the given string.
-func removeLeadingSlashes(s string) string {
-	return strings.TrimLeft(s, "/")
 }
