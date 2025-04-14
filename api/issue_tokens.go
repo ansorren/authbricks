@@ -100,7 +100,7 @@ func (a *API) issueTokens(ctx context.Context, payload TokenPayload, grantedScop
 		AuthTime:    authTime,
 	}
 
-	accessTokenResponse, err := a.issueAccessToken(accessTokenOpts)
+	accessTokenResponse, err := a.issueAccessToken(ctx, accessTokenOpts)
 	if err != nil {
 		msg := "server error: cannot issue access token"
 		a.Logger.Error(msg, "error", ErrServerError, "error_details", err.Error(), "service", service.Name, "op", op)
@@ -108,7 +108,7 @@ func (a *API) issueTokens(ctx context.Context, payload TokenPayload, grantedScop
 	}
 
 	// if we can issue an ID token, we create it here and return it in the response
-	if canIssueIDToken(grantedScopes) {
+	if canIssueIDToken(grantedScopes, payload.GrantType) {
 		opts := idTokenOptions{
 			Scopes:      grantedScopes,
 			Service:     service,
@@ -129,7 +129,7 @@ func (a *API) issueTokens(ctx context.Context, payload TokenPayload, grantedScop
 	}
 
 	// If we can issue a refresh token, we create it here and return it in the response
-	if canIssueRefreshToken(grantedScopes) {
+	if canIssueRefreshToken(grantedScopes, payload.GrantType) {
 		opts := refreshTokenOptions{
 			ID:            uuid.New().String(),
 			Application:   application,

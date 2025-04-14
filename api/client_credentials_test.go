@@ -94,9 +94,9 @@ func clientCredentialsTokenSuccessfulResponse(t *testing.T, req *http.Request, t
 }
 
 // getCredentials is an helper function to retrieve the credentials for the given application.
-func getCredentials(t *testing.T, api TestAPI, application string) *ent.Credentials {
+func getCredentials(t *testing.T, api *API, application string) *ent.Credentials {
 	t.Helper()
-	c := client.New(api.API.DB)
+	c := client.New(api.DB)
 	creds, err := c.GetCredentialsByApplication(context.Background(), application)
 	require.Nil(t, err)
 	require.NotEmpty(t, creds)
@@ -120,7 +120,7 @@ func TestAPI_ClientCredentialsTokenSuccess(t *testing.T) {
 	tokenEndpoint := fmt.Sprintf("http://%s/m2m/oauth2/token", testAPI.Address)
 	keySetEndpoint := fmt.Sprintf("http://%s/m2m/oauth2/jwks", testAPI.Address)
 
-	notificationsCredentials := getCredentials(t, testAPI, "notifications")
+	notificationsCredentials := getCredentials(t, testAPI.API, "notifications")
 	m2mKeySet := getKeySet(t, keySetEndpoint)
 
 	aud := fmt.Sprintf("http://%s/m2m/", testAPI.Address)
@@ -180,9 +180,9 @@ func TestAPI_ClientCredentialsTokenError(t *testing.T) {
 	a.Run(t)
 
 	tokenEndpoint := fmt.Sprintf("http://%s/m2m/oauth2/token", a.Address)
-	creds := getCredentials(t, a, "notifications")
+	creds := getCredentials(t, a.API, "notifications")
 	require.NotEmpty(t, creds)
-	wrongGrants := getCredentials(t, a, "helpdesk-application")
+	wrongGrants := getCredentials(t, a.API, "helpdesk-application")
 
 	aud := fmt.Sprintf("http://%s/m2m/", a.Address)
 	testCases := []clientCredentialsTokenErrorTestCase{
@@ -278,10 +278,10 @@ func TestAPI_ClientCredentials_AuthenticationMethods(t *testing.T) {
 	a.Run(t)
 
 	tokenEndpoint := fmt.Sprintf("http://%s/m2m/oauth2/token", a.Address)
-	clientSecretPostCreds := getCredentials(t, a, "only-client-secret-post")
+	clientSecretPostCreds := getCredentials(t, a.API, "only-client-secret-post")
 	require.NotEmpty(t, clientSecretPostCreds)
 
-	clientSecretBasicCreds := getCredentials(t, a, "only-client-secret-basic")
+	clientSecretBasicCreds := getCredentials(t, a.API, "only-client-secret-basic")
 	require.NotEmpty(t, clientSecretBasicCreds)
 
 	testCases := []struct {

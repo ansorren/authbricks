@@ -15,7 +15,7 @@ import (
 
 func newTestAuthorizationPayload(t *testing.T, testAPI TestAPI) *ent.AuthorizationPayload {
 	t.Helper()
-	creds := getCredentials(t, testAPI, "login-application")
+	creds := getCredentials(t, testAPI.API, "login-application")
 
 	state, err := generateRandomState()
 	require.Nil(t, err)
