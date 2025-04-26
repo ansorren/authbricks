@@ -18,10 +18,43 @@ At the moment it implements the following RFCs (planning to get to full OIDC com
 - [x] PKCE Support (RFC 7636)
 - [x] JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens (RFC 9068)
 
-
-
 # Get Started 
 
+## Basic Setup
+
+First, you need to set up the database and API server. Then you can use the client to manage your services and applications.
+
+```go
+package main
+
+import (
+	"context"
+	
+	"go.authbricks.com/bricks/api"
+	"go.authbricks.com/bricks/client"
+	"go.authbricks.com/bricks/database"
+)
+
+func main() {
+	// 1. Create database connection
+	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	if err != nil {
+		panic(err)
+	}
+	
+	// 2. Create API server
+	a, err := api.New(db)
+	if err != nil {
+		panic(err)
+	}
+	
+	// 3. Create client
+	c := client.New(db)
+	
+	// Now you can use the client to manage your services and applications
+	// See the Services section for examples
+}
+```
 
 ## Postgres 
 
@@ -32,29 +65,25 @@ package main
 
 import (
 	"context"
-    
-    "go.authbricks.com/bricks/api"
+	
+	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/database"
 )
 
 func main() {
 	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
-    if err != nil {
-        panic(err)
-    }
-    
-    a, err := api.New(db)
-    if err != nil {
-        panic(err)
-    }
-    
+	if err != nil {
+		panic(err)
+	}
+	
+	a, err := api.New(db)
+	if err != nil {
+		panic(err)
+	}
+	
 	a.ListenAndServe(":8080")
 }
 ```
-
-
-
-
 
 ## MySQL
 
@@ -64,24 +93,24 @@ Connect to a local MySQL database, and start the API server on port 8080.
 package main
 
 import (
-    "context"
-    
-    "go.authbricks.com/bricks/api"
-    "go.authbricks.com/bricks/database"
+	"context"
+	
+	"go.authbricks.com/bricks/api"
+	"go.authbricks.com/bricks/database"
 )
 
 func main() {
-    db, err := database.NewMySQL(context.Background(), "user:password@tcp(localhost:3306)/db")
-    if err != nil {
-        panic(err)
-    }
-    
-    a, err := api.New(db)
-    if err != nil {
-        panic(err)
-    }
-    
-    a.ListenAndServe(":8080")
+	db, err := database.NewMySQL(context.Background(), "user:password@tcp(localhost:3306)/db")
+	if err != nil {
+		panic(err)
+	}
+	
+	a, err := api.New(db)
+	if err != nil {
+		panic(err)
+	}
+	
+	a.ListenAndServe(":8080")
 }
 ```
 
@@ -93,23 +122,23 @@ Connect to a SQLite database, and start the API server on port 8080.
 package main 
 
 import (
-    "context"
-    
-    "go.authbricks.com/bricks/api"
-    "go.authbricks.com/bricks/database"
+	"context"
+	
+	"go.authbricks.com/bricks/api"
+	"go.authbricks.com/bricks/database"
 )
 
 func main() {
-    db, err := database.NewSQLite(context.Background(), "file:file.db?_fk=1")
-    if err != nil {
-        panic(err)
-    }
-    
-    a, err := api.New(db)
-    if err != nil {
-        panic(err)
-    }
-    
-    a.ListenAndServe(":8080")
+	db, err := database.NewSQLite(context.Background(), "file:file.db?_fk=1")
+	if err != nil {
+		panic(err)
+	}
+	
+	a, err := api.New(db)
+	if err != nil {
+		panic(err)
+	}
+	
+	a.ListenAndServe(":8080")
 }
 ```
