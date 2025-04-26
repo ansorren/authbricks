@@ -30,19 +30,19 @@ func TestAPI_AuthorizationCodeTokenFlow_Error(t *testing.T) {
 	defer cancel(t)
 	a.Run(t)
 
-	creds := getCredentials(t, a, "login-application")
+	creds := getCredentials(t, a.API, "login-application")
 	require.NotEmpty(t, creds)
 
-	publicCreds := getCredentials(t, a, "public-client")
+	publicCreds := getCredentials(t, a.API, "public-client")
 	require.NotEmpty(t, publicCreds)
 
-	s256Required := getCredentials(t, a, "s256-required")
+	s256Required := getCredentials(t, a.API, "s256-required")
 	require.NotEmpty(t, s256Required)
 
-	employeesLoginAppCreds := getCredentials(t, a, "employees-login-application")
+	employeesLoginAppCreds := getCredentials(t, a.API, "employees-login-application")
 	require.NotEmpty(t, employeesLoginAppCreds)
 
-	helpdeskAppCreds := getCredentials(t, a, "helpdesk-application")
+	helpdeskAppCreds := getCredentials(t, a.API, "helpdesk-application")
 	require.NotEmpty(t, helpdeskAppCreds)
 
 	// vars for PKCE testing
@@ -544,7 +544,7 @@ func TestAPI_AuthorizationCodeTokenFlow_Success(t *testing.T) {
 	defer cancel(t)
 	a.Run(t)
 
-	creds := getCredentials(t, a, "login-application")
+	creds := getCredentials(t, a.API, "login-application")
 	require.NotEmpty(t, creds)
 
 	oneMinuteAgo := time.Now().Add(-1 * time.Minute)

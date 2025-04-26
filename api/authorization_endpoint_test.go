@@ -29,7 +29,7 @@ func TestAPI_AuthorizationHandler_Redirect(t *testing.T) {
 	require.Nil(t, err)
 	fmt.Println("state", state)
 
-	creds := getCredentials(t, testAPI, "login-application")
+	creds := getCredentials(t, testAPI.API, "login-application")
 
 	tokenEndpoint := fmt.Sprintf("http://%s/oauth2/token", testAPI.Address)
 	authEndpoint := fmt.Sprintf("http://%s/oauth2/authorize", testAPI.Address)
@@ -95,10 +95,10 @@ func TestAPI_AuthorizationHandler_Error(t *testing.T) {
 	})
 	require.Nil(t, err)
 	require.NotNil(t, u)
-	credentials := getCredentials(t, testAPI, "test-application")
+	credentials := getCredentials(t, testAPI.API, "test-application")
 	fmt.Println("credentials", credentials)
 
-	publicClientCredentials := getCredentials(t, testAPI, "public-client")
+	publicClientCredentials := getCredentials(t, testAPI.API, "public-client")
 	fmt.Println("publicClient", publicClientCredentials)
 
 	codeVerifier, err := GeneratePKCECodeVerifier()
@@ -276,12 +276,12 @@ func TestAPI_AuthorizationHandler_Success(t *testing.T) {
 
 	// customer endpoint and credentials who don't need PKCE
 	customerEndpoint := fmt.Sprintf("http://%s/customers/oauth2/authorize", testAPI.Address)
-	credentials := getCredentials(t, testAPI, "login-application")
+	credentials := getCredentials(t, testAPI.API, "login-application")
 	fmt.Println("credentials", credentials)
 
 	// public client endpoint and credentials who need PKCE
 	endpoint := fmt.Sprintf("http://%s/oauth2/authorize", testAPI.Address)
-	publicClientCredentials := getCredentials(t, testAPI, "public-client")
+	publicClientCredentials := getCredentials(t, testAPI.API, "public-client")
 	fmt.Println("publicClient", publicClientCredentials)
 
 	codeVerifier, err := GeneratePKCECodeVerifier()

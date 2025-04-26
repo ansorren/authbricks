@@ -22,7 +22,11 @@ const (
 )
 
 // canIssueIDToken returns true if the client is allowed to request an ID token.
-func canIssueIDToken(scopes string) bool {
+func canIssueIDToken(scopes string, grantType string) bool {
+	if grantType == GrantTypeClientCredentials {
+		return false
+	}
+
 	s := strings.Split(scopes, " ")
 	if contains(s, ScopeOpenID) {
 		return true

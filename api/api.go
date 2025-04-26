@@ -45,6 +45,9 @@ type API struct {
 	Key                 []byte
 	CertificateFilePath string
 	KeyFilePath         string
+
+	AccessTokenActions []Action
+	IDTokenActions     []Action
 }
 
 // Option is used to configure the API.
@@ -101,6 +104,18 @@ func WithKeyFilePath(keyFilePath string) Option {
 func WithRoutes(routes []Route) Option {
 	return func(a *API) {
 		a.Routes = routes
+	}
+}
+
+func WithAccessTokenActions(actions []Action) Option {
+	return func(a *API) {
+		a.AccessTokenActions = actions
+	}
+}
+
+func WithIDTokenActions(actions []Action) Option {
+	return func(a *API) {
+		a.IDTokenActions = actions
 	}
 }
 

@@ -64,7 +64,7 @@ func (a *API) RefreshTokenFlow(c echo.Context, payload TokenPayload, service *en
 		})
 	}
 
-	if !canIssueRefreshToken(grantedScopes) {
+	if !canIssueRefreshToken(grantedScopes, payload.GrantType) {
 		msg := fmt.Sprintf("invalid grant: cannot issue refresh token")
 		a.Logger.Error(msg, "error", ErrInvalidGrant, "service", service.Name, "op", op)
 		return c.JSON(http.StatusBadRequest, TokenErrorResponse{

@@ -41,10 +41,10 @@ func TestAPI_RefreshToken(t *testing.T) {
 	a.Run(t)
 
 	tokenEndpoint := fmt.Sprintf("http://%s/customers/oauth2/token", a.API.Address)
-	creds := getCredentials(t, a, "login-application")
+	creds := getCredentials(t, a.API, "login-application")
 	require.NotEmpty(t, creds)
 
-	notificationCreds := getCredentials(t, a, "notifications")
+	notificationCreds := getCredentials(t, a.API, "notifications")
 	require.NotEmpty(t, notificationCreds)
 
 	loginApplication, err := a.API.DB.EntClient.Application.Query().Where(application.Name("login-application")).Only(context.Background())

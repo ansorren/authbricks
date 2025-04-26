@@ -20,9 +20,13 @@ const (
 )
 
 // canIssueRefreshToken returns true if the client is allowed to request a refresh token.
-func canIssueRefreshToken(scopes string) bool {
+func canIssueRefreshToken(scopes string, grantType string) bool {
+	if grantType == GrantTypeClientCredentials {
+		return false
+	}
+
 	s := strings.Split(scopes, " ")
-	if contains(s, ScopeOfflineAccess) {
+	if !contains(s, ScopeOfflineAccess) {
 		return true
 	}
 	return false

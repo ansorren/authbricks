@@ -59,7 +59,7 @@ func TestAPI_PostLogin_EmailPass(t *testing.T) {
 	})
 	require.Nil(t, err)
 	require.NotNil(t, u)
-	credentials := getCredentials(t, testAPI, "test-application")
+	credentials := getCredentials(t, testAPI.API, "test-application")
 
 	cfg := oauth2.Config{
 		ClientID:     credentials.ClientID,

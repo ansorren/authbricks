@@ -13,7 +13,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"gopkg.in/go-jose/go-jose.v2/jwt"
 )
 
 const (
@@ -146,28 +145,21 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 
 	jwtID := uuid.New().String()
 	now := time.Now()
-	// FIXME: this should be configurable
-	expiry := now.Add(DefaultAccessTokenLifetime)
-	expiresIn := int(expiry.Sub(now).Seconds())
-	claims := jwt.Claims{
-		Issuer:    service.Issuer,
-		Subject:   jwtID,
-		Audience:  []string{service.Issuer},
-		Expiry:    jwt.NewNumericDate(expiry),
-		NotBefore: jwt.NewNumericDate(now),
-		IssuedAt:  jwt.NewNumericDate(now),
-		ID:        jwtID,
-	}
-	cc := accessTokenCustomClaims{
-		AuthTime:        jwt.NewNumericDate(now),
-		ClientID:        payload.ClientID,
-		Scope:           grantedScopes,
-		AuthorizedParty: fmt.Sprintf("%s@clients", payload.ClientID),
-	}
-	token, err := abcrypto.SignAccessToken(privKey, claims, cc, keyID)
+
+	t, err := a.issueTokens(c.Request().Context(), payload, grantedScopes, app, service, privKey, keyID, "", jwtID, now)
 	if err != nil {
-		msg := "server error: cannot sign token"
-		a.Logger.Error(msg, "error", ErrServerError, "error_details", err.Error(), "service", service.Name, "op", op)
+		msg := "server error: cannot issue token"
+		a.Logger.Error(msg, "error", err, "service", service.Name, "op", op)
+		return c.JSON(http.StatusInternalServerError, TokenErrorResponse{
+			Error:            ErrServerError,
+			ErrorDescription: msg,
+		})
+	}
+
+	resp, err := t.toSuccessResponse()
+	if err != nil {
+		msg := "server error: cannot create response"
+		a.Logger.Error(msg, "error", err, "service", service.Name, "op", op)
 		return c.JSON(http.StatusInternalServerError, TokenErrorResponse{
 			Error:            ErrServerError,
 			ErrorDescription: msg,
@@ -177,12 +169,7 @@ func (a *API) ClientCredentialsTokenFlow(c echo.Context, payload TokenPayload, s
 	// headers required by RFC6749
 	c.Response().Header().Set(echo.HeaderCacheControl, "no-store")
 	c.Response().Header().Set("Pragma", "no-cache")
-	return c.JSON(http.StatusOK, TokenSuccessResponse{
-		AccessToken: token,
-		Scope:       grantedScopes,
-		ExpiresIn:   expiresIn,
-		TokenType:   TokenTypeBearer,
-	})
+	return c.JSON(http.StatusOK, resp)
 }
 
 // lastPrivateKeyAndKeyID returns the last private key and its key ID associated with the given service.

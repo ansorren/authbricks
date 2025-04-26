@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"crypto"
 	"fmt"
 	"time"
@@ -33,10 +34,11 @@ type issueAccessTokenOptions struct {
 	KeyID       string
 	Subject     string
 	AuthTime    time.Time
+	GrantType   string
 }
 
 // issueAccessToken creates a new access token.
-func (a *API) issueAccessToken(opts issueAccessTokenOptions) (*issueAccessTokenResponse, error) {
+func (a *API) issueAccessToken(ctx context.Context, opts issueAccessTokenOptions) (*issueAccessTokenResponse, error) {
 	op := "issueAccessToken"
 
 	now := time.Now()
@@ -55,14 +57,24 @@ func (a *API) issueAccessToken(opts issueAccessTokenOptions) (*issueAccessTokenR
 		ID:        id,
 	}
 
-	cc := accessTokenCustomClaims{
-		AuthTime:        jwt.NewNumericDate(opts.AuthTime),
-		ClientID:        opts.Payload.ClientID,
-		Scope:           opts.Scopes,
-		AuthorizedParty: fmt.Sprintf("%s@clients", opts.Payload.ClientID),
+	customClaims := map[string]any{
+		"auth_time": jwt.NewNumericDate(opts.AuthTime),
+		"client_id": opts.Payload.ClientID,
+		"scope":     opts.Scopes,
+		"azp":       fmt.Sprintf("%s@clients", opts.Payload.ClientID),
 	}
 
-	token, err := abcrypto.SignAccessToken(opts.PrivateKey, claims, cc, opts.KeyID)
+	for _, action := range a.AccessTokenActions {
+		var err error
+		customClaims, err = action.Execute(ctx, opts.Payload.GrantType, opts.Service.Name, opts.Application.Name, customClaims)
+		if err != nil {
+			msg := "server error: cannot execute access token action"
+			a.Logger.Error(msg, "error", ErrServerError, "error_details", err.Error(), "service", opts.Service.Name, "op", op)
+			return nil, errors.New(msg)
+		}
+	}
+
+	token, err := abcrypto.SignAccessToken(opts.PrivateKey, claims, customClaims, opts.KeyID)
 	if err != nil {
 		msg := "unable to sign access token"
 		a.Logger.Error(msg, "error", ErrServerError, "error_details", err.Error(), "subject", opts.Subject, "op", op)
