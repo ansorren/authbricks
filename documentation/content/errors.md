@@ -8,25 +8,25 @@ title: Errors
 
 <aside class="notice">This error section is stored in a separate file, errors.md. DocuAPI allows you to split the single page documentation in as many files as needed. Files are included in the  default Hugo page order . One way of ordering the pages is by setting the page `weight` in the front matter. Pages with lower weight will be listed first.</aside>
 
-The Kittn API uses the following error codes:
+The AuthBricks API uses the following error codes:
 
 ## 4xx
 
 Error Code | Meaning
 ---------- | -------
-400 | Bad Request -- Your request sucks
-401 | Unauthorized -- Your API key is wrong
-403 | Forbidden -- The kitten requested is hidden for administrators only
-404 | Not Found -- The specified kitten could not be found
-405 | Method Not Allowed -- You tried to access a kitten with an invalid method
-406 | Not Acceptable -- You requested a format that isn't json
-410 | Gone -- The kitten requested has been removed from our servers
-418 | I'm a teapot
-429 | Too Many Requests -- You're requesting too many kittens! Slow down!
+400 | Bad Request -- The request was malformed or contained invalid parameters
+401 | Unauthorized -- The request requires authentication
+403 | Forbidden -- The authenticated user does not have permission to access the requested resource
+404 | Not Found -- The requested resource could not be found
+405 | Method Not Allowed -- The HTTP method is not supported for the requested resource
+406 | Not Acceptable -- The requested response format is not supported
+409 | Conflict -- The request conflicts with the current state of the resource
+415 | Unsupported Media Type -- The request media type is not supported
+429 | Too Many Requests -- The request rate limit has been exceeded
 
 ## 5xx
 
 Error Code | Meaning
 ---------- | -------
-500 | Internal Server Error -- We had a problem with our server. Try again later.
-503 | Service Unavailable -- We're temporarily offline for maintenance. Please try again later.
+500 | Internal Server Error -- An unexpected error occurred on the server
+503 | Service Unavailable -- The service is temporarily unavailable
