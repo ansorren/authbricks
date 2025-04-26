@@ -56,6 +56,74 @@ func main() {
 }
 ```
 
+## Custom Routes
+
+You can add custom routes to the API server using the `WithRoutes` option. This allows you to extend the API with your own endpoints and middleware.
+
+```go
+package main
+
+import (
+	"context"
+	"net/http"
+	
+	"go.authbricks.com/bricks/api"
+	"go.authbricks.com/bricks/database"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+func main() {
+	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	if err != nil {
+		panic(err)
+	}
+	
+	// Define custom routes
+	routes := []api.Route{
+		{
+			Method: http.MethodGet,
+			Path:   "/custom",
+			Handler: echo.HandlerFunc(func(c echo.Context) error {
+				return c.JSON(http.StatusTeapot, "custom route")
+			}),
+			Middlewares: []echo.MiddlewareFunc{},
+		},
+		{
+			Method: http.MethodGet,
+			Path:   "/custom/with/middleware",
+			Handler: echo.HandlerFunc(func(c echo.Context) error {
+				return c.JSON(http.StatusTeapot, "custom route with middleware")
+			}),
+			Middlewares: []echo.MiddlewareFunc{
+				middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+					if username == "toni" && password == "hunter2" {
+						return true, nil
+					}
+					return false, nil
+				}),
+			},
+		},
+	}
+	
+	// Create API server with custom routes
+	a, err := api.New(db, ":8080",
+		api.WithRoutes(routes),
+	)
+	if err != nil {
+		panic(err)
+	}
+	
+	a.ListenAndServe()
+}
+```
+
+Each route can specify:
+- `Method`: The HTTP method (GET, POST, etc.)
+- `Path`: The URL path for the route
+- `Handler`: The Echo handler function that processes the request
+- `Middlewares`: Optional middleware functions to apply to the route
+
 ## Postgres 
 
 Connect to a local postgres database, and start the API server on port 8080.
