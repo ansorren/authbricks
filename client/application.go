@@ -62,3 +62,39 @@ func (c *Client) DeleteApplication(ctx context.Context, name string) error {
 
 	return c.DB.EntClient.Application.DeleteOne(app).Exec(ctx)
 }
+
+// UpdateApplication updates an application with the given name.
+func (c *Client) UpdateApplication(ctx context.Context, name string, cfg config.Application) (*ent.Application, error) {
+	app, err := c.GetApplication(ctx, name)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update application %s - not found", name)
+	}
+
+	if err := cfg.Validate(); err != nil {
+		return nil, errors.Wrapf(err, "cannot update application %s - invalid configuration", name)
+	}
+
+	svc, err := c.GetService(ctx, cfg.Service)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update application %s - unable to get service %s", name, cfg.Service)
+	}
+
+	app, err = c.DB.EntClient.Application.UpdateOne(app).
+		SetService(svc).
+		SetName(cfg.Name).
+		SetPublic(cfg.Public).
+		SetDescription(cfg.Description).
+		SetRedirectUris(cfg.RedirectURIs).
+		SetResponseTypes(cfg.ResponseTypes).
+		SetGrantTypes(cfg.GrantTypes).
+		SetScopes(cfg.Scopes).
+		SetPKCERequired(cfg.PKCERequired).
+		SetS256CodeChallengeMethodRequired(cfg.S256CodeChallengeMethodRequired).
+		SetAllowedAuthenticationMethods(cfg.AllowedAuthenticationMethods).
+		Save(ctx)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot update application %s", name)
+	}
+
+	return app, nil
+}
