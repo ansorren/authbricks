@@ -109,4 +109,61 @@ func TestApplication(t *testing.T) {
 	require.Nil(t, err)
 	require.NotNil(t, apps)
 	require.Len(t, apps, 0)
+
+	// Test UpdateApplication
+	updatedCfg := config.Application{
+		Name:          "updated-application",
+		Description:   "updated-description",
+		Service:       svc.Name,
+		Public:        true,
+		RedirectURIs:  []string{"https://example.com/oauth2/updated-callback"},
+		ResponseTypes: []string{config.ResponseTypeCode},
+		GrantTypes:    []string{config.GrantTypeAuthorizationCode, config.GrantTypeClientCredentials},
+		Scopes:        []string{"calendar:read", "calendar:write"},
+		PKCERequired:  true,
+	}
+
+	// Create an application to update
+	app, err = client.CreateApplication(context.Background(), cfg)
+	require.Nil(t, err)
+	require.NotNil(t, app)
+
+	// Update the application
+	updatedApp, err := client.UpdateApplication(context.Background(), cfg.Name, updatedCfg)
+	require.Nil(t, err)
+	require.NotNil(t, updatedApp)
+	require.Equal(t, updatedCfg.Name, updatedApp.Name)
+	require.Equal(t, updatedCfg.Description, updatedApp.Description)
+	require.Equal(t, updatedCfg.Public, updatedApp.Public)
+	require.Equal(t, updatedCfg.RedirectURIs, updatedApp.RedirectUris)
+	require.Equal(t, updatedCfg.ResponseTypes, updatedApp.ResponseTypes)
+	require.Equal(t, updatedCfg.GrantTypes, updatedApp.GrantTypes)
+	require.Equal(t, updatedCfg.Scopes, updatedApp.Scopes)
+	require.Equal(t, updatedCfg.PKCERequired, updatedApp.PKCERequired)
+
+	// Test updating non-existent application
+	_, err = client.UpdateApplication(context.Background(), "non-existent", updatedCfg)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "not found")
+
+	// Test updating with invalid configuration
+	invalidCfg := updatedCfg
+	invalidCfg.Name = "" // Empty name is invalid
+	_, err = client.UpdateApplication(context.Background(), updatedCfg.Name, invalidCfg)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "invalid configuration")
+
+	// Test updating with non-existent service
+	invalidServiceCfg := updatedCfg
+	invalidServiceCfg.Service = "non-existent-service"
+	_, err = client.UpdateApplication(context.Background(), updatedCfg.Name, invalidServiceCfg)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "unable to get service")
+
+	// Test updating public application without PKCE
+	invalidPKCECfg := updatedCfg
+	invalidPKCECfg.PKCERequired = false
+	_, err = client.UpdateApplication(context.Background(), updatedCfg.Name, invalidPKCECfg)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "public applications are required to use PKCE")
 }
