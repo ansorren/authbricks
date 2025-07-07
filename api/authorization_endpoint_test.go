@@ -31,8 +31,8 @@ func TestAPI_AuthorizationHandler_Redirect(t *testing.T) {
 
 	creds := getCredentials(t, testAPI.API, "login-application")
 
-	tokenEndpoint := fmt.Sprintf("http://%s/oauth2/token", testAPI.Address)
-	authEndpoint := fmt.Sprintf("http://%s/oauth2/authorize", testAPI.Address)
+	tokenEndpoint := fmt.Sprintf("http://%s/customers/oauth2/token", testAPI.Address)
+	authEndpoint := fmt.Sprintf("http://%s/customers/oauth2/authorize", testAPI.Address)
 	cfg := oauth2.Config{
 		ClientID:     creds.ClientID,
 		ClientSecret: creds.ClientSecret,
@@ -65,7 +65,7 @@ func TestAPI_AuthorizationHandler_Redirect(t *testing.T) {
 
 	// assert we are getting redirected to the login endpoint
 	// with the session ID as a query parameter
-	expectedLocationPrefix := fmt.Sprintf("http://%s/login?%s=", testAPI.Address, SessionIDQueryParameter)
+	expectedLocationPrefix := fmt.Sprintf("http://%s/customers/login?%s=", testAPI.Address, SessionIDQueryParameter)
 	require.True(t, strings.HasPrefix(location.String(), expectedLocationPrefix))
 
 	// assert the found session ID is a UUID

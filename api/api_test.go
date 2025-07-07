@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"net/http"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -321,8 +322,8 @@ func TestAPI_TLS_FilePath(t *testing.T) {
 	cert, key, err := rsaKey.Certificate(template)
 	require.Nil(t, err)
 
-	certFilePath := fmt.Sprintf("%s%s", os.TempDir(), "cert.pem")
-	keyFilePath := fmt.Sprintf("%s%s", os.TempDir(), "/key.pem")
+	certFilePath := filepath.Join(os.TempDir(), "cert.pem")
+	keyFilePath := filepath.Join(os.TempDir(), "key.pem")
 
 	writeFile(t, certFilePath, cert)
 	writeFile(t, keyFilePath, key)
