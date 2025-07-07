@@ -27,9 +27,9 @@ func canIssueRefreshToken(scopes string, grantType string) bool {
 
 	s := strings.Split(scopes, " ")
 	if !contains(s, ScopeOfflineAccess) {
-		return true
+		return false
 	}
-	return false
+	return true
 }
 
 // refreshTokenOptions holds the configuration required
