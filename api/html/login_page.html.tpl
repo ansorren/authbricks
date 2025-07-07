@@ -155,7 +155,10 @@ form.addEventListener('submit', async (e) => {
 
     let res = await submit();
     if (res && res.ok) {
-        window.location.assign(res.url);
+        const location = res.headers.get('Location');
+        if (location) {
+            window.location.assign(location);
+        }
     }
 });
 </script>
