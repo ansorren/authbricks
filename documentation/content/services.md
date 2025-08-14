@@ -23,18 +23,25 @@ import (
     "go.authbricks.com/bricks/api"
     "go.authbricks.com/bricks/client"
     "go.authbricks.com/bricks/config"
+    "go.authbricks.com/bricks/config/options/service"
     "go.authbricks.com/bricks/database"
+    "github.com/hashicorp/go-hclog"
 )
 
 func main() {
+    ctx := context.Background()
+    
     // 1. Create database connection
-    db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+    db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
     if err != nil {
         panic(err)
     }
     
-    // 2. Create API server
-    a, err := api.New(db)
+    // 2. Create API server with functional options
+    a, err := api.New(db, ":8080",
+        api.WithLogger(hclog.Default()),
+        api.WithBaseURL("https://api.example.com"),
+    )
     if err != nil {
         panic(err)
     }
@@ -48,46 +55,44 @@ func main() {
         panic(err)
     }
     
-    // 5. Create service configuration
-    serviceConfig := config.Service{
-        Name: "customers",
-        Identifier: "customers",
-        Description: "Service for authenticating customers",
-        ServiceMetadata: config.ServiceMetadata{
-            "version": "1.0.0",
-            "environment": "production",
-        },
-        AllowedClientMetadata: []string{"logo_uri", "client_uri", "policy_uri"},
-        Scopes: []string{"openid", "profile", "email", "read", "write"},
-        GrantTypes: []string{
+    // 5. Create service configuration using functional options
+    serviceConfig := service.New(
+        service.WithName("customers"),
+        service.WithIdentifier("customers"),
+        service.WithDescription("Service for authenticating customers"),
+        service.WithServiceMetadataEntry("version", "1.0.0"),
+        service.WithServiceMetadataEntry("environment", "production"),
+        service.WithAllowedClientMetadata("logo_uri", "client_uri", "policy_uri"),
+        service.WithScopes("openid", "profile", "email", "read", "write"),
+        service.WithGrantTypes(
             config.GrantTypeAuthorizationCode,
             config.GrantTypeClientCredentials,
             config.GrantTypeRefreshToken,
-        },
-        ResponseTypes: []string{
+        ),
+        service.WithResponseTypes(
             config.ResponseTypeCode,
             config.ResponseTypeIDToken,
             config.ResponseTypeCodeIDToken,
-        },
-        AuthorizationEndpoint: config.AuthorizationEndpoint{
+        ),
+        service.WithAuthorizationEndpoint(config.AuthorizationEndpoint{
             Enabled: true,
-        },
-        TokenEndpoint: config.TokenEndpoint{
+        }),
+        service.WithTokenEndpoint(config.TokenEndpoint{
             Enabled: true,
-        },
-        UserInfoEndpoint: config.UserInfoEndpoint{
+        }),
+        service.WithUserInfoEndpoint(config.UserInfoEndpoint{
             Enabled: true,
-        },
-        JWKSEndpoint: config.JWKSEndpoint{
+        }),
+        service.WithJWKSEndpoint(config.JWKSEndpoint{
             Enabled: true,
-        },
-        WellKnownEndpoint: config.WellKnownEndpoint{
+        }),
+        service.WithWellKnownEndpoint(config.WellKnownEndpoint{
             Enabled: true,
-        },
-        LoginEndpoint: config.LoginEndpoint{
+        }),
+        service.WithLoginEndpoint(config.LoginEndpoint{
             Enabled: true,
-        },
-        Connection: config.Connection{
+        }),
+        service.WithConnection(config.Connection{
             EmailPassword: &config.EmailPasswordConnection{
                 Enabled: true,
             },
@@ -111,9 +116,9 @@ func main() {
                     WellKnownEndpoint: "https://github.com/.well-known/openid-configuration",
                 },
             },
-        },
-        Keys: []crypto.PrivateKey{privateKey},
-    }
+        }),
+        service.WithKey(privateKey),
+    )
     
     // 6. Create service using the client
     svc, err := c.CreateOrUpdateService(context.Background(), serviceConfig)
@@ -122,7 +127,9 @@ func main() {
     }
     
     // 7. Start the API server
-    a.ListenAndServe(":8080")
+    if err := a.Run(ctx); err != nil {
+        panic(err)
+    }
 }
 ```
 
@@ -138,18 +145,25 @@ import (
     "go.authbricks.com/bricks/api"
     "go.authbricks.com/bricks/client"
     "go.authbricks.com/bricks/config"
+    "go.authbricks.com/bricks/config/options/application"
     "go.authbricks.com/bricks/database"
+    "github.com/hashicorp/go-hclog"
 )
 
 func main() {
+    ctx := context.Background()
+    
     // 1. Create database connection
-    db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+    db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
     if err != nil {
         panic(err)
     }
     
-    // 2. Create API server
-    a, err := api.New(db)
+    // 2. Create API server with functional options
+    a, err := api.New(db, ":8080",
+        api.WithLogger(hclog.Default()),
+        api.WithBaseURL("https://api.example.com"),
+    )
     if err != nil {
         panic(err)
     }
@@ -163,30 +177,30 @@ func main() {
         panic(err)
     }
     
-    // 5. Create application configuration
-    appConfig := config.Application{
-        Name: "myapp",
-        Service: "customers",
-        Description: "My OAuth2/OIDC Application",
-        Public: false,
-        RedirectURIs: []string{
+    // 5. Create application configuration using functional options
+    appConfig := application.New(
+        application.WithName("myapp"),
+        application.WithService("customers"),
+        application.WithDescription("My OAuth2/OIDC Application"),
+        application.WithPublic(false),
+        application.WithRedirectURIs(
             "http://localhost:8080/callback",
             "https://myapp.com/callback",
-        },
-        ResponseTypes: []string{
+        ),
+        application.WithResponseTypes(
             config.ResponseTypeCode,
             config.ResponseTypeIDToken,
             config.ResponseTypeCodeIDToken,
-        },
-        GrantTypes: []string{
+        ),
+        application.WithGrantTypes(
             config.GrantTypeAuthorizationCode,
             config.GrantTypeRefreshToken,
-        },
-        PKCERequired: true,
-        S256CodeChallengeMethodRequired: true,
-        AllowedAuthenticationMethods: []string{"client_secret_basic", "client_secret_post"},
-        Scopes: []string{"openid", "profile", "email", "read", "write"},
-    }
+        ),
+        application.WithPKCERequired(true),
+        application.WithS256CodeChallengeMethodRequired(true),
+        application.WithAllowedAuthenticationMethods("client_secret_basic", "client_secret_post"),
+        application.WithScopes("openid", "profile", "email", "read", "write"),
+    )
     
     // 6. Create application using the client
     app, err := c.CreateOrUpdateApplication(context.Background(), appConfig)
@@ -195,7 +209,9 @@ func main() {
     }
     
     // 7. Start the API server
-    a.ListenAndServe(":8080")
+    if err := a.Run(ctx); err != nil {
+        panic(err)
+    }
 }
 ```
 
@@ -212,19 +228,26 @@ import (
     "go.authbricks.com/bricks/api"
     "go.authbricks.com/bricks/client"
     "go.authbricks.com/bricks/config"
-    "go.authbricks.com/bricks/database"
+    "go.authbricks.com/bricks/config/options/credentials"
     "go.authbricks.com/bricks/crypto"
+    "go.authbricks.com/bricks/database"
+    "github.com/hashicorp/go-hclog"
 )
 
 func main() {
+    ctx := context.Background()
+    
     // 1. Create database connection
-    db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+    db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
     if err != nil {
         panic(err)
     }
     
-    // 2. Create API server
-    a, err := api.New(db)
+    // 2. Create API server with functional options
+    a, err := api.New(db, ":8080",
+        api.WithLogger(hclog.Default()),
+        api.WithBaseURL("https://api.example.com"),
+    )
     if err != nil {
         panic(err)
     }
@@ -238,11 +261,12 @@ func main() {
         panic(err)
     }
     
-    // 5. Create credentials configuration
-    credentialsConfig := config.Credentials{
-        ClientID: crypto.GenerateClientID(),
-        ClientSecret: crypto.GenerateClientSecret(),
-    }
+    // 5. Create credentials configuration using functional options
+    credentialsConfig := credentials.New(
+        credentials.WithApplication("myapp"),
+        credentials.WithClientID(crypto.GenerateClientID()),
+        credentials.WithClientSecret(crypto.GenerateClientSecret()),
+    )
     
     // 6. Create credentials using the client
     creds, err := c.CreateOrUpdateCredentials(context.Background(), credentialsConfig)
@@ -251,6 +275,8 @@ func main() {
     }
     
     // 7. Start the API server
-    a.ListenAndServe(":8080")
+    if err := a.Run(ctx); err != nil {
+        panic(err)
+    }
 }
 ```

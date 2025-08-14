@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// DefaultSessionTimeout is the default timeout for login sessions.
+const DefaultSessionTimeout = 24 * time.Hour
+
 type LoginEndpoint struct {
 	// Endpoint is the path of the login endpoint.
 	Endpoint string

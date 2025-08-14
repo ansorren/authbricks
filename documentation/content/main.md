@@ -33,23 +33,34 @@ import (
 	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/client"
 	"go.authbricks.com/bricks/database"
+	"github.com/hashicorp/go-hclog"
 )
 
 func main() {
+	ctx := context.Background()
+	
 	// 1. Create database connection
-	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
 	if err != nil {
 		panic(err)
 	}
 	
-	// 2. Create API server
-	a, err := api.New(db)
+	// 2. Create API server with functional options
+	a, err := api.New(db, ":8080",
+		api.WithLogger(hclog.Default()),
+		api.WithBaseURL("https://api.example.com"),
+	)
 	if err != nil {
 		panic(err)
 	}
 	
 	// 3. Create client
 	c := client.New(db)
+	
+	// 4. Run the API server
+	if err := a.Run(ctx); err != nil {
+		panic(err)
+	}
 	
 	// Now you can use the client to manage your services and applications
 	// See the Services section for examples
@@ -69,12 +80,15 @@ import (
 	
 	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/database"
+	"github.com/hashicorp/go-hclog"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	ctx := context.Background()
+	
+	db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
 	if err != nil {
 		panic(err)
 	}
@@ -106,15 +120,19 @@ func main() {
 		},
 	}
 	
-	// Create API server with custom routes
+	// Create API server with custom routes using functional options
 	a, err := api.New(db, ":8080",
 		api.WithRoutes(routes),
+		api.WithLogger(hclog.Default()),
+		api.WithBaseURL("https://api.example.com"),
 	)
 	if err != nil {
 		panic(err)
 	}
 	
-	a.ListenAndServe()
+	if err := a.Run(ctx); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -136,20 +154,28 @@ import (
 	
 	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/database"
+	"github.com/hashicorp/go-hclog"
 )
 
 func main() {
-	db, err := database.NewPostgres(context.Background(), "postgres://user:password@localhost:5432/db")
+	ctx := context.Background()
+	
+	db, err := database.NewPostgres(ctx, "postgres://user:password@localhost:5432/db")
 	if err != nil {
 		panic(err)
 	}
 	
-	a, err := api.New(db)
+	a, err := api.New(db, ":8080",
+		api.WithLogger(hclog.Default()),
+		api.WithBaseURL("https://api.example.com"),
+	)
 	if err != nil {
 		panic(err)
 	}
 	
-	a.ListenAndServe(":8080")
+	if err := a.Run(ctx); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -165,20 +191,28 @@ import (
 	
 	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/database"
+	"github.com/hashicorp/go-hclog"
 )
 
 func main() {
-	db, err := database.NewMySQL(context.Background(), "user:password@tcp(localhost:3306)/db")
+	ctx := context.Background()
+	
+	db, err := database.NewMySQL(ctx, "user:password@tcp(localhost:3306)/db")
 	if err != nil {
 		panic(err)
 	}
 	
-	a, err := api.New(db)
+	a, err := api.New(db, ":8080",
+		api.WithLogger(hclog.Default()),
+		api.WithBaseURL("https://api.example.com"),
+	)
 	if err != nil {
 		panic(err)
 	}
 	
-	a.ListenAndServe(":8080")
+	if err := a.Run(ctx); err != nil {
+		panic(err)
+	}
 }
 ```
 
@@ -194,19 +228,27 @@ import (
 	
 	"go.authbricks.com/bricks/api"
 	"go.authbricks.com/bricks/database"
+	"github.com/hashicorp/go-hclog"
 )
 
 func main() {
-	db, err := database.NewSQLite(context.Background(), "file:file.db?_fk=1")
+	ctx := context.Background()
+	
+	db, err := database.NewSQLite(ctx, "file:file.db?_fk=1")
 	if err != nil {
 		panic(err)
 	}
 	
-	a, err := api.New(db)
+	a, err := api.New(db, ":8080",
+		api.WithLogger(hclog.Default()),
+		api.WithBaseURL("https://api.example.com"),
+	)
 	if err != nil {
 		panic(err)
 	}
 	
-	a.ListenAndServe(":8080")
+	if err := a.Run(ctx); err != nil {
+		panic(err)
+	}
 }
 ```

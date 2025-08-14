@@ -7,6 +7,9 @@ import (
 	"time"
 
 	"go.authbricks.com/bricks/config"
+	"go.authbricks.com/bricks/config/options/application"
+	"go.authbricks.com/bricks/config/options/credentials"
+	"go.authbricks.com/bricks/config/options/service"
 	abcrypto "go.authbricks.com/bricks/crypto"
 
 	"github.com/stretchr/testify/require"
@@ -32,43 +35,36 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 	firstKey := privateKey(t)
 	secondKey := privateKey(t)
 
-	firstService := config.Service{
-		Name:        "test-service",
-		Identifier:  "test-identifier",
-		Description: "test-description",
-		ServiceMetadata: map[string]string{
-			"key": "value",
-		},
-		AllowedClientMetadata: []string{"key"},
-		Scopes:                []string{"openid"},
-		GrantTypes:            []string{config.GrantTypeAuthorizationCode, config.GrantTypeClientCredentials},
-		ResponseTypes:         []string{config.ResponseTypeCode},
-		AuthorizationEndpoint: config.AuthorizationEndpoint{
+	firstService := service.New("test-service",
+		service.WithIdentifier("test-identifier"),
+		service.WithDescription("test-description"),
+		service.WithGrantTypes(config.GrantTypeAuthorizationCode, config.GrantTypeClientCredentials),
+		service.WithAuthorizationEndpoint(config.AuthorizationEndpoint{
 			Endpoint:                        "/oauth2/authorize",
 			PKCERequired:                    true,
 			S256CodeChallengeMethodRequired: true,
-		},
-		IntrospectionEndpoint: config.IntrospectionEndpoint{
+		}),
+		service.WithIntrospectionEndpoint(config.IntrospectionEndpoint{
 			Endpoint: "/oauth2/introspect",
-		},
-		TokenEndpoint: config.TokenEndpoint{
+		}),
+		service.WithTokenEndpoint(config.TokenEndpoint{
 			Endpoint:                     "/oauth2/token",
 			AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		},
-		UserInfoEndpoint: config.UserInfoEndpoint{
+		}),
+		service.WithUserInfoEndpoint(config.UserInfoEndpoint{
 			Endpoint: "/oauth2/userinfo",
-		},
-		JWKSEndpoint: config.JWKSEndpoint{
+		}),
+		service.WithJWKSEndpoint(config.JWKSEndpoint{
 			Endpoint: "/oauth2/jwks",
-		},
-		WellKnownEndpoint: config.WellKnownEndpoint{
+		}),
+		service.WithWellKnownEndpoint(config.WellKnownEndpoint{
 			Endpoint: "/oauth2/.well-known/openid-configuration",
-		},
-		LoginEndpoint: config.LoginEndpoint{
+		}),
+		service.WithLoginEndpoint(config.LoginEndpoint{
 			Endpoint:       "/login",
 			SessionTimeout: 24 * time.Hour,
-		},
-		Connection: config.Connection{
+		}),
+		service.WithConnection(config.Connection{
 			EmailPassword: &config.EmailPasswordConnection{
 				Enabled: true,
 			},
@@ -92,282 +88,239 @@ func NewTestConfig(t *testing.T, addr string) TestConfig {
 					WellKnownEndpoint: fmt.Sprintf("http://127.0.0.1:3001/oauth2/.well-known/openid-configuration"),
 				},
 			},
-		},
-		Keys: []crypto.PrivateKey{firstKey, secondKey},
-	}
+		}),
+		service.WithKeys(firstKey, secondKey),
+	)
 
-	testApp := config.Application{
-		Name:                         "test-application",
-		Description:                  "test-description",
-		Service:                      firstService.Name,
-		Public:                       false,
-		AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		RedirectURIs:                 []string{"http://localhost:8080/callback"},
-		ResponseTypes:                []string{config.ResponseTypeCode},
-		GrantTypes:                   []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
-		Scopes:                       []string{"openid"},
-		PKCERequired:                 true,
-	}
+	testApp := application.New("test-application",
+		application.WithDescription("test-description"),
+		application.WithService(firstService.Name),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+		application.WithRedirectURIs("http://localhost:8080/callback"),
+		application.WithGrantTypes(config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken),
+		application.WithScopes("openid"),
+		application.WithPKCERequired(true),
+	)
 
-	firstCredentials := config.Credentials{
-		Application:  testApp.Name,
-		ClientID:     "test-client-id",
-		ClientSecret: "test-client-secret",
-	}
+	firstCredentials := credentials.New(
+		credentials.WithApplication(testApp.Name),
+		credentials.WithClientID("test-client-id"),
+		credentials.WithClientSecret("test-client-secret"),
+	)
 
 	customersKey := privateKey(t)
-	customersService := config.Service{
-		Name:          "customers",
-		Identifier:    fmt.Sprintf("https://%s/customers", addr),
-		Scopes:        []string{"openid", "profile", "email", "offline_access", "customers:read"},
-		GrantTypes:    []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken, config.GrantTypeClientCredentials},
-		ResponseTypes: []string{config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeCodeIDToken},
-		AuthorizationEndpoint: config.AuthorizationEndpoint{
+	customersService := service.New("customers",
+		service.WithIdentifier(fmt.Sprintf("https://%s/customers", addr)),
+		service.WithScopes("openid", "profile", "email", "offline_access", "customers:read"),
+		service.WithGrantTypes(config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken, config.GrantTypeClientCredentials),
+		service.WithResponseTypes(config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeCodeIDToken),
+		service.WithAuthorizationEndpoint(config.AuthorizationEndpoint{
 			Endpoint: "customers/oauth2/authorize",
-		},
-		IntrospectionEndpoint: config.IntrospectionEndpoint{
+		}),
+		service.WithIntrospectionEndpoint(config.IntrospectionEndpoint{
 			Endpoint: "customers/oauth2/introspect",
-		},
-		TokenEndpoint: config.TokenEndpoint{
+		}),
+		service.WithTokenEndpoint(config.TokenEndpoint{
 			Endpoint:                     "customers/oauth2/token",
 			AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		},
-		UserInfoEndpoint: config.UserInfoEndpoint{
+		}),
+		service.WithUserInfoEndpoint(config.UserInfoEndpoint{
 			Endpoint: "customers/oauth2/userinfo",
-		},
-		JWKSEndpoint: config.JWKSEndpoint{
+		}),
+		service.WithJWKSEndpoint(config.JWKSEndpoint{
 			Endpoint: "customers/oauth2/jwks",
-		},
-		WellKnownEndpoint: config.WellKnownEndpoint{
+		}),
+		service.WithWellKnownEndpoint(config.WellKnownEndpoint{
 			Endpoint: "customers/oauth2/.well-known/openid-configuration",
-		},
-		LoginEndpoint: config.LoginEndpoint{
+		}),
+		service.WithLoginEndpoint(config.LoginEndpoint{
 			Endpoint:       "customers/login",
 			SessionTimeout: 24 * time.Hour,
-		},
-		Keys: []crypto.PrivateKey{customersKey},
-	}
+		}),
+		service.WithKeys(customersKey),
+	)
 
-	loginApplication := config.Application{
-		Name:                            "login-application",
-		Description:                     "Login Application",
-		Service:                         customersService.Name,
-		Public:                          false,
-		RedirectURIs:                    []string{"http://localhost:8080/callback"},
-		ResponseTypes:                   []string{config.ResponseTypeCode, config.ResponseTypeIDToken},
-		GrantTypes:                      []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken},
-		Scopes:                          []string{"openid", "profile", "offline_access"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-	}
+	loginApplication := application.New("login-application",
+		application.WithDescription("Login Application"),
+		application.WithService(customersService.Name),
+		application.WithRedirectURIs("http://localhost:8080/callback"),
+		application.WithResponseTypes(config.ResponseTypeCode, config.ResponseTypeIDToken),
+		application.WithGrantTypes(config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken),
+		application.WithScopes("openid", "profile", "offline_access"),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+	)
 
-	loginApplicationCredentials := config.Credentials{
-		Application:  loginApplication.Name,
-		ClientID:     "login-client-id",
-		ClientSecret: "login-client-secret",
-	}
+	loginApplicationCredentials := credentials.New(
+		credentials.WithApplication(loginApplication.Name),
+		credentials.WithClientID("login-client-id"),
+		credentials.WithClientSecret("login-client-secret"),
+	)
 
-	publicApplication := config.Application{
-		Name:                            "public-client",
-		Description:                     "Public Client",
-		Public:                          true,
-		Service:                         customersService.Name,
-		RedirectURIs:                    []string{"http://localhost:8080/callback"},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		GrantTypes:                      []string{config.GrantTypeAuthorizationCode},
-		Scopes:                          []string{"openid", "profile", "offline_access"},
-		PKCERequired:                    true,
-		S256CodeChallengeMethodRequired: false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-	}
+	publicApplication := application.New("public-client",
+		application.WithDescription("Public Client"),
+		application.IsPublic(true),
+		application.WithService(customersService.Name),
+		application.WithRedirectURIs("http://localhost:8080/callback"),
+		application.WithGrantTypes(config.GrantTypeAuthorizationCode),
+		application.WithScopes("openid", "profile", "offline_access"),
+		application.WithPKCERequired(true),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+	)
 
-	publicCredentials := config.Credentials{
-		Application:  publicApplication.Name,
-		ClientID:     "publicApplication-client-id",
-		ClientSecret: "",
-	}
+	publicCredentials := credentials.New(
+		credentials.WithApplication(publicApplication.Name),
+		credentials.WithClientID("publicApplication-client-id"),
+	)
 
-	s256RequiredApplication := config.Application{
-		Name:                            "s256-required",
-		Description:                     "S256 Required",
-		Public:                          true,
-		Service:                         customersService.Name,
-		RedirectURIs:                    []string{"http://localhost:8080/callback"},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		GrantTypes:                      []string{config.GrantTypeAuthorizationCode},
-		Scopes:                          []string{"openid", "profile", "offline_access"},
-		PKCERequired:                    true,
-		S256CodeChallengeMethodRequired: true,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-	}
+	s256RequiredApplication := application.New("s256-required",
+		application.WithDescription("S256 Required"),
+		application.IsPublic(true),
+		application.WithService(customersService.Name),
+		application.WithRedirectURIs("http://localhost:8080/callback"),
+		application.WithGrantTypes(config.GrantTypeAuthorizationCode),
+		application.WithScopes("openid", "profile", "offline_access"),
+		application.WithPKCERequired(true),
+		application.S256CodeChallengeMethodRequired(true),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+	)
 
-	s256RequiredCredentials := config.Credentials{
-		Application:  s256RequiredApplication.Name,
-		ClientID:     "s256-required-client-id",
-		ClientSecret: "",
-	}
+	s256RequiredCredentials := credentials.New(
+		credentials.WithApplication(s256RequiredApplication.Name),
+		credentials.WithClientID("s256-required-client-id"),
+	)
 
-	helpdeskApplication := config.Application{
-		Name:                            "helpdesk-application",
-		Description:                     "Helpdesk Application",
-		Service:                         customersService.Name,
-		Public:                          false,
-		GrantTypes:                      []string{config.GrantTypeClientCredentials},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		Scopes:                          []string{"customers:read"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-	}
+	helpdeskApplication := application.New("helpdesk-application",
+		application.WithDescription("Helpdesk Application"),
+		application.WithService(customersService.Name),
+		application.WithGrantTypes(config.GrantTypeClientCredentials),
+		application.WithScopes("customers:read"),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+	)
 
-	helpdeskCredentials := config.Credentials{
-		Application:  helpdeskApplication.Name,
-		ClientID:     "helpdesk-client-id",
-		ClientSecret: "helpdesk-client-secret",
-	}
+	helpdeskCredentials := credentials.New(
+		credentials.WithApplication(helpdeskApplication.Name),
+		credentials.WithClientID("helpdesk-client-id"),
+		credentials.WithClientSecret("helpdesk-client-secret"),
+	)
 
 	employeesKey := privateKey(t)
-	employeesService := config.Service{
-		Name:          "employees",
-		Identifier:    fmt.Sprintf("https://%s/employees", addr),
-		Scopes:        []string{"openid", "profile", "email", "offline_access"},
-		GrantTypes:    []string{config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken, config.GrantTypeClientCredentials},
-		ResponseTypes: []string{config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeIDToken},
-		AuthorizationEndpoint: config.AuthorizationEndpoint{
+	employeesService := service.New("employees",
+		service.WithIdentifier(fmt.Sprintf("https://%s/employees", addr)),
+		service.WithScopes("openid", "profile", "email", "offline_access"),
+		service.WithGrantTypes(config.GrantTypeAuthorizationCode, config.GrantTypeRefreshToken, config.GrantTypeClientCredentials),
+		service.WithResponseTypes(config.ResponseTypeCode, config.ResponseTypeIDToken, config.ResponseTypeIDToken),
+		service.WithAuthorizationEndpoint(config.AuthorizationEndpoint{
 			Endpoint: "employees/oauth2/authorize",
-		},
-		IntrospectionEndpoint: config.IntrospectionEndpoint{
+		}),
+		service.WithIntrospectionEndpoint(config.IntrospectionEndpoint{
 			Endpoint: "employees/oauth2/introspect",
-		},
-		TokenEndpoint: config.TokenEndpoint{
+		}),
+		service.WithTokenEndpoint(config.TokenEndpoint{
 			Endpoint:                     "employees/oauth2/token",
 			AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		},
-		UserInfoEndpoint: config.UserInfoEndpoint{
+		}),
+		service.WithUserInfoEndpoint(config.UserInfoEndpoint{
 			Endpoint: "employees/oauth2/userinfo",
-		},
-		JWKSEndpoint: config.JWKSEndpoint{
+		}),
+		service.WithJWKSEndpoint(config.JWKSEndpoint{
 			Endpoint: "employees/oauth2/jwks",
-		},
-		WellKnownEndpoint: config.WellKnownEndpoint{
+		}),
+		service.WithWellKnownEndpoint(config.WellKnownEndpoint{
 			Endpoint: "employees/oauth2/.well-known/openid-configuration",
-		},
-		LoginEndpoint: config.LoginEndpoint{
+		}),
+		service.WithLoginEndpoint(config.LoginEndpoint{
 			Endpoint:       "employees/login",
 			SessionTimeout: 24 * time.Hour,
-		},
-		Keys: []crypto.PrivateKey{employeesKey},
-	}
+		}),
+		service.WithKeys(employeesKey),
+	)
 
-	employeesLoginApplication := config.Application{
-		Name:                            "employees-login-application",
-		Description:                     "Employees Login Application",
-		Service:                         employeesService.Name,
-		Public:                          false,
-		RedirectURIs:                    []string{"http://localhost:8080/callback"},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		GrantTypes:                      []string{config.GrantTypeAuthorizationCode},
-		Scopes:                          []string{"openid", "profile", "offline_access"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-	}
+	employeesLoginApplication := application.New("employees-login-application",
+		application.WithDescription("Employees Login Application"),
+		application.WithService(employeesService.Name),
+		application.WithRedirectURIs("http://localhost:8080/callback"),
+		application.WithGrantTypes(config.GrantTypeAuthorizationCode),
+		application.WithScopes("openid", "profile", "offline_access"),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+	)
 
-	employeesLoginApplicationCredentials := config.Credentials{
-		Application:  employeesLoginApplication.Name,
-		ClientID:     "employees-login-client-id",
-		ClientSecret: "employees-login-client-secret",
-	}
+	employeesLoginApplicationCredentials := credentials.New(
+		credentials.WithApplication(employeesLoginApplication.Name),
+		credentials.WithClientID("employees-login-client-id"),
+		credentials.WithClientSecret("employees-login-client-secret"),
+	)
 
 	m2mFirstKey := privateKey(t)
 	m2mSecondKey := privateKey(t)
-	m2mService := config.Service{
-		Name:          "m2m",
-		Identifier:    fmt.Sprintf("http://%s/m2m/", addr),
-		Description:   "Machine to Machine Service",
-		Scopes:        []string{"calendar:create", "calendar:read", "calendar:update", "calendar:delete"},
-		GrantTypes:    []string{config.GrantTypeClientCredentials},
-		ResponseTypes: []string{config.ResponseTypeCode},
-		AuthorizationEndpoint: config.AuthorizationEndpoint{
+	m2mService := service.New("m2m",
+		service.WithIdentifier(fmt.Sprintf("http://%s/m2m/", addr)),
+		service.WithDescription("Machine to Machine Service"),
+		service.WithScopes("calendar:create", "calendar:read", "calendar:update", "calendar:delete"),
+		service.WithGrantTypes(config.GrantTypeClientCredentials),
+		service.WithAuthorizationEndpoint(config.AuthorizationEndpoint{
 			Endpoint: "m2m/oauth2/authorize",
-		},
-		IntrospectionEndpoint: config.IntrospectionEndpoint{
+		}),
+		service.WithIntrospectionEndpoint(config.IntrospectionEndpoint{
 			Endpoint: "m2m/oauth2/introspect",
-		},
-		TokenEndpoint: config.TokenEndpoint{
+		}),
+		service.WithTokenEndpoint(config.TokenEndpoint{
 			Endpoint:                     "m2m/oauth2/token",
 			AllowedAuthenticationMethods: []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		},
-		UserInfoEndpoint: config.UserInfoEndpoint{
+		}),
+		service.WithUserInfoEndpoint(config.UserInfoEndpoint{
 			Endpoint: "m2m/oauth2/userinfo",
-		},
-		JWKSEndpoint: config.JWKSEndpoint{
+		}),
+		service.WithJWKSEndpoint(config.JWKSEndpoint{
 			Endpoint: "m2m/oauth2/jwks",
-		},
-		WellKnownEndpoint: config.WellKnownEndpoint{
+		}),
+		service.WithWellKnownEndpoint(config.WellKnownEndpoint{
 			Endpoint: "m2m/oauth2/.well-known/openid-configuration",
-		},
-		LoginEndpoint: config.LoginEndpoint{
+		}),
+		service.WithLoginEndpoint(config.LoginEndpoint{
 			Endpoint:       "m2m/login",
 			SessionTimeout: 24 * time.Hour,
-		},
-		Keys: []crypto.PrivateKey{m2mFirstKey, m2mSecondKey},
-	}
+		}),
+		service.WithKeys(m2mFirstKey, m2mSecondKey),
+	)
 
-	notificationsApplication := config.Application{
-		Name:                            "notifications",
-		Service:                         m2mService.Name,
-		Public:                          false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost},
-		GrantTypes:                      []string{config.GrantTypeClientCredentials},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		Scopes:                          []string{"calendar:read", "calendar:update"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-	}
+	notificationsApplication := application.New("notifications",
+		application.WithService(m2mService.Name),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic, config.AuthenticationMethodClientSecretPost),
+		application.WithGrantTypes(config.GrantTypeClientCredentials),
+		application.WithScopes("calendar:read", "calendar:update"),
+	)
 
-	notificationsCredentials := config.Credentials{
-		Application:  notificationsApplication.Name,
-		ClientID:     "notifications-client-id",
-		ClientSecret: "notifications-client-secret",
-	}
+	notificationsCredentials := credentials.New(
+		credentials.WithApplication(notificationsApplication.Name),
+		credentials.WithClientID("notifications-client-id"),
+		credentials.WithClientSecret("notifications-client-secret"),
+	)
 
-	onlyClientSecretBasic := config.Application{
-		Name:                            "only-client-secret-basic",
-		Service:                         m2mService.Name,
-		Public:                          false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretBasic},
-		GrantTypes:                      []string{config.GrantTypeClientCredentials},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		Scopes:                          []string{"calendar:read", "calendar:update"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-	}
+	onlyClientSecretBasic := application.New("only-client-secret-basic",
+		application.WithService(m2mService.Name),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretBasic),
+		application.WithGrantTypes(config.GrantTypeClientCredentials),
+		application.WithScopes("calendar:read", "calendar:update"),
+	)
 
-	onlyClientSecretBasicCredentials := config.Credentials{
-		Application:  onlyClientSecretBasic.Name,
-		ClientID:     "only-client-secret-basic-client-id",
-		ClientSecret: "only-client-secret-basic-client-secret",
-	}
+	onlyClientSecretBasicCredentials := credentials.New(
+		credentials.WithApplication(onlyClientSecretBasic.Name),
+		credentials.WithClientID("only-client-secret-basic-client-id"),
+		credentials.WithClientSecret("only-client-secret-basic-client-secret"),
+	)
 
-	onlyClientSecretPost := config.Application{
-		Name:                            "only-client-secret-post",
-		Service:                         m2mService.Name,
-		Public:                          false,
-		AllowedAuthenticationMethods:    []string{config.AuthenticationMethodClientSecretPost},
-		GrantTypes:                      []string{config.GrantTypeClientCredentials},
-		ResponseTypes:                   []string{config.ResponseTypeCode},
-		Scopes:                          []string{"calendar:read", "calendar:update"},
-		PKCERequired:                    false,
-		S256CodeChallengeMethodRequired: false,
-	}
+	onlyClientSecretPost := application.New("only-client-secret-post",
+		application.WithService(m2mService.Name),
+		application.WithAllowedAuthenticationMethods(config.AuthenticationMethodClientSecretPost),
+		application.WithGrantTypes(config.GrantTypeClientCredentials),
+		application.WithScopes("calendar:read", "calendar:update"),
+	)
 
-	onlyClientSecretPostCredentials := config.Credentials{
-		Application:  onlyClientSecretPost.Name,
-		ClientID:     "only-client-secret-post-client-id",
-		ClientSecret: "only-client-secret-post-client-secret",
-	}
+	onlyClientSecretPostCredentials := credentials.New(
+		credentials.WithApplication(onlyClientSecretPost.Name),
+		credentials.WithClientID("only-client-secret-post-client-id"),
+		credentials.WithClientSecret("only-client-secret-post-client-secret"),
+	)
 
 	return TestConfig{
 		Services:     []config.Service{firstService, customersService, employeesService, m2mService},
